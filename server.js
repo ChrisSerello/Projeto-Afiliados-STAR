@@ -1,8 +1,8 @@
-// server.js — migrado de SQLite para Supabase
+// server.js — Vercel-compatible (JWT cookies, sem sessão PostgreSQL)
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const session = require('express-session');
-const pgSession = require('connect-pg-simple')(session);
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const nodemailer = require('nodemailer');
@@ -13,6 +13,9 @@ const supabase = require('./db');
 require('dotenv').config();
 
 const app = express();
+const JWT_SECRET = process.env.SESSION_SECRET || 'secreto-sistema-afiliados';
+const IS_PROD = process.env.NODE_ENV === 'production';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 // ─── EMAIL ─────────────────────────────────────────────────────────────────
 
@@ -22,7 +25,7 @@ const transporter = nodemailer.createTransport(emailConfig);
 
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
         if (allowed.includes(file.mimetype)) cb(null, true);
@@ -98,48 +101,74 @@ async function enviarNotificacaoCliente(clienteData, afiliado) {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(session({
-    store: new pgSession({
-        conString: process.env.DATABASE_URL,
-        tableName: 'session'
-    }),
-    secret: process.env.SESSION_SECRET || 'secreto-sistema-afiliados',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 horas
-    }
-}));
-
+app.use(cookieParser());
 app.use('/assets', express.static(path.join(__dirname, 'public')));
+
+// ─── HELPERS JWT ────────────────────────────────────────────────────────────
+
+function criarTokenCookie(res, payload, cookieName) {
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+    res.cookie(cookieName, token, {
+        httpOnly: true,
+        secure: IS_PROD,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000
+    });
+}
 
 // ─── MIDDLEWARES DE AUTENTICAÇÃO ───────────────────────────────────────────
 
 function verificarAutenticacao(req, res, next) {
-    if (req.session.afiliadoId) return next();
-    if (req.originalUrl.startsWith('/api')) return res.status(401).json({ erro: 'Não autenticado' });
-    res.redirect('/login');
+    const token = req.cookies?.auth_token;
+    if (!token) {
+        if (req.originalUrl.startsWith('/api')) return res.status(401).json({ erro: 'Não autenticado' });
+        return res.redirect('/login');
+    }
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.afiliadoId = decoded.afiliadoId;
+        req.codigoAfiliado = decoded.codigoAfiliado;
+        next();
+    } catch {
+        res.clearCookie('auth_token');
+        if (req.originalUrl.startsWith('/api')) return res.status(401).json({ erro: 'Não autenticado' });
+        res.redirect('/login');
+    }
 }
 
 function verificarAdmin(req, res, next) {
-    if (req.session.adminEmail) {
+    const token = req.cookies?.admin_token;
+    if (!token) return res.redirect('/admin');
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
         const emailsAutorizados = ['christian.serello@starbank.tec.br', 'kaique.silva@starbank.tec.br'];
-        if (emailsAutorizados.includes(req.session.adminEmail)) return next();
-        req.session.destroy();
-        return res.redirect('/admin');
+        if (emailsAutorizados.includes(decoded.adminEmail)) {
+            req.adminEmail = decoded.adminEmail;
+            return next();
+        }
+        res.clearCookie('admin_token');
+        res.redirect('/admin');
+    } catch {
+        res.clearCookie('admin_token');
+        res.redirect('/admin');
     }
-    res.redirect('/admin');
+}
+
+// ─── HELPER PARA SERVIR HTML SEM CACHE ─────────────────────────────────────
+
+function serveHTML(res, filePath) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.sendFile(filePath);
 }
 
 // ─── ROTAS PÚBLICAS ────────────────────────────────────────────────────────
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/esqueci-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'esqueci-senha.html')));
-app.get('/redefinir-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'redefinir-senha.html')));
-app.get('/formulario-starbank', (req, res) => res.sendFile(path.join(__dirname, 'public', 'formulario-starbank.html')));
+app.get('/', (req, res) => serveHTML(res, path.join(__dirname, 'public', 'index.html')));
+app.get('/login', (req, res) => serveHTML(res, path.join(__dirname, 'public', 'login.html')));
+app.get('/esqueci-senha', (req, res) => serveHTML(res, path.join(__dirname, 'public', 'esqueci-senha.html')));
+app.get('/redefinir-senha', (req, res) => serveHTML(res, path.join(__dirname, 'public', 'redefinir-senha.html')));
+app.get('/formulario-starbank', (req, res) => serveHTML(res, path.join(__dirname, 'public', 'formulario-starbank.html')));
 
 // ─── AUTENTICAÇÃO ──────────────────────────────────────────────────────────
 
@@ -157,13 +186,12 @@ app.post('/login', async (req, res) => {
         const senhaCorreta = await bcrypt.compare(senha, afiliado.senha);
         if (!senhaCorreta) return res.status(401).json({ erro: 'Email ou senha incorretos' });
 
-        req.session.afiliadoId = afiliado.id;
-        req.session.codigoAfiliado = afiliado.codigo_afiliado;
+        criarTokenCookie(res, {
+            afiliadoId: afiliado.id,
+            codigoAfiliado: afiliado.codigo_afiliado
+        }, 'auth_token');
 
-        req.session.save((err) => {
-            if (err) return res.status(500).json({ erro: 'Erro ao salvar sessão' });
-            res.json({ sucesso: true, redirect: '/dashboard' });
-        });
+        res.json({ sucesso: true, redirect: '/dashboard' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ erro: 'Erro no servidor' });
@@ -171,7 +199,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    req.session.destroy();
+    res.clearCookie('auth_token');
     res.redirect('/login');
 });
 
@@ -188,7 +216,7 @@ app.post('/api/esqueci-senha', async (req, res) => {
             .eq('email', email)
             .single();
 
-        if (!afiliado) return res.json({ sucesso: true }); // Não revelar e-mails
+        if (!afiliado) return res.json({ sucesso: true });
 
         const token = uuidv4();
         const expiraEm = new Date(Date.now() + 60 * 60 * 1000).toISOString();
@@ -199,7 +227,7 @@ app.post('/api/esqueci-senha', async (req, res) => {
 
         if (insertError) return res.status(500).json({ erro: 'Erro ao gerar token' });
 
-        const linkReset = `${process.env.BASE_URL || 'http://localhost:3000'}/redefinir-senha?token=${token}`;
+        const linkReset = `${BASE_URL}/redefinir-senha?token=${token}`;
 
         try {
             await transporter.sendMail({
@@ -277,11 +305,11 @@ app.post('/api/redefinir-senha', async (req, res) => {
 // ─── DASHBOARD DO AFILIADO ─────────────────────────────────────────────────
 
 app.get('/dashboard', verificarAutenticacao, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+    serveHTML(res, path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 app.get('/api/dados-afiliado', verificarAutenticacao, async (req, res) => {
-    const afiliadoId = req.session.afiliadoId;
+    const afiliadoId = req.afiliadoId;
     try {
         const { data: afiliado } = await supabase
             .from('afiliados')
@@ -294,12 +322,10 @@ app.get('/api/dados-afiliado', verificarAutenticacao, async (req, res) => {
             .select('*', { count: 'exact', head: true })
             .eq('id_afiliado', afiliadoId);
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-
         res.json({
             afiliado,
             total_clientes: total_clientes || 0,
-            link_afiliado: `${baseUrl}/?afiliado=${afiliado.codigo_afiliado}`
+            link_afiliado: `${BASE_URL}/?afiliado=${afiliado.codigo_afiliado}`
         });
     } catch (err) {
         console.error(err);
@@ -308,7 +334,7 @@ app.get('/api/dados-afiliado', verificarAutenticacao, async (req, res) => {
 });
 
 app.get('/api/meus-clientes', verificarAutenticacao, async (req, res) => {
-    const afiliadoId = req.session.afiliadoId;
+    const afiliadoId = req.afiliadoId;
     try {
         const { data: rows, error } = await supabase
             .from('clientes')
@@ -325,7 +351,7 @@ app.get('/api/meus-clientes', verificarAutenticacao, async (req, res) => {
 });
 
 app.get('/api/cliente/:id', verificarAutenticacao, async (req, res) => {
-    const afiliadoId = req.session.afiliadoId;
+    const afiliadoId = req.afiliadoId;
     const clienteId = req.params.id;
     try {
         const { data: cliente, error } = await supabase
@@ -337,7 +363,6 @@ app.get('/api/cliente/:id', verificarAutenticacao, async (req, res) => {
 
         if (error || !cliente) return res.status(404).json({ erro: 'Cliente não encontrado' });
 
-        // Formata igual ao original (nome_afiliado, codigo_afiliado no mesmo objeto)
         const resposta = {
             ...cliente,
             nome_afiliado: cliente.afiliados?.nome,
@@ -353,7 +378,7 @@ app.get('/api/cliente/:id', verificarAutenticacao, async (req, res) => {
 });
 
 app.post('/api/gerar-link', verificarAutenticacao, async (req, res) => {
-    const afiliadoId = req.session.afiliadoId;
+    const afiliadoId = req.afiliadoId;
     const linkId = uuidv4().substring(0, 12);
     try {
         const { error } = await supabase
@@ -362,8 +387,7 @@ app.post('/api/gerar-link', verificarAutenticacao, async (req, res) => {
 
         if (error) throw error;
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-        res.json({ sucesso: true, link: `${baseUrl}/formulario?link=${linkId}`, link_id: linkId });
+        res.json({ sucesso: true, link: `${BASE_URL}/formulario?link=${linkId}`, link_id: linkId });
     } catch (err) {
         console.error(err);
         res.status(500).json({ erro: 'Erro ao gerar link' });
@@ -399,7 +423,6 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
             return res.status(400).json({ erro: 'Preencha todos os campos obrigatórios.' });
         }
 
-        // Upload do holerite para o Supabase Storage
         let holeriteUrl = null;
         if (req.file) {
             const ext = req.file.originalname.split('.').pop();
@@ -422,22 +445,13 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
         const { error: insertError } = await supabase
             .from('formularios_servidor')
             .insert({
-                codigo_afiliado,
-                nome_afiliado,
-                nome_completo,
-                cpf,
-                data_nascimento,
-                celular,
-                orgao,
-                tipo_vinculo,
-                objetivo,
-                bancos_atuais,
-                holerite_path: holeriteUrl
+                codigo_afiliado, nome_afiliado, nome_completo, cpf,
+                data_nascimento, celular, orgao, tipo_vinculo,
+                objetivo, bancos_atuais, holerite_path: holeriteUrl
             });
 
         if (insertError) throw insertError;
 
-        // Enviar e-mail de notificação
         try {
             const corpoEmail = `
                 <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -504,10 +518,10 @@ app.get('/api/admin/formularios', verificarAdmin, async (req, res) => {
     }
 });
 
-// ─── FORMULÁRIO DE CLIENTE (mantido por compatibilidade) ───────────────────
+// ─── FORMULÁRIO DE CLIENTE ──────────────────────────────────────────────────
 
 app.get('/formulario', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'formulario-cliente.html'));
+    serveHTML(res, path.join(__dirname, 'public', 'formulario-cliente.html'));
 });
 
 app.post('/api/cadastrar-cliente', async (req, res) => {
@@ -562,23 +576,24 @@ app.get('/obrigado', (req, res) => {
 
 // ─── ADMIN ─────────────────────────────────────────────────────────────────
 
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin-login.html')));
+app.get('/admin', (req, res) => serveHTML(res, path.join(__dirname, 'public', 'admin-login.html')));
 
 app.post('/admin/login', (req, res) => {
     const { email, senha } = req.body;
     const emailsAutorizados = ['christian.serello@starbank.tec.br', 'kaique.silva@starbank.tec.br'];
     if (!emailsAutorizados.includes(email)) return res.status(403).json({ erro: 'Não autorizado' });
     if (senha !== 'admin123') return res.status(401).json({ erro: 'Senha incorreta' });
-    req.session.adminEmail = email;
+
+    criarTokenCookie(res, { adminEmail: email }, 'admin_token');
     res.json({ sucesso: true, redirect: '/admin/dashboard' });
 });
 
 app.get('/admin/dashboard', verificarAdmin, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+    serveHTML(res, path.join(__dirname, 'public', 'admin.html'));
 });
 
 app.get('/admin/logout', (req, res) => {
-    req.session.destroy();
+    res.clearCookie('admin_token');
     res.redirect('/admin');
 });
 
@@ -618,7 +633,6 @@ app.get('/api/estatisticas', async (req, res) => {
 
         const mediaClientes = totalAfiliados > 0 ? totalClientes / totalAfiliados : 0;
 
-        // Top afiliado: busca todos e calcula pelo lado da aplicação
         const { data: afiliados } = await supabase
             .from('afiliados')
             .select('id, nome');
@@ -654,7 +668,6 @@ app.get('/api/afiliados', async (req, res) => {
 
         if (error) throw error;
 
-        // Adiciona total de clientes para cada afiliado
         const resultado = await Promise.all(afiliados.map(async (af) => {
             const { count } = await supabase
                 .from('clientes')
@@ -685,7 +698,6 @@ app.get('/api/admin/clientes', verificarAdmin, async (req, res) => {
         const { data: rows, error } = await query;
         if (error) throw error;
 
-        // Filtro de busca (feito no servidor pois Supabase não faz OR simples com ilike em query builder facilmente)
         let resultado = rows;
         if (busca) {
             const b = busca.toLowerCase();
@@ -696,7 +708,6 @@ app.get('/api/admin/clientes', verificarAdmin, async (req, res) => {
             );
         }
 
-        // Achata os dados do afiliado para o mesmo nível
         resultado = resultado.map(c => ({
             ...c,
             nome_afiliado: c.afiliados?.nome,
@@ -735,6 +746,5 @@ app.get('/api/admin/afiliados-filtro', verificarAdmin, async (req, res) => {
         res.status(500).json({ erro: 'Erro no servidor' });
     }
 });
-
 
 module.exports = app;
