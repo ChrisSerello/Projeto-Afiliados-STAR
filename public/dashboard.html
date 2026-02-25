@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarCard - Dashboard do Afiliado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --purple-deep: #0f0620;
+            --purple-dark: #1a0a2e;
+            --purple-mid: #6b21a8;
+            --purple-bright: #a855f7;
+            --purple-glow: #c084fc;
+            --accent: #e879f9;
+            --sidebar-w: 260px;
+            --white: #ffffff;
+            --white-dim: rgba(255,255,255,0.5);
+            --white-faint: rgba(255,255,255,0.06);
+            --card-bg: rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--purple-deep);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(168,85,247,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168,85,247,0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: rgba(255,255,255,0.03);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            left: 0; top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .sidebar-brand {
+            padding: 28px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .brand-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-user {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-avatar {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .user-name {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 2px;
+        }
+
+        .user-email {
+            font-size: 11px;
+            color: var(--white-dim);
+        }
+
+        .sidebar-nav {
+            padding: 16px 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.25);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 12px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--white-dim);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-item i { width: 16px; font-size: 13px; }
+
+        .nav-item:hover {
+            background: var(--white-faint);
+            color: var(--white);
+        }
+
+        .nav-item.active {
+            background: rgba(168,85,247,0.15);
+            border-color: rgba(168,85,247,0.25);
+            color: var(--purple-glow);
+        }
+
+        .nav-item.danger {
+            color: rgba(248,113,113,0.7);
+        }
+
+        .nav-item.danger:hover {
+            background: rgba(239,68,68,0.1);
+            color: #fca5a5;
+        }
+
+        .sidebar-bottom {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ─── MAIN ─── */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            padding: 32px 36px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--white-dim);
+        }
+
+        /* ─── STAT CARDS ─── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(168,85,247,0.3);
+            transform: translateY(-2px);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168,85,247,0.5), transparent);
+        }
+
+        .stat-icon-wrap {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: rgba(168,85,247,0.12);
+            border: 1px solid rgba(168,85,247,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--purple-glow);
+            margin-bottom: 16px;
+        }
+
+        .stat-value {
+            font-family: 'Inter', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--white-dim);
+        }
+
+        /* ─── CONTENT CARDS ─── */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* ─── HOW IT WORKS ─── */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 24px 16px;
+        }
+
+        .step-number {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(168,85,247,0.12);
+            border: 1px solid rgba(168,85,247,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--purple-glow);
+            margin: 0 auto 14px;
+        }
+
+        .step-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 6px;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--white-dim);
+            line-height: 1.6;
+        }
+
+        /* ─── LINK SECTION ─── */
+        .link-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--white-faint);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+
+        .link-input {
+            flex: 1;
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--white-dim);
+            outline: none;
+        }
+
+        .btn-copy {
+            background: rgba(168,85,247,0.15);
+            border: 1px solid rgba(168,85,247,0.25);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--purple-glow);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-copy:hover {
+            background: rgba(168,85,247,0.25);
+        }
+
+        .share-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-share {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-whatsapp {
+            background: rgba(37,211,102,0.12);
+            border: 1px solid rgba(37,211,102,0.2);
+            color: #4ade80;
+        }
+
+        .btn-whatsapp:hover { background: rgba(37,211,102,0.2); }
+
+        .btn-email-share {
+            background: rgba(96,165,250,0.1);
+            border: 1px solid rgba(96,165,250,0.2);
+            color: #93c5fd;
+        }
+
+        .btn-email-share:hover { background: rgba(96,165,250,0.2); }
+
+        /* ─── GENERATE LINK BUTTON ─── */
+        .btn-generate {
+            width: 100%;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(168,85,247,0.35);
+        }
+
+        .generated-link-box {
+            background: rgba(168,85,247,0.06);
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            display: none;
+        }
+
+        .generated-link-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--purple-glow);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ─── TABLE ─── */
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: var(--white-dim);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        tbody tr:hover td {
+            background: var(--white-faint);
+            color: var(--white);
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+
+        .td-name { color: var(--white) !important; font-weight: 500; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-link {
+            background: rgba(168,85,247,0.12);
+            border: 1px solid rgba(168,85,247,0.2);
+            color: var(--purple-glow);
+        }
+
+        .badge-direct {
+            background: rgba(255,255,255,0.06);
+            color: var(--white-dim);
+        }
+
+        .btn-action {
+            background: var(--white-faint);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--white-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: rgba(168,85,247,0.12);
+            border-color: rgba(168,85,247,0.25);
+            color: var(--purple-glow);
+        }
+
+        /* ─── SEARCH BAR ─── */
+        .search-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            background: var(--white-faint);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--white);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input::placeholder { color: rgba(255,255,255,0.2); }
+        .search-input:focus { border-color: rgba(168,85,247,0.4); }
+
+        .select-filter {
+            background: var(--white-faint);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--white);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .select-filter option { background: #1a0a2e; }
+
+        .badge-count {
+            background: rgba(168,85,247,0.15);
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 100px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: var(--purple-glow);
+        }
+
+        .btn-export {
+            background: var(--white-faint);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            color: var(--white-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-export:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 32px;
+            color: rgba(168,85,247,0.3);
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 6px;
+        }
+
+        .empty-desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        /* ─── SECTIONS ─── */
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeUp 0.3s ease; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── PAGINATION ─── */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 20px 0 4px;
+        }
+
+        .page-btn {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--white-faint);
+            color: var(--white-dim);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: rgba(168,85,247,0.15);
+            border-color: rgba(168,85,247,0.25);
+            color: var(--purple-glow);
+        }
+
+        /* ─── MODAL ─── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: #1a0a2e;
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 20px;
+            padding: 32px;
+            width: 90%;
+            max-width: 480px;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.open .modal { transform: translateY(0); }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: var(--white-faint);
+            border: none;
+            border-radius: 8px;
+            width: 32px; height: 32px;
+            color: var(--white-dim);
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+        .detail-key { color: var(--white-dim); }
+        .detail-val { color: var(--white); font-weight: 500; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 20px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .steps { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">🚀</div>
+            <span class="brand-text">starcard</span>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar" id="userInitials">--</div>
+            <div class="user-name" id="nomeAfiliado">Carregando...</div>
+            <div class="user-email" id="emailAfiliado">--</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Menu</div>
+            <a class="nav-item active" onclick="showSection('dashboard', this)">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a class="nav-item" onclick="showSection('criar-link', this)">
+                <i class="fas fa-plus-circle"></i> Criar Link
+            </a>
+            <a class="nav-item" onclick="showSection('link', this)">
+                <i class="fas fa-link"></i> Meus Links
+            </a>
+            <a class="nav-item" onclick="showSection('clientes', this)">
+                <i class="fas fa-users"></i> Meus Clientes
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="/logout" class="nav-item danger">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- ── DASHBOARD ── -->
+        <div id="dashboard-section" class="content-section active">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Acompanhe sua performance em tempo real</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap"><i class="fas fa-users"></i></div>
+                    <div class="stat-value" id="totalClientes">0</div>
+                    <div class="stat-label">Clientes Indicados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrap"><i class="fas fa-id-badge"></i></div>
+                    <div class="stat-value" id="codigoAfiliado" style="font-size:18px; letter-spacing:0">-</div>
+                    <div class="stat-label">Código do Afiliado</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrap"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-value" id="dataCadastro" style="font-size:18px; letter-spacing:0">-</div>
+                    <div class="stat-label">Membro desde</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Como funciona</span>
+                </div>
+                <div class="card-body">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-title">Gere seu link</div>
+                            <div class="step-desc">Crie um link único e personalizado para compartilhar com seus contatos</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-title">Compartilhe</div>
+                            <div class="step-desc">Envie pelo WhatsApp, e-mail ou qualquer outro canal</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-title">Acompanhe</div>
+                            <div class="step-desc">Veja todos os clientes que vieram através do seu link aqui</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CRIAR LINK ── -->
+        <div id="criar-link-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Criar Link</h1>
+                <p class="page-subtitle">Gere um link personalizado para enviar ao cliente</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Gerar Link de Cadastro</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size:14px; color:var(--white-dim); margin-bottom:24px;">
+                        Clique no botão abaixo para gerar o link do formulário com seus dados já preenchidos automaticamente.
+                    </p>
+
+                    <button class="btn-generate" onclick="gerarNovoLink()">
+                        <i class="fas fa-plus-circle"></i> &nbsp;Gerar Link de Cadastro
+                    </button>
+
+                    <div class="generated-link-box" id="novoLinkGerado">
+                        <div class="generated-link-title">
+                            <i class="fas fa-check-circle"></i> Link gerado com sucesso!
+                        </div>
+                        <div class="link-box">
+                            <input type="text" class="link-input" id="novoLinkInput" readonly>
+                            <button class="btn-copy" onclick="copyNovoLink()">Copiar</button>
+                        </div>
+                        <div class="share-row">
+                            <button class="btn-share btn-whatsapp" onclick="shareWhatsAppNovo()">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </button>
+                            <button class="btn-share btn-email-share" onclick="shareEmailNovo()">
+                                <i class="fas fa-envelope"></i> E-mail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── MEUS LINKS ── -->
+        <div id="link-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Meus Links</h1>
+                <p class="page-subtitle">Seu link fixo de afiliado</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Link do Formulário</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size:14px; color:var(--white-dim); margin-bottom:20px;">
+                        Compartilhe este link com seus clientes. Os campos do formulário serão preenchidos automaticamente com seus dados.
+                    </p>
+                    <div class="link-box">
+                        <input type="text" class="link-input" id="linkFormularioInput" readonly>
+                        <button class="btn-copy" onclick="copyLinkFormulario()">Copiar</button>
+                    </div>
+                    <div class="share-row">
+                        <button class="btn-share btn-whatsapp" onclick="shareWhatsAppFormulario()">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="btn-share btn-email-share" onclick="shareEmailFormulario()">
+                            <i class="fas fa-envelope"></i> E-mail
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CLIENTES ── -->
+        <div id="clientes-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Meus Clientes</h1>
+                <p class="page-subtitle">Todos os clientes indicados por você</p>
+            </div>
+
+            <div class="search-row">
+                <input type="text" class="search-input" id="buscaCliente" placeholder="Buscar por nome, email ou CPF...">
+                <select class="select-filter" id="filtroData">
+                    <option value="">Todos os períodos</option>
+                    <option value="hoje">Hoje</option>
+                    <option value="semana">Esta semana</option>
+                    <option value="mes">Este mês</option>
+                </select>
+                <select class="select-filter" id="filtroLink">
+                    <option value="">Todos os links</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Clientes Cadastrados</span>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span class="badge-count" id="badgeTotalClientes">0 clientes</span>
+                        <button class="btn-export" onclick="exportarClientes()">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>CPF</th>
+                                    <th>Link</th>
+                                    <th>Data</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaClientes">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                                            <div class="empty-title">Nenhum cliente ainda</div>
+                                            <div class="empty-desc">Compartilhe seu link para começar a captar clientes</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="paginacao"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Detalhes do Cliente</span>
+                <button class="modal-close" onclick="fecharModal()">✕</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let dadosAfiliado = null;
+        let meusClientes = [];
+        let clientesFiltrados = [];
+        let paginaAtual = 1;
+        const itensPorPagina = 10;
+
+        async function carregarDadosAfiliado() {
+            try {
+                const response = await fetch('/api/dados-afiliado', { credentials: 'include' });
+                if (response.ok) {
+                    dadosAfiliado = await response.json();
+                    atualizarInterface();
+                } else {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+
+        function atualizarInterface() {
+            const nome = dadosAfiliado.afiliado.nome;
+            document.getElementById('nomeAfiliado').textContent = nome;
+            document.getElementById('emailAfiliado').textContent = dadosAfiliado.afiliado.email;
+            document.getElementById('userInitials').textContent = nome.substring(0, 2).toUpperCase();
+            document.getElementById('totalClientes').textContent = dadosAfiliado.total_clientes;
+            document.getElementById('codigoAfiliado').textContent = dadosAfiliado.afiliado.codigo_afiliado;
+            document.getElementById('dataCadastro').textContent = new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+
+            const codigo = dadosAfiliado.afiliado.codigo_afiliado;
+            const linkFormulario = `${window.location.origin}/formulario-starbank?codigo=${codigo}`;
+            document.getElementById('linkFormularioInput').value = linkFormulario;
+        }
+
+        async function carregarMeusClientes() {
+            try {
+                const response = await fetch('/api/meus-clientes', { credentials: 'include' });
+                if (response.ok) {
+                    meusClientes = await response.json();
+                    clientesFiltrados = [...meusClientes];
+                    atualizarTabelaClientes();
+                    atualizarFiltros();
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        function atualizarTabelaClientes() {
+            const tbody = document.getElementById('tabelaClientes');
+            const inicio = (paginaAtual - 1) * itensPorPagina;
+            const clientesPagina = clientesFiltrados.slice(inicio, inicio + itensPorPagina);
+
+            document.getElementById('badgeTotalClientes').textContent = `${clientesFiltrados.length} cliente(s)`;
+
+            if (!clientesPagina.length) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><i class="fas fa-search"></i></div><div class="empty-title">Nenhum resultado</div><div class="empty-desc">Tente ajustar os filtros</div></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = clientesPagina.map(c => `
+                <tr>
+                    <td class="td-name">${c.nome}</td>
+                    <td>${c.email}</td>
+                    <td>${c.telefone || '-'}</td>
+                    <td>${c.cpf || '-'}</td>
+                    <td>${c.link_id ? `<span class="badge badge-link">${c.link_id}</span>` : '<span class="badge badge-direct">Direto</span>'}</td>
+                    <td>${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td>
+                    <td><button class="btn-action" onclick="verDetalhes(${c.id})">Ver</button></td>
+                </tr>
+            `).join('');
+
+            atualizarPaginacao();
+        }
+
+        function atualizarPaginacao() {
+            const total = Math.ceil(clientesFiltrados.length / itensPorPagina);
+            const el = document.getElementById('paginacao');
+            if (total <= 1) { el.innerHTML = ''; return; }
+            el.innerHTML = Array.from({length: total}, (_, i) =>
+                `<button class="page-btn ${i+1 === paginaAtual ? 'active' : ''}" onclick="mudarPagina(${i+1})">${i+1}</button>`
+            ).join('');
+        }
+
+        function mudarPagina(p) { paginaAtual = p; atualizarTabelaClientes(); }
+
+        function atualizarFiltros() {
+            const links = [...new Set(meusClientes.map(c => c.link_id).filter(Boolean))];
+            const el = document.getElementById('filtroLink');
+            el.innerHTML = '<option value="">Todos os links</option>' + links.map(l => `<option value="${l}">${l}</option>`).join('');
+        }
+
+        function aplicarFiltros() {
+            const busca = document.getElementById('buscaCliente').value.toLowerCase();
+            const periodo = document.getElementById('filtroData').value;
+            const link = document.getElementById('filtroLink').value;
+
+            clientesFiltrados = meusClientes.filter(c => {
+                const matchBusca = !busca || c.nome.toLowerCase().includes(busca) || c.email.toLowerCase().includes(busca) || (c.cpf && c.cpf.includes(busca));
+                const matchLink = !link || c.link_id === link;
+                let matchData = true;
+                if (periodo) {
+                    const d = new Date(c.criado_em), hoje = new Date();
+                    if (periodo === 'hoje') matchData = d.toDateString() === hoje.toDateString();
+                    else if (periodo === 'semana') matchData = d >= new Date(hoje - 7*864e5);
+                    else if (periodo === 'mes') matchData = d >= new Date(hoje - 30*864e5);
+                }
+                return matchBusca && matchLink && matchData;
+            });
+
+            paginaAtual = 1;
+            atualizarTabelaClientes();
+        }
+
+        async function verDetalhes(id) {
+            try {
+                const r = await fetch(`/api/cliente/${id}`, { credentials: 'include' });
+                if (!r.ok) return;
+                const c = await r.json();
+                document.getElementById('modalContent').innerHTML = `
+                    <div class="detail-row"><span class="detail-key">Nome</span><span class="detail-val">${c.nome}</span></div>
+                    <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">${c.email}</span></div>
+                    <div class="detail-row"><span class="detail-key">Telefone</span><span class="detail-val">${c.telefone || '-'}</span></div>
+                    <div class="detail-row"><span class="detail-key">CPF</span><span class="detail-val">${c.cpf || '-'}</span></div>
+                    <div class="detail-row"><span class="detail-key">Link</span><span class="detail-val">${c.link_id || 'Direto'}</span></div>
+                    <div class="detail-row"><span class="detail-key">Data</span><span class="detail-val">${new Date(c.criado_em).toLocaleString('pt-BR')}</span></div>
+                `;
+                document.getElementById('modalOverlay').classList.add('open');
+            } catch(e) {}
+        }
+
+        function fecharModal(e) {
+            if (!e || e.target === document.getElementById('modalOverlay') || e.currentTarget.tagName === 'BUTTON') {
+                document.getElementById('modalOverlay').classList.remove('open');
+            }
+        }
+
+        function showSection(name, el) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`${name}-section`).classList.add('active');
+            if (el) el.classList.add('active');
+            if (name === 'clientes') carregarMeusClientes();
+        }
+
+        function copyLinkFormulario() {
+            navigator.clipboard.writeText(document.getElementById('linkFormularioInput').value);
+        }
+
+        function copyNovoLink() {
+            navigator.clipboard.writeText(document.getElementById('novoLinkInput').value);
+        }
+
+        function shareWhatsAppFormulario() {
+            const link = document.getElementById('linkFormularioInput').value;
+            window.open(`https://wa.me/?text=${encodeURIComponent('Olá! Acesse nosso formulário: ' + link)}`, '_blank');
+        }
+
+        function shareEmailFormulario() {
+            const link = document.getElementById('linkFormularioInput').value;
+            window.location.href = `mailto:?subject=Formulário StarCard&body=${encodeURIComponent('Acesse: ' + link)}`;
+        }
+
+        function shareWhatsAppNovo() {
+            const link = document.getElementById('novoLinkInput').value;
+            window.open(`https://wa.me/?text=${encodeURIComponent('Olá! Acesse nosso formulário: ' + link)}`, '_blank');
+        }
+
+        function shareEmailNovo() {
+            const link = document.getElementById('novoLinkInput').value;
+            window.location.href = `mailto:?subject=Formulário StarCard&body=${encodeURIComponent('Acesse: ' + link)}`;
+        }
+
+        function gerarNovoLink() {
+            if (!dadosAfiliado) return;
+            const codigo = dadosAfiliado.afiliado.codigo_afiliado;
+            const link = `${window.location.origin}/formulario-starbank?codigo=${codigo}`;
+            document.getElementById('novoLinkInput').value = link;
+            document.getElementById('novoLinkGerado').style.display = 'block';
+            document.getElementById('novoLinkGerado').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function exportarClientes() {
+            const csv = [['ID','Nome','Email','Telefone','CPF','Link','Data'],
+                ...clientesFiltrados.map(c => [c.id, c.nome, c.email, c.telefone||'', c.cpf||'', c.link_id||'', new Date(c.criado_em).toLocaleString('pt-BR')])
+            ].map(r => r.join(',')).join('\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+            a.download = `clientes_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDadosAfiliado();
+            document.getElementById('buscaCliente').addEventListener('input', aplicarFiltros);
+            document.getElementById('filtroData').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroLink').addEventListener('change', aplicarFiltros);
+        });
+    </script>
+</body>
+</html>

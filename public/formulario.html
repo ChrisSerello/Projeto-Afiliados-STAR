@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Cadastro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .form-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .form-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .form-header i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .afiliado-info {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .step.active {
+            background: #667eea;
+            color: white;
+        }
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <i class="fas fa-user-plus"></i>
+                <h2 class="fw-bold">Formulário de Cadastro</h2>
+                <p class="text-muted">Preencha seus dados para continuar</p>
+            </div>
+
+            <!-- Informações do Afiliado -->
+            <div id="afiliadoInfo" class="afiliado-info" style="display: none;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-tie fa-2x text-primary me-3"></i>
+                    <div>
+                        <h6 class="mb-1">Indicado por:</h6>
+                        <p class="mb-0 fw-bold" id="nomeAfiliado">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+            </div>
+
+            <div id="alert-container"></div>
+
+            <form id="cadastroForm">
+                <!-- Step 1: Dados Pessoais -->
+                <div class="form-section active" id="section1">
+                    <h5 class="mb-3">
+                        <i class="fas fa-user text-primary"></i> Dados Pessoais
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label for="nome" class="form-label required-field">Nome Completo</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label required-field">E-mail</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="telefone" class="form-label required-field">Telefone</label>
+                        <input type="tel" class="form-control" id="telefone" name="telefone" 
+                               placeholder="(XX) XXXXX-XXXX" required>
+                    </div>
+
+                    <input type="hidden" id="codigo_afiliado" name="codigo_afiliado">
+                </div>
+
+                <!-- Step 2: Documentos -->
+                <div class="form-section" id="section2">
+                    <h5 class="mb-3">
+                        <i class="fas fa-id-card text-primary"></i> Documentos
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label for="cpf" class="form-label required-field">CPF</label>
+                        <input type="text" class="form-control" id="cpf" name="cpf" 
+                               placeholder="XXX.XXX.XXX-XX" required>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Seus dados são seguros e serão utilizados apenas para fins de cadastro em nosso sistema.
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmação -->
+                <div class="form-section" id="section3">
+                    <h5 class="mb-3">
+                        <i class="fas fa-check-circle text-primary"></i> Confirmação
+                    </h5>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6>Resumo do Cadastro:</h6>
+                            <div id="resumoCadastro"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 mt-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="termos" required>
+                            <label class="form-check-label" for="termos">
+                                Li e aceito os <a href="#" class="text-decoration-none">termos de uso</a> e 
+                                <a href="#" class="text-decoration-none">política de privacidade</a>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary" id="btnAnterior" onclick="changeStep(-1)" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <div></div>
+                    <button type="button" class="btn btn-primary" id="btnProximo" onclick="changeStep(1)">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="submit" class="btn btn-submit" id="btnFinalizar" style="display: none;">
+                        <i class="fas fa-check"></i> Finalizar Cadastro
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="/" class="text-decoration-none text-muted">
+                    <i class="fas fa-arrow-left"></i> Voltar para página inicial
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Obter código do afiliado da URL
+        function getAffiliateCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('afiliado');
+        }
+
+        // Formatar CPF
+        function formatCPF(value) {
+            return value
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+
+        // Formatar Telefone
+        function formatPhone(value) {
+            return value
+                .replace(/\D/g, '')
+                .replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+        }
+
+        // Validar CPF
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11) return false;
+            
+            // Validação básica de CPF
+            let sum = 0;
+            for (let i = 0; i < 9; i++) {
+                sum += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let remainder = sum % 11;
+            let digit1 = remainder < 2 ? 0 : 11 - remainder;
+            
+            sum = 0;
+            for (let i = 0; i < 10; i++) {
+                sum += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            remainder = sum % 11;
+            let digit2 = remainder < 2 ? 0 : 11 - remainder;
+            
+            return cpf.charAt(9) == digit1 && cpf.charAt(10) == digit2;
+        }
+
+        // Mudar step
+        function changeStep(direction) {
+            if (direction === 1 && !validateCurrentStep()) {
+                return;
+            }
+
+            // Esconder step atual
+            document.getElementById(`section${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.add('completed');
+
+            currentStep += direction;
+
+            // Mostrar novo step
+            document.getElementById(`section${currentStep}`).classList.add('active');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            // Atualizar botões
+            updateButtons();
+
+            // Se for o último step, mostrar resumo
+            if (currentStep === 3) {
+                showResumo();
+            }
+        }
+
+        // Validar step atual
+        function validateCurrentStep() {
+            if (currentStep === 1) {
+                const nome = document.getElementById('nome').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const telefone = document.getElementById('telefone').value.trim();
+
+                if (!nome || !email || !telefone) {
+                    showAlert('warning', 'Preencha todos os campos obrigatórios');
+                    return false;
+                }
+
+                if (!validateEmail(email)) {
+                    showAlert('warning', 'Digite um e-mail válido');
+                    return false;
+                }
+            } else if (currentStep === 2) {
+                const cpf = document.getElementById('cpf').value.trim();
+
+                if (!cpf) {
+                    showAlert('warning', 'Preencha o CPF');
+                    return false;
+                }
+
+                if (!validateCPF(cpf)) {
+                    showAlert('warning', 'CPF inválido');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Validar email
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Atualizar botões
+        function updateButtons() {
+            const btnAnterior = document.getElementById('btnAnterior');
+            const btnProximo = document.getElementById('btnProximo');
+            const btnFinalizar = document.getElementById('btnFinalizar');
+
+            btnAnterior.style.display = currentStep === 1 ? 'none' : 'block';
+            btnProximo.style.display = currentStep === totalSteps ? 'none' : 'block';
+            btnFinalizar.style.display = currentStep === totalSteps ? 'block' : 'none';
+        }
+
+        // Mostrar resumo
+        function showResumo() {
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const telefone = document.getElementById('telefone').value;
+            const cpf = document.getElementById('cpf').value;
+
+            document.getElementById('resumoCadastro').innerHTML = `
+                <p><strong>Nome:</strong> ${nome}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Telefone:</strong> ${telefone}</p>
+                <p><strong>CPF:</strong> ${formatCPF(cpf)}</p>
+            `;
+        }
+
+        // Mostrar alerta
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        // Event Listeners
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            e.target.value = formatCPF(e.target.value);
+        });
+
+        document.getElementById('telefone').addEventListener('input', function(e) {
+            e.target.value = formatPhone(e.target.value);
+        });
+
+        document.getElementById('cadastroForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!document.getElementById('termos').checked) {
+                showAlert('warning', 'Aceite os termos para continuar');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/api/cadastrar-cliente', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.sucesso) {
+                    showAlert('success', 'Cadastro realizado com sucesso! Redirecionando...');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
+                } else {
+                    showAlert('danger', result.erro || 'Erro ao cadastrar');
+                }
+            } catch (error) {
+                showAlert('danger', 'Erro de conexão. Tente novamente.');
+            }
+        });
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            const codigoAfiliado = getAffiliateCode();
+            
+            if (codigoAfiliado) {
+                document.getElementById('codigo_afiliado').value = codigoAfiliado;
+                document.getElementById('afiliadoInfo').style.display = 'block';
+                document.getElementById('nomeAfiliado').textContent = `Código: ${codigoAfiliado}`;
+            }
+
+            updateButtons();
+        });
+    </script>
+</body>
+</html>

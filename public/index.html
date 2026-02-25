@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Afiliados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-section i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .admin-link:hover {
+            background: rgba(0,0,0,0.9);
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <i class="fas fa-users-cog"></i>
+                <h2 class="mb-3">Portal de Afiliados</h2>
+                <p class="text-muted">Acesse sua conta</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="senha" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Senha
+                    </label>
+                    <input type="password" class="form-control" id="senha" name="senha" required>
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                    </button>
+                </div>
+            </form>
+            
+            <div id="alertContainer"></div>
+        </div>
+    </div>
+
+    <!-- Link para área administrativa -->
+    <a href="/admin" class="admin-link">
+        <i class="fas fa-cog"></i> Admin
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.sucesso) {
+                    showAlert('success', 'Login realizado com sucesso!');
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 1000);
+                } else {
+                    showAlert('danger', result.erro || 'Erro ao fazer login');
+                }
+            } catch (error) {
+                showAlert('danger', 'Erro de conexão com o servidor');
+            }
+        });
+        
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benefício ao Servidor — StarBank</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --purple: #4f1d9a;
+            --purple-mid: #6b21a8;
+            --purple-bright: #a855f7;
+            --purple-light: #ede9fe;
+            --purple-faint: #f5f3ff;
+            --dark: #0f0a1e;
+            --text: #1e1b4b;
+            --text-mid: #4c4474;
+            --text-dim: #8b83b0;
+            --border: #e2e0f0;
+            --white: #ffffff;
+            --success: #059669;
+            --error: #dc2626;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f7ff;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: var(--dark);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .header-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 13px; color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-name {
+            font-size: 16px; font-weight: 700;
+            color: white; letter-spacing: -0.3px;
+        }
+
+        .header-badge {
+            background: rgba(168,85,247,0.15);
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 100px;
+            padding: 4px 12px;
+            font-size: 11px; font-weight: 600;
+            color: var(--purple-bright);
+            letter-spacing: 0.3px;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e0a40 60%, #2d1152 100%);
+            padding: 48px 24px 64px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(168,85,247,0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168,85,247,0.07) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .hero-content { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(168,85,247,0.15);
+            border: 1px solid rgba(168,85,247,0.25);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 11px; font-weight: 600;
+            color: var(--purple-bright);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero-tag::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--purple-bright);
+            border-radius: 50%;
+        }
+
+        .hero-title {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 800;
+            color: white;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 14px;
+        }
+
+        .hero-subtitle {
+            font-size: 15px;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.6;
+        }
+
+        /* ── AFILIADO BAR ── */
+        .afiliado-bar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .afiliado-bar strong { color: var(--text); }
+
+        .afiliado-badge {
+            background: var(--purple-faint);
+            border: 1px solid #ddd6fe;
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: 11px; font-weight: 600;
+            color: var(--purple-mid);
+            font-family: monospace;
+        }
+
+        /* ── FORM WRAPPER ── */
+        .form-wrapper {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        /* ── SECTION ── */
+        .section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .section:focus-within {
+            box-shadow: 0 0 0 3px rgba(168,85,247,0.1);
+            border-color: rgba(168,85,247,0.3);
+        }
+
+        .section-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fafafa;
+        }
+
+        .section-number {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800;
+            color: white; flex-shrink: 0;
+        }
+
+        .section-info { display: flex; flex-direction: column; gap: 2px; }
+
+        .section-title {
+            font-size: 14px; font-weight: 700;
+            color: var(--text);
+        }
+
+        .section-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .section-body { padding: 24px; }
+
+        /* ── FIELDS ── */
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .field-row.single { grid-template-columns: 1fr; }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .field:last-child { margin-bottom: 0; }
+
+        .field-label {
+            font-size: 13px; font-weight: 600;
+            color: var(--text);
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        .required {
+            color: var(--error);
+            font-size: 12px;
+        }
+
+        .field-input, .field-select {
+            background: var(--purple-faint);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .field-input::placeholder { color: var(--text-dim); opacity: 0.6; }
+
+        .field-input:focus, .field-select:focus {
+            border-color: var(--purple-mid);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(107,33,168,0.08);
+        }
+
+        .field-input.readonly {
+            background: #f0ebff;
+            border-color: #ddd6fe;
+            color: var(--purple-mid);
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+
+        .field-input.loading {
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        /* ── RADIO OPTIONS ── */
+        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--purple-faint);
+        }
+
+        .radio-option:hover {
+            border-color: var(--purple-bright);
+            background: #f5f0ff;
+        }
+
+        .radio-option input[type="radio"] {
+            accent-color: var(--purple-mid);
+            width: 16px; height: 16px;
+            cursor: pointer;
+        }
+
+        .radio-option.selected {
+            border-color: var(--purple-mid);
+            background: #ede9fe;
+        }
+
+        .radio-label {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        /* ── FILE UPLOAD ── */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--purple-faint);
+            position: relative;
+        }
+
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: var(--purple-bright);
+            background: #f0ebff;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .upload-title {
+            font-size: 14px; font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .upload-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .upload-preview {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #ede9fe;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--purple-mid);
+            font-weight: 500;
+        }
+
+        .upload-preview.show { display: flex; }
+
+        /* ── SUBMIT BUTTON ── */
+        .submit-section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 24px;
+            text-align: center;
+        }
+
+        .btn-submit {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 36px rgba(107,33,168,0.35);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── ALERTS ── */
+        .alert {
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .alert.show { display: block; }
+
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--error);
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: var(--success);
+            text-align: center;
+            padding: 24px;
+        }
+
+        .alert-success .success-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .alert-success h3 {
+            font-size: 18px; font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        /* ── LGPD FOOTER ── */
+        .lgpd-footer {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 0 24px 40px;
+            text-align: center;
+        }
+
+        .lgpd-text {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .lgpd-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .field-row { grid-template-columns: 1fr; }
+            .hero { padding: 36px 16px 48px; }
+            .form-wrapper { padding: 20px 16px 60px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-logo">SB</div>
+                <span class="brand-name">StarBank</span>
+            </div>
+            <span class="header-badge">Benefício ao Servidor</span>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">Proposta Exclusiva</div>
+            <h1 class="hero-title">Benefício ao Servidor</h1>
+            <p class="hero-subtitle">Preencha o formulário abaixo para que nossa equipe especializada<br>entre em contato com a melhor oferta para o seu perfil.</p>
+        </div>
+    </div>
+
+    <!-- Afiliado Bar -->
+    <div class="afiliado-bar" id="afiliadoBar" style="display:none;">
+        <span>Atendimento por:</span>
+        <strong id="afiliadoNomeBar">—</strong>
+        <span class="afiliado-badge" id="afiliadoCodigoBar">—</span>
+    </div>
+
+    <!-- Alert -->
+    <div class="form-wrapper" id="mainWrapper">
+        <div class="alert alert-danger" id="alertBox"></div>
+
+        <form id="formulario" enctype="multipart/form-data">
+            <input type="hidden" id="codigoAfiliado" name="codigo_afiliado">
+
+            <!-- SEÇÃO 1: Identificação do Parceiro -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-info">
+                        <span class="section-title">Identificação do Parceiro</span>
+                        <span class="section-desc">Dados do seu consultor responsável</span>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="field-row">
+                        <div class="field">
+                            <label class="field-label">Nome do Afiliado</label>
+                            <input type="text" class="field-input readonly loading" id="nomeAfiliado" name="nome_afiliado" value="Carregando..." readonly>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Código do Afiliado</label>
+                            <input type="text" class="field-input readonly loading" id="codigoAfiliadoDisplay" value="Carregando..." readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: Dados do Servidor -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-info">
+                        <span class="section-title">Dados do Servidor</span>
+                        <span class="section-desc">Informações pessoais para análise</span>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="field-row">
+                        <div class="field" style="grid-column: 1 / -1;">
+                            <label class="field-label">Nome Completo <span class="required">*</span></label>
+                            <input type="text" class="field-input" name="nome_completo" placeholder="Seu nome completo" required>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label class="field-label">CPF <span class="required">*</span></label>
+                            <input type="text" class="field-input" name="cpf" id="cpfInput" placeholder="000.000.000-00" maxlength="14" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Data de Nascimento <span class="required">*</span></label>
+                            <input type="date" class="field-input" name="data_nascimento" required>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label class="field-label">Celular (WhatsApp) <span class="required">*</span></label>
+                            <input type="tel" class="field-input" name="celular" id="celularInput" placeholder="(00) 00000-0000" maxlength="15" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Órgão / Prefeitura <span class="required">*</span></label>
+                            <input type="text" class="field-input" name="orgao" placeholder="Ex: Prefeitura de Águas Lindas" required>
+                        </div>
+                    </div>
+                    <div class="field-row single">
+                        <div class="field">
+                            <label class="field-label">Tipo de Vínculo <span class="required">*</span></label>
+                            <select class="field-select" name="tipo_vinculo" required>
+                                <option value="" disabled selected>Selecione seu tipo de vínculo</option>
+                                <option value="Efetivo">Efetivo</option>
+                                <option value="Comissionado">Comissionado</option>
+                                <option value="Temporário">Temporário</option>
+                                <option value="Aposentado/Pensionista">Aposentado / Pensionista</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 3: Diagnóstico Financeiro -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-info">
+                        <span class="section-title">Diagnóstico Financeiro</span>
+                        <span class="section-desc">Nos ajude a entender seu objetivo</span>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="field">
+                        <label class="field-label">Qual é o seu objetivo principal hoje? <span class="required">*</span></label>
+                        <div class="radio-group" id="objetivoGroup">
+                            <label class="radio-option" onclick="selectRadio(this)">
+                                <input type="radio" name="objetivo" value="Portabilidade e liberação de valores" required>
+                                <span class="radio-label">💰 Portabilidade e liberação de valores</span>
+                            </label>
+                            <label class="radio-option" onclick="selectRadio(this)">
+                                <input type="radio" name="objetivo" value="Dinheiro novo na conta">
+                                <span class="radio-label">💳 Dinheiro novo na conta</span>
+                            </label>
+                            <label class="radio-option" onclick="selectRadio(this)">
+                                <input type="radio" name="objetivo" value="Limpar rotativo do cartão / Sair dos juros altos">
+                                <span class="radio-label">📉 Limpar o rotativo do cartão / Sair dos juros altos</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="field" style="margin-top: 20px;">
+                        <label class="field-label">Possui contratos em quais bancos atualmente?</label>
+                        <input type="text" class="field-input" name="bancos_atuais" placeholder="Ex: Caixa, Banco do Brasil, Bradesco...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 4: Upload -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-info">
+                        <span class="section-title">Upload de Documento</span>
+                        <span class="section-desc">Holerite ou Contracheque mais recente</span>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="field">
+                        <label class="field-label">Anexe seu último Holerite / Contracheque <span class="required">*</span></label>
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" name="holerite" id="holerite" accept=".pdf,.jpg,.jpeg,.png" required onchange="previewFile(this)">
+                            <div class="upload-icon">📄</div>
+                            <div class="upload-title">Clique ou arraste o arquivo aqui</div>
+                            <div class="upload-desc">PDF, JPG ou PNG · Máximo 10MB</div>
+                        </div>
+                        <div class="upload-preview" id="uploadPreview">
+                            <span>📎</span>
+                            <span id="uploadFileName"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="submit-section">
+                <div class="alert" id="successBox" style="display:none;">
+                    <div class="success-icon">✅</div>
+                    <h3>Formulário enviado com sucesso!</h3>
+                    <p>Nossa equipe entrará em contato em breve pelo WhatsApp informado.</p>
+                </div>
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    <span id="btnText">Enviar Formulário</span>
+                </button>
+                <p style="font-size: 12px; color: var(--text-dim); margin-top: 12px;">
+                    Todos os campos marcados com <span style="color:var(--error)">*</span> são obrigatórios
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- LGPD Footer -->
+    <div class="lgpd-footer">
+        <div class="lgpd-text">
+            <span class="lgpd-icon">🔒</span>
+            <span>Seus dados estão protegidos e serão usados exclusivamente para análise de crédito em conformidade com a <strong>Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018)</strong>. Nenhuma informação será compartilhada com terceiros sem o seu consentimento.</span>
+        </div>
+    </div>
+
+    <script>
+        // ── Carregar dados do afiliado ──
+        const params = new URLSearchParams(window.location.search);
+        const codigoParam = params.get('codigo');
+
+        async function carregarAfiliado() {
+            if (!codigoParam) {
+                setAfiliadoFields('Afiliado não identificado', '—', false);
+                return;
+            }
+
+            try {
+                const r = await fetch(`/api/afiliado-publico?codigo=${codigoParam}`);
+                if (r.ok) {
+                    const data = await r.json();
+                    setAfiliadoFields(data.nome, data.codigo_afiliado, true);
+                } else {
+                    setAfiliadoFields('Afiliado não encontrado', codigoParam, false);
+                }
+            } catch {
+                setAfiliadoFields('Erro ao carregar', codigoParam, false);
+            }
+        }
+
+        function setAfiliadoFields(nome, codigo, found) {
+            const nomeInput = document.getElementById('nomeAfiliado');
+            const codigoInput = document.getElementById('codigoAfiliadoDisplay');
+            const codigoHidden = document.getElementById('codigoAfiliado');
+            const bar = document.getElementById('afiliadoBar');
+            
+            nomeInput.value = nome;
+            codigoInput.value = codigo;
+            codigoHidden.value = codigo;
+            
+            nomeInput.classList.remove('loading');
+            codigoInput.classList.remove('loading');
+
+            if (found) {
+                bar.style.display = 'flex';
+                document.getElementById('afiliadoNomeBar').textContent = nome;
+                document.getElementById('afiliadoCodigoBar').textContent = codigo;
+            }
+        }
+
+        carregarAfiliado();
+
+        // ── Máscaras ──
+        document.getElementById('cpfInput').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = v;
+        });
+
+        document.getElementById('celularInput').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            v = v.replace(/^(\d{2})(\d)/, '($1) $2');
+            v = v.replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+            e.target.value = v;
+        });
+
+        // ── Radio visual ──
+        function selectRadio(label) {
+            document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
+            label.classList.add('selected');
+        }
+
+        // ── Upload preview ──
+        function previewFile(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('uploadFileName').textContent = file.name;
+                document.getElementById('uploadPreview').classList.add('show');
+                document.getElementById('uploadArea').style.borderColor = '#6b21a8';
+                document.getElementById('uploadArea').style.background = '#ede9fe';
+            }
+        }
+
+        // ── Drag & Drop ──
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                document.getElementById('holerite').files = e.dataTransfer.files;
+                previewFile(document.getElementById('holerite'));
+            }
+        });
+
+        // ── Submit ──
+        document.getElementById('formulario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const btnText = document.getElementById('btnText');
+            const alertBox = document.getElementById('alertBox');
+            
+            alertBox.className = 'alert';
+            alertBox.style.display = 'none';
+
+            // Validar objetivo
+            const objetivo = document.querySelector('input[name="objetivo"]:checked');
+            if (!objetivo) {
+                alertBox.className = 'alert alert-danger show';
+                alertBox.style.display = 'block';
+                alertBox.textContent = 'Por favor, selecione seu objetivo principal.';
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Enviando...';
+
+            try {
+                const formData = new FormData(e.target);
+
+                const response = await fetch('/api/enviar-formulario', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.sucesso) {
+                    e.target.style.display = 'none';
+                    const successBox = document.getElementById('successBox');
+                    successBox.style.display = 'block';
+                    successBox.className = 'alert alert-success show';
+                    successBox.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alertBox.className = 'alert alert-danger show';
+                    alertBox.style.display = 'block';
+                    alertBox.textContent = result.erro || 'Erro ao enviar. Tente novamente.';
+                    btn.disabled = false;
+                    btnText.textContent = 'Enviar Formulário';
+                }
+            } catch {
+                alertBox.className = 'alert alert-danger show';
+                alertBox.style.display = 'block';
+                alertBox.textContent = 'Erro de conexão. Verifique sua internet e tente novamente.';
+                btn.disabled = false;
+                btnText.textContent = 'Enviar Formulário';
+            }
+        });
+    </script>
+</body>
+</html>

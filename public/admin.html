@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarCard — Painel Administrativo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --black: #080808;
+            --surface: #0e0e0e;
+            --surface-2: #141414;
+            --border: rgba(255,255,255,0.07);
+            --amber: #f59e0b;
+            --amber-dim: rgba(245,158,11,0.12);
+            --amber-border: rgba(245,158,11,0.2);
+            --white: #ffffff;
+            --white-dim: rgba(255,255,255,0.45);
+            --white-faint: rgba(255,255,255,0.04);
+            --sidebar-w: 240px;
+            --green: #10b981;
+            --red: #ef4444;
+        }
+        body { font-family: 'Outfit', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; display: flex; }
+
+        .sidebar {
+            width: var(--sidebar-w); min-height: 100vh;
+            background: var(--surface); border-right: 1px solid var(--border);
+            position: fixed; left: 0; top: 0;
+            display: flex; flex-direction: column; z-index: 100;
+        }
+        .sidebar-top { padding: 28px 20px 20px; border-bottom: 1px solid var(--border); }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .brand-mark {
+            width: 32px; height: 32px; border: 1px solid var(--amber); border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: var(--amber); flex-shrink: 0;
+        }
+        .brand-info { display: flex; flex-direction: column; gap: 1px; }
+        .brand-name { font-size: 13px; font-weight: 700; color: var(--white); }
+        .brand-role { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1.5px; text-transform: uppercase; }
+        .status-indicator {
+            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+            background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.15); border-radius: 8px;
+        }
+        .status-dot {
+            width: 6px; height: 6px; background: var(--green); border-radius: 50%;
+            box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+        .status-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--green); letter-spacing: 1.5px; text-transform: uppercase; }
+        .sidebar-nav { padding: 16px 12px; flex: 1; }
+        .nav-label { font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 2px; padding: 12px 8px 6px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+            font-size: 13px; font-weight: 500; color: var(--white-dim); cursor: pointer;
+            transition: all 0.2s; border: 1px solid transparent; text-decoration: none; margin-bottom: 2px;
+        }
+        .nav-item i { width: 14px; font-size: 12px; }
+        .nav-item:hover { background: var(--white-faint); color: var(--white); }
+        .nav-item.active { background: var(--amber-dim); border-color: var(--amber-border); color: var(--amber); }
+        .nav-item.danger { color: rgba(239,68,68,0.6); }
+        .nav-item.danger:hover { background: rgba(239,68,68,0.07); color: #fca5a5; }
+        .sidebar-bottom { padding: 16px 12px; border-top: 1px solid var(--border); }
+
+        .main { margin-left: var(--sidebar-w); flex: 1; padding: 32px 36px; min-height: 100vh; }
+        .page-header { margin-bottom: 32px; }
+        .page-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+        .page-title { font-size: 26px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+            position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s;
+        }
+        .stat-card:hover { border-color: var(--amber-border); transform: translateY(-2px); }
+        .stat-card::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--amber), transparent); opacity: 0; transition: opacity 0.2s;
+        }
+        .stat-card:hover::after { opacity: 0.5; }
+        .stat-icon { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1px; margin-bottom: 14px; opacity: 0.7; }
+        .stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--white); letter-spacing: -1px; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .tabs-header { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+        .tab-btn {
+            display: flex; align-items: center; gap: 8px; padding: 10px 18px;
+            font-size: 13px; font-weight: 500; color: var(--white-dim);
+            background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer;
+            transition: all 0.2s; margin-bottom: -1px;
+        }
+        .tab-btn:hover { color: var(--white); }
+        .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+        .tab-btn i { font-size: 12px; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .card-title { font-size: 14px; font-weight: 600; color: var(--white); }
+        .card-tag { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1.5px; text-transform: uppercase; }
+        .card-body { padding: 24px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        .field-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1.5px; }
+        .field-label::before { content: '// '; color: var(--amber); opacity: 0.5; }
+        .field-input {
+            background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+            padding: 11px 14px; font-size: 13px; font-family: 'Outfit', sans-serif; color: var(--white); outline: none; transition: all 0.2s;
+        }
+        .field-input::placeholder { color: rgba(255,255,255,0.15); }
+        .field-input:focus { border-color: var(--amber-border); background: rgba(245,158,11,0.03); }
+        .btn-primary {
+            background: var(--amber); border: none; border-radius: 8px; padding: 11px 24px;
+            font-size: 13px; font-family: 'Outfit', sans-serif; font-weight: 700; color: #000; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary:hover { background: #fbbf24; box-shadow: 0 6px 20px rgba(245,158,11,0.25); transform: translateY(-1px); }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th { padding: 10px 16px; font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1.5px; text-align: left; border-bottom: 1px solid var(--border); }
+        tbody td { padding: 13px 16px; font-size: 13px; color: var(--white-dim); border-bottom: 1px solid rgba(255,255,255,0.03); }
+        tbody tr:hover td { background: var(--white-faint); color: var(--white); }
+        tbody tr:last-child td { border-bottom: none; }
+        .td-primary { color: var(--white) !important; font-weight: 500; }
+
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.5px; }
+        .badge-amber { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); }
+        .badge-green { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); color: var(--green); }
+        .badge-gray { background: var(--white-faint); border: 1px solid var(--border); color: var(--white-dim); }
+
+        .filters-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-input {
+            background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+            padding: 9px 13px; font-size: 12px; font-family: 'Outfit', sans-serif; color: var(--white); outline: none; transition: border-color 0.2s;
+        }
+        .filter-input::placeholder { color: rgba(255,255,255,0.2); }
+        .filter-input:focus { border-color: var(--amber-border); }
+        .filter-input.grow { flex: 1; min-width: 180px; }
+        .filter-input option { background: #0e0e0e; }
+        .btn-filter {
+            background: var(--amber-dim); border: 1px solid var(--amber-border); border-radius: 8px;
+            padding: 9px 16px; font-size: 12px; font-family: 'Outfit', sans-serif; font-weight: 600; color: var(--amber); cursor: pointer; transition: all 0.2s;
+        }
+        .btn-filter:hover { background: rgba(245,158,11,0.2); }
+        .btn-clear {
+            background: var(--white-faint); border: 1px solid var(--border); border-radius: 8px;
+            padding: 9px 16px; font-size: 12px; font-family: 'Outfit', sans-serif; color: var(--white-dim); cursor: pointer; transition: all 0.2s;
+        }
+        .btn-clear:hover { color: var(--white); }
+
+        .alert-box { border-radius: 8px; padding: 11px 14px; margin-bottom: 16px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.5px; display: none; }
+        .alert-success { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); display: block; }
+        .alert-danger { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; display: block; }
+
+        .empty-state { text-align: center; padding: 48px 20px; }
+        .empty-icon { font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.15); letter-spacing: 2px; margin-bottom: 12px; }
+        .empty-text { font-size: 13px; color: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">
+                <div class="brand-mark">SC</div>
+                <div class="brand-info">
+                    <span class="brand-name">starcard</span>
+                    <span class="brand-role">Admin</span>
+                </div>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span class="status-text">Sistema Online</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Navegação</div>
+            <a class="nav-item active" onclick="showTab('criar')"><i class="fas fa-user-plus"></i> Criar Afiliado</a>
+            <a class="nav-item" onclick="showTab('afiliados')"><i class="fas fa-users"></i> Afiliados</a>
+            <a class="nav-item" onclick="showTab('clientes')"><i class="fas fa-user-check"></i> Clientes</a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="/admin/logout" class="nav-item danger"><i class="fas fa-sign-out-alt"></i> Sair</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="page-header">
+            <div class="page-eyebrow">StarCard · Admin</div>
+            <h1 class="page-title">Painel de Controle</h1>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon">AFILIADOS</div><div class="stat-value" id="totalAfiliados">—</div><div class="stat-label">Total Cadastrados</div></div>
+            <div class="stat-card"><div class="stat-icon">CLIENTES</div><div class="stat-value" id="totalClientes">—</div><div class="stat-label">Total Indicados</div></div>
+            <div class="stat-card"><div class="stat-icon">MÉDIA</div><div class="stat-value" id="mediaClientes">—</div><div class="stat-label">Por Afiliado</div></div>
+            <div class="stat-card"><div class="stat-icon">TOP</div><div class="stat-value" id="topAfiliado" style="font-size:14px;letter-spacing:0">—</div><div class="stat-label">Melhor Afiliado</div></div>
+        </div>
+
+        <div class="tabs-header">
+            <button class="tab-btn active" id="tab-criar" onclick="showTab('criar')"><i class="fas fa-user-plus"></i> Criar Afiliado</button>
+            <button class="tab-btn" id="tab-afiliados" onclick="showTab('afiliados')"><i class="fas fa-users"></i> Afiliados</button>
+            <button class="tab-btn" id="tab-clientes" onclick="showTab('clientes')"><i class="fas fa-user-check"></i> Clientes</button>
+        </div>
+
+        <div class="tab-panel active" id="panel-criar">
+            <div class="card">
+                <div class="card-header"><span class="card-title">Novo Afiliado</span><span class="card-tag">Criar Acesso</span></div>
+                <div class="card-body">
+                    <div class="alert-box" id="alertCriar"></div>
+                    <form id="criarAfiliadoForm">
+                        <div class="form-grid">
+                            <div class="field"><label class="field-label">Nome Completo</label><input type="text" class="field-input" id="nome" name="nome" placeholder="Nome do afiliado" required></div>
+                            <div class="field"><label class="field-label">E-mail</label><input type="email" class="field-input" id="email" name="email" placeholder="email@exemplo.com" required></div>
+                            <div class="field"><label class="field-label">Senha</label><input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••" required></div>
+                            <div class="field"><label class="field-label">Confirmar Senha</label><input type="password" class="field-input" id="confirmar_senha" name="confirmar_senha" placeholder="••••••••" required></div>
+                        </div>
+                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> &nbsp;Criar Afiliado</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-afiliados">
+            <div class="card">
+                <div class="card-header"><span class="card-title">Lista de Afiliados</span><span class="card-tag" id="countAfiliados">—</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Código</th><th>Clientes</th><th>Cadastro</th></tr></thead>
+                        <tbody id="tabelaAfiliados"><tr><td colspan="6"><div class="empty-state"><div class="empty-icon">// LOADING</div></div></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-clientes">
+            <div class="filters-row">
+                <input type="text" class="filter-input grow" id="buscaClienteAdmin" placeholder="Buscar por nome, email ou CPF...">
+                <select class="filter-input" id="filtroAfiliado"><option value="">Todos os afiliados</option></select>
+                <input type="date" class="filter-input" id="dataInicio">
+                <input type="date" class="filter-input" id="dataFim">
+                <button class="btn-filter" onclick="aplicarFiltrosAdmin()"><i class="fas fa-filter"></i> Filtrar</button>
+                <button class="btn-clear" onclick="limparFiltrosAdmin()">Limpar</button>
+            </div>
+            <div class="card">
+                <div class="card-header"><span class="card-title">Todos os Clientes</span><span class="card-tag" id="countClientes">—</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Afiliado</th><th>Link</th><th>Cadastro</th></tr></thead>
+                        <tbody id="tabelaClientes"><tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// LOADING</div></div></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function showTab(name) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-item:not(.danger)').forEach(n => n.classList.remove('active'));
+            document.getElementById(`panel-${name}`).classList.add('active');
+            document.getElementById(`tab-${name}`).classList.add('active');
+            if (name === 'afiliados') carregarAfiliados();
+            if (name === 'clientes') { carregarAfiliadosFiltro(); carregarClientes(); }
+        }
+
+        async function carregarEstatisticas() {
+            try {
+                const r = await fetch('/api/estatisticas');
+                if (!r.ok) return;
+                const s = await r.json();
+                document.getElementById('totalAfiliados').textContent = s.total_afiliados;
+                document.getElementById('totalClientes').textContent = s.total_clientes;
+                document.getElementById('mediaClientes').textContent = s.media_clientes.toFixed(1);
+                document.getElementById('topAfiliado').textContent = s.top_afiliado || '—';
+            } catch(e) {}
+        }
+
+        async function carregarAfiliados() {
+            try {
+                const r = await fetch('/api/afiliados');
+                if (!r.ok) return;
+                const afiliados = await r.json();
+                const tbody = document.getElementById('tabelaAfiliados');
+                document.getElementById('countAfiliados').textContent = `${afiliados.length} registros`;
+                if (!afiliados.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum afiliado cadastrado</div></div></td></tr>`; return; }
+                tbody.innerHTML = afiliados.map(a => `<tr><td><span class="badge badge-gray">#${a.id}</span></td><td class="td-primary">${a.nome}</td><td>${a.email}</td><td><span class="badge badge-amber">${a.codigo_afiliado}</span></td><td><span class="badge badge-green">${a.total_clientes||0}</span></td><td>${new Date(a.criado_em).toLocaleDateString('pt-BR')}</td></tr>`).join('');
+            } catch(e) {}
+        }
+
+        async function carregarClientes() {
+            try {
+                const params = new URLSearchParams();
+                const afiliadoId = document.getElementById('filtroAfiliado').value;
+                const busca = document.getElementById('buscaClienteAdmin').value;
+                const dataInicio = document.getElementById('dataInicio').value;
+                const dataFim = document.getElementById('dataFim').value;
+                if (afiliadoId) params.append('afiliado_id', afiliadoId);
+                if (busca) params.append('busca', busca);
+                if (dataInicio) params.append('data_inicio', dataInicio);
+                if (dataFim) params.append('data_fim', dataFim);
+                const r = await fetch(`/api/admin/clientes?${params}`);
+                if (!r.ok) return;
+                const clientes = await r.json();
+                const tbody = document.getElementById('tabelaClientes');
+                document.getElementById('countClientes').textContent = `${clientes.length} registros`;
+                if (!clientes.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum resultado encontrado</div></div></td></tr>`; return; }
+                tbody.innerHTML = clientes.map(c => `<tr><td><span class="badge badge-gray">#${c.id}</span></td><td class="td-primary">${c.nome}</td><td>${c.email}</td><td>${c.telefone||'—'}</td><td>${c.codigo_afiliado?`<span class="badge badge-amber">${c.codigo_afiliado}</span><br><small style="color:var(--white-dim);font-size:11px">${c.nome_afiliado}</small>`:'<span class="badge badge-gray">Direto</span>'}</td><td>${c.link_id?`<span class="badge badge-green">${c.link_id}</span>`:'—'}</td><td>${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td></tr>`).join('');
+            } catch(e) {}
+        }
+
+        async function carregarAfiliadosFiltro() {
+            try {
+                const r = await fetch('/api/admin/afiliados-filtro');
+                if (!r.ok) return;
+                const afiliados = await r.json();
+                const filtro = document.getElementById('filtroAfiliado');
+                filtro.innerHTML = '<option value="">Todos os afiliados</option>' + afiliados.map(a => `<option value="${a.id}">${a.nome} — ${a.total_clientes} clientes</option>`).join('');
+            } catch(e) {}
+        }
+
+        function aplicarFiltrosAdmin() { carregarClientes(); }
+        function limparFiltrosAdmin() {
+            ['filtroAfiliado','buscaClienteAdmin','dataInicio','dataFim'].forEach(id => document.getElementById(id).value = '');
+            carregarClientes();
+        }
+
+        document.getElementById('criarAfiliadoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const alertBox = document.getElementById('alertCriar');
+            if (data.senha !== data.confirmar_senha) {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.textContent = '// ERRO: As senhas não coincidem';
+                return;
+            }
+            delete data.confirmar_senha;
+            try {
+                const r = await fetch('/api/criar-afiliado', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await r.json();
+                if (result.sucesso) {
+                    alertBox.className = 'alert-box alert-success';
+                    alertBox.textContent = `// OK: Afiliado criado — Código: ${result.codigo_afiliado}`;
+                    e.target.reset();
+                    carregarEstatisticas();
+                } else {
+                    alertBox.className = 'alert-box alert-danger';
+                    alertBox.textContent = '// ERRO: ' + (result.erro || 'Falha ao criar afiliado');
+                }
+            } catch { alertBox.className = 'alert-box alert-danger'; alertBox.textContent = '// ERRO: Falha de conexão'; }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarEstatisticas);
+    </script>
+</body>
+</html>
