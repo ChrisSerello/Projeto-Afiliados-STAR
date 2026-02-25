@@ -638,6 +638,4 @@ app.get('/api/admin/afiliados-filtro', verificarAdmin, (req, res) => {
 
 // ─── START ─────────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+module.exports = app;
