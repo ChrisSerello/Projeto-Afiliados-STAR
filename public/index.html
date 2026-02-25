@@ -3,158 +3,467 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Afiliados</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>StarCard - Área do Afiliado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --purple-deep: #1a0a2e;
+            --purple-dark: #2d1152;
+            --purple-mid: #6b21a8;
+            --purple-bright: #a855f7;
+            --purple-glow: #c084fc;
+            --accent: #e879f9;
+            --white: #ffffff;
+            --white-dim: rgba(255,255,255,0.6);
+            --white-faint: rgba(255,255,255,0.08);
         }
-        .login-container {
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--purple-deep);
             min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(168,85,247,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168,85,247,0.06) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: drift 8s ease-in-out infinite alternate;
+        }
+        .bg-orb-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(168,85,247,0.3), transparent 70%);
+            top: -150px; right: -100px;
+        }
+        .bg-orb-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(232,121,249,0.2), transparent 70%);
+            bottom: -100px; left: -50px;
+            animation-delay: -4s;
+        }
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(30px, 20px) scale(1.1); }
+        }
+
+        /* Left panel */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 72px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 80px;
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+        }
+
+        .brand-name {
+            font-family: 'Inter', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.5px;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(168,85,247,0.15);
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--purple-glow);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .hero-tag::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--purple-bright);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero-title {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(36px, 4vw, 56px);
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, var(--purple-bright), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 16px;
+            color: var(--white-dim);
+            line-height: 1.7;
+            max-width: 400px;
+            margin-bottom: 60px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 48px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-value {
+            font-family: 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--white-dim);
+        }
+
+        /* Right panel - login form */
+        .right-panel {
+            width: 520px;
+            min-height: 100vh;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255,255,255,0.06);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 60px 64px;
+            position: relative;
+            z-index: 1;
         }
-        .login-card {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 40px;
+
+        .form-container {
             width: 100%;
-            max-width: 400px;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .logo-section {
-            text-align: center;
-            margin-bottom: 30px;
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .logo-section i {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 15px;
+
+        .form-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+
+        .form-subtitle {
+            font-size: 14px;
+            color: var(--white-dim);
+            margin-bottom: 40px;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--white-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+        }
+
+        .field-input {
+            width: 100%;
+            background: var(--white-faint);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            color: var(--white);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .field-input::placeholder { color: rgba(255,255,255,0.25); }
+
+        .field-input:focus {
+            border-color: var(--purple-bright);
+            background: rgba(168,85,247,0.08);
+            box-shadow: 0 0 0 4px rgba(168,85,247,0.12);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
             border: none;
-            padding: 12px;
-            font-weight: 600;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-        .admin-link {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-size: 0.9rem;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            color: var(--white);
+            cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
         }
-        .admin-link:hover {
-            background: rgba(0,0,0,0.9);
-            color: white;
-            transform: translateY(-2px);
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-login:hover::before { left: 100%; }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(168,85,247,0.4); }
+        .btn-login:active { transform: translateY(0); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .alert-box {
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-danger {
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #fca5a5;
+            display: block;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 28px;
+            font-size: 13px;
+            color: var(--white-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--purple-glow); }
+
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 32px 0;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .security-note svg { flex-shrink: 0; }
+
+        .spinner {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 900px) {
+            .left-panel { display: none; }
+            .right-panel { width: 100%; border-left: none; }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="logo-section">
-                <i class="fas fa-users-cog"></i>
-                <h2 class="mb-3">Portal de Afiliados</h2>
-                <p class="text-muted">Acesse sua conta</p>
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+        <div class="brand">
+            <svg class="brand-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="24" fill="rgba(168,85,247,0.15)"/>
+                <path d="M32 12L24 20M24 20L16 28M24 20L32 28M24 20L16 12" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="24" cy="20" r="3" fill="#c084fc"/>
+                <path d="M20 34c0 0 1-4 4-4s4 4 4 4" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="brand-name">starcard</span>
+        </div>
+
+        <div class="hero-tag">Portal de Afiliados</div>
+
+        <h1 class="hero-title">
+            Sua central<br>
+            de <span>resultados</span><br>
+            começa aqui.
+        </h1>
+
+        <p class="hero-desc">
+            Acesse seu painel exclusivo, gere links personalizados e acompanhe em tempo real cada cliente que você indica.
+        </p>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-value">100%</span>
+                <span class="stat-label">Digital</span>
             </div>
-            
-            <form id="loginForm">
-                <div class="mb-3">
-                    <label for="email" class="form-label">
-                        <i class="fas fa-envelope me-2"></i>Email
-                    </label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="senha" class="form-label">
-                        <i class="fas fa-lock me-2"></i>Senha
-                    </label>
-                    <input type="password" class="form-control" id="senha" name="senha" required>
-                </div>
-                
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt me-2"></i>Entrar
-                    </button>
-                </div>
-            </form>
-            
-            <div id="alertContainer"></div>
+            <div class="stat">
+                <span class="stat-value">24h</span>
+                <span class="stat-label">Suporte</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">∞</span>
+                <span class="stat-label">Indicações</span>
+            </div>
         </div>
     </div>
 
-    <!-- Link para área administrativa -->
-    <a href="/admin" class="admin-link">
-        <i class="fas fa-cog"></i> Admin
-    </a>
+    <!-- Right Panel - Login Form -->
+    <div class="right-panel">
+        <div class="form-container">
+            <h2 class="form-title">Entrar na conta</h2>
+            <p class="form-subtitle">Bem-vindo de volta ao seu painel</p>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <div class="alert-box" id="alertBox"></div>
+
+            <form id="loginForm">
+                <div class="field">
+                    <label class="field-label" for="email">E-mail</label>
+                    <input type="email" class="field-input" id="email" name="email" placeholder="seu@email.com.br" required>
+                </div>
+
+                <div class="field">
+                    <label class="field-label" for="senha">Senha</label>
+                    <input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-login" id="btnLogin">
+                    <span id="btnText">Acessar Painel</span>
+                </button>
+            </form>
+
+            <div class="divider"></div>
+
+            <div class="security-note">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                Acesso protegido com criptografia de ponta a ponta
+            </div>
+
+            <a href="/admin" class="back-link">⚙ Painel Administrativo</a>
+        </div>
+    </div>
+
     <script>
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+            const btn = document.getElementById('btnLogin');
+            const btnText = document.getElementById('btnText');
+            const alertBox = document.getElementById('alertBox');
+
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Entrando...';
+            alertBox.className = 'alert-box';
+            alertBox.textContent = '';
+
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
-            
+
             try {
                 const response = await fetch('/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.sucesso) {
-                    showAlert('success', 'Login realizado com sucesso!');
-                    setTimeout(() => {
-                        window.location.href = result.redirect;
-                    }, 1000);
+                    btnText.innerHTML = '✓ Redirecionando...';
+                    window.location.href = result.redirect;
                 } else {
-                    showAlert('danger', result.erro || 'Erro ao fazer login');
+                    alertBox.className = 'alert-box alert-danger';
+                    alertBox.textContent = result.erro || 'Email ou senha incorretos.';
                 }
             } catch (error) {
-                showAlert('danger', 'Erro de conexão com o servidor');
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.textContent = 'Erro de conexão. Tente novamente.';
+            } finally {
+                btn.disabled = false;
+                if (btnText.textContent !== '✓ Redirecionando...') {
+                    btnText.textContent = 'Acessar Painel';
+                }
             }
         });
-        
-        function showAlert(type, message) {
-            const alertContainer = document.getElementById('alertContainer');
-            alertContainer.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-        }
     </script>
 </body>
 </html>
