@@ -454,6 +454,32 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
 
         if (insertError) throw insertError;
 
+        // ── INSERIR TAMBÉM NA TABELA CLIENTES ──────────────────────────────
+        try {
+            let idAfiliado = null;
+            if (codigo_afiliado) {
+                const { data: af } = await supabase
+                    .from('afiliados')
+                    .select('id')
+                    .eq('codigo_afiliado', codigo_afiliado)
+                    .single();
+                idAfiliado = af?.id || null;
+            }
+
+            await supabase.from('clientes').insert({
+                nome: nome_completo,
+                email: null,
+                telefone: celular,
+                cpf: cpf,
+                id_afiliado: idAfiliado,
+                codigo_afiliado: codigo_afiliado || null,
+                link_id: null
+            });
+        } catch (clienteErr) {
+            console.error('Erro ao espelhar cliente:', clienteErr);
+        }
+        // ───────────────────────────────────────────────────────────────────
+
         // ── DISTRIBUIÇÃO ALEATÓRIA DE OPERADOR ──────────────────────────
         let operadorAtribuido = null;
         try {
@@ -465,7 +491,6 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
             if (operadores && operadores.length > 0) {
                 operadorAtribuido = operadores[Math.floor(Math.random() * operadores.length)];
 
-                // Salva a atribuição na tabela de histórico
                 await supabase
                     .from('atribuicoes_operadores')
                     .insert({
@@ -506,7 +531,13 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
                 </div>
             `;
 
-            const destinatarios = [emailConfig.emailEmpresa, 'kaique.silva@starbank.tec.br'];
+            // ── CORREÇÃO: brunno adicionado na lista de destinatários ──────
+            const destinatarios = [
+                emailConfig.emailEmpresa,
+                'kaique.silva@starbank.tec.br',
+                'brunno@starbank.tec.br'
+            ];
+            // ─────────────────────────────────────────────────────────────
 
             if (codigo_afiliado) {
                 const { data: afiliadoEmail } = await supabase
