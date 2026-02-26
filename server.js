@@ -442,15 +442,46 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
             }
         }
 
-        const { error: insertError } = await supabase
+        const { data: formularioInserido, error: insertError } = await supabase
             .from('formularios_servidor')
             .insert({
                 codigo_afiliado, nome_afiliado, nome_completo, cpf,
                 data_nascimento, celular, orgao, tipo_vinculo,
                 objetivo, bancos_atuais, holerite_path: holeriteUrl
-            });
+            })
+            .select('id')
+            .single();
 
         if (insertError) throw insertError;
+
+        // ── DISTRIBUIÇÃO ALEATÓRIA DE OPERADOR ──────────────────────────
+        let operadorAtribuido = null;
+        try {
+            const { data: operadores } = await supabase
+                .from('operadores')
+                .select('*')
+                .eq('ativo', true);
+
+            if (operadores && operadores.length > 0) {
+                operadorAtribuido = operadores[Math.floor(Math.random() * operadores.length)];
+
+                // Salva a atribuição na tabela de histórico
+                await supabase
+                    .from('atribuicoes_operadores')
+                    .insert({
+                        formulario_id: formularioInserido?.id,
+                        operador_id: operadorAtribuido.id,
+                        nome_operador: operadorAtribuido.nome,
+                        sobrenome_operador: operadorAtribuido.sobrenome,
+                        telefone_operador: operadorAtribuido.telefone,
+                        nome_cliente: nome_completo,
+                        telefone_cliente: celular,
+                        prefeitura_cliente: orgao
+                    });
+            }
+        } catch (opErr) {
+            console.error('Erro ao atribuir operador:', opErr);
+        }
 
         try {
             const corpoEmail = `
@@ -496,7 +527,14 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
             console.error('Erro ao enviar e-mail de notificação:', emailErr);
         }
 
-        res.json({ sucesso: true });
+        res.json({
+            sucesso: true,
+            operador: operadorAtribuido ? {
+                nome: operadorAtribuido.nome,
+                sobrenome: operadorAtribuido.sobrenome,
+                telefone: operadorAtribuido.telefone
+            } : null
+        });
     } catch (error) {
         console.error('Erro no formulário:', error);
         res.status(500).json({ erro: 'Erro interno no servidor.' });
@@ -741,6 +779,61 @@ app.get('/api/admin/afiliados-filtro', verificarAdmin, async (req, res) => {
         }));
 
         res.json(resultado);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ erro: 'Erro no servidor' });
+    }
+});
+
+// ─── OPERADORES ────────────────────────────────────────────────────────────
+
+app.get('/api/admin/operadores', verificarAdmin, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('operadores')
+            .select('*')
+            .order('nome');
+        if (error) throw error;
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ erro: 'Erro no servidor' });
+    }
+});
+
+app.post('/api/admin/operadores', verificarAdmin, async (req, res) => {
+    const { nome, sobrenome, telefone } = req.body;
+    if (!nome || !sobrenome || !telefone) return res.status(400).json({ erro: 'Dados incompletos' });
+    try {
+        const { error } = await supabase.from('operadores').insert({ nome, sobrenome, telefone, ativo: true });
+        if (error) throw error;
+        res.json({ sucesso: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ erro: 'Erro ao criar operador' });
+    }
+});
+
+app.patch('/api/admin/operadores/:id', verificarAdmin, async (req, res) => {
+    const { ativo } = req.body;
+    try {
+        const { error } = await supabase.from('operadores').update({ ativo }).eq('id', req.params.id);
+        if (error) throw error;
+        res.json({ sucesso: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ erro: 'Erro ao atualizar operador' });
+    }
+});
+
+app.get('/api/admin/atribuicoes', verificarAdmin, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('atribuicoes_operadores')
+            .select('*')
+            .order('atribuido_em', { ascending: false });
+        if (error) throw error;
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).json({ erro: 'Erro no servidor' });

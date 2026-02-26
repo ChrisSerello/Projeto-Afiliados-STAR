@@ -4,295 +4,367 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <title>StarCard - Área do Afiliado</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>StarCard — Portal de Afiliados</title>
+    <link rel="icon" type="image/png" href="/assets/Logo_Starbank.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --purple-deep: #1a0a2e;
-            --purple-dark: #2d1152;
-            --purple-mid: #6b21a8;
-            --purple-bright: #a855f7;
-            --purple-glow: #c084fc;
-            --accent: #e879f9;
-            --white: #ffffff;
-            --white-dim: rgba(255,255,255,0.6);
-            --white-faint: rgba(255,255,255,0.08);
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--purple-deep);
             min-height: 100vh;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
             overflow: hidden;
+            background: #060410;
+        }
+
+        /* Camadas de profundidade do fundo */
+        .depth-1 {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 100% 100% at 0% 100%, #000 0%, transparent 55%),
+                radial-gradient(ellipse 100% 100% at 100% 0%, #000 0%, transparent 55%);
+        }
+        .depth-2 {
+            position: fixed; inset: 0; z-index: 1;
+            background:
+                radial-gradient(ellipse 80% 80% at 25% 20%, #7c3aed 0%, transparent 55%),
+                radial-gradient(ellipse 60% 60% at 75% 15%, #9333ea 0%, transparent 45%),
+                radial-gradient(ellipse 70% 60% at 50% 60%, #4c1d95 0%, transparent 60%);
+            opacity: 0.55;
+        }
+        .depth-3 {
+            position: fixed; inset: 0; z-index: 2;
+            background:
+                radial-gradient(ellipse 50% 40% at 30% 20%, #a855f7 0%, transparent 50%),
+                radial-gradient(ellipse 30% 30% at 65% 10%, #c084fc 0%, transparent 45%);
+            opacity: 0.28;
+        }
+        .depth-4 {
+            position: fixed; inset: 0; z-index: 3;
+            background:
+                radial-gradient(ellipse 70% 50% at 50% 120%, #000 0%, transparent 65%),
+                radial-gradient(ellipse 30% 90% at -5% 50%, #000 0%, transparent 50%),
+                radial-gradient(ellipse 30% 90% at 105% 50%, #000 0%, transparent 50%);
+            opacity: 0.75;
+        }
+
+        /* S de fundo */
+        .bg-watermark {
+            position: fixed;
+            bottom: -140px; left: -80px;
+            font-size: 700px;
+            font-weight: 900;
+            color: rgba(168,85,247,0.05);
+            line-height: 1;
+            pointer-events: none;
+            user-select: none;
+            z-index: 4;
+        }
+
+        /* Card */
+        .card {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 860px;
+            min-height: 490px;
+            display: flex;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.07),
+                0 60px 120px rgba(0,0,0,0.7),
+                inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+
+        /* ── PAINEL ESQUERDO ── */
+        .left {
+            flex: 1;
+            padding: 44px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             position: relative;
+            overflow: hidden;
+            background: linear-gradient(
+                155deg,
+                #9333ea 0%,
+                #7c3aed 20%,
+                #5b21b6 45%,
+                #3b0f8a 70%,
+                #100530 100%
+            );
         }
 
-        .bg-grid {
-            position: fixed; inset: 0;
-            background-image:
-                linear-gradient(rgba(168,85,247,0.06) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(168,85,247,0.06) 1px, transparent 1px);
-            background-size: 60px 60px;
-            z-index: 0;
+        .left::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(216,180,254,0.3) 0%, transparent 65%);
+            pointer-events: none;
         }
 
-        .bg-orb {
-            position: fixed; border-radius: 50%;
-            filter: blur(80px); z-index: 0;
-            animation: drift 8s ease-in-out infinite alternate;
-        }
-        .bg-orb-1 {
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(168,85,247,0.3), transparent 70%);
-            top: -150px; right: -100px;
-        }
-        .bg-orb-2 {
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(232,121,249,0.2), transparent 70%);
-            bottom: -100px; left: -50px;
-            animation-delay: -4s;
-        }
-        @keyframes drift {
-            from { transform: translate(0, 0) scale(1); }
-            to { transform: translate(30px, 20px) scale(1.1); }
+        /* Divisor sutil entre os dois lados */
+        .left::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 1px; height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent,
+                rgba(216,180,254,0.25) 30%,
+                rgba(196,141,252,0.25) 70%,
+                transparent
+            );
         }
 
-        /* Left panel */
-        .left-panel {
-            flex: 1; display: flex; flex-direction: column;
-            justify-content: center; padding: 60px 72px;
+        .left-logo {
+            height: 28px; width: auto;
+            filter: brightness(0) invert(1);
+            opacity: 0.88;
             position: relative; z-index: 1;
         }
 
-        .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 80px; }
-        .brand-logo { width: 48px; height: 48px; }
-        .brand-name { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
-
-        .hero-tag {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);
-            border-radius: 100px; padding: 6px 16px; font-size: 12px; font-weight: 500;
-            color: var(--purple-glow); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 28px;
-        }
-        .hero-tag::before {
-            content: ''; width: 6px; height: 6px; background: var(--purple-bright);
-            border-radius: 50%; animation: pulse 2s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
-
-        .hero-title {
-            font-family: 'Inter', sans-serif;
-            font-size: clamp(36px, 4vw, 56px); font-weight: 800; color: var(--white);
-            line-height: 1.1; margin-bottom: 20px; letter-spacing: -1.5px;
-        }
-        .hero-title span { background: linear-gradient(135deg, var(--purple-bright), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .hero-desc { font-size: 16px; color: var(--white-dim); line-height: 1.7; max-width: 400px; margin-bottom: 60px; }
-
-        .stats { display: flex; gap: 48px; }
-        .stat { display: flex; flex-direction: column; gap: 4px; }
-        .stat-value { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -1px; }
-        .stat-label { font-size: 13px; color: var(--white-dim); }
-
-        /* Right panel */
-        .right-panel {
-            width: 520px; min-height: 100vh;
-            background: rgba(255,255,255,0.03); backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(255,255,255,0.06);
-            display: flex; align-items: center; justify-content: center;
-            padding: 60px 64px; position: relative; z-index: 1;
+        .left-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px 0;
+            position: relative; z-index: 1;
         }
 
-        .form-container {
+        .left-brand-name {
+            font-size: clamp(46px, 5vw, 68px);
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 40px rgba(0,0,0,0.3);
+        }
+
+        .left-by {
+            font-size: 18px;
+            color: rgba(255,255,255,0.45);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        .left-by b {
+            font-weight: 800;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+
+        /* ── PAINEL DIREITO — roxo escuro ── */
+        .right {
+            width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 40px;
+            position: relative;
+            background: linear-gradient(
+                155deg,
+                #3b0f8a 0%,
+                #2a0a6e 35%,
+                #16053a 70%,
+                #060210 100%
+            );
+        }
+
+        /* Brilho sutil no canto superior direito */
+        .right::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .right-logo {
+            height: 36px; width: auto;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1);
+            opacity: 0.85;
+            position: relative; z-index: 1;
+        }
+
+        .right-title {
+            font-size: 22px; font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+            text-align: center;
+            position: relative; z-index: 1;
+        }
+        .right-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 28px;
+            text-align: center;
+            position: relative; z-index: 1;
+        }
+
+        /* Inputs no tema escuro */
+        .field { width: 100%; margin-bottom: 12px; position: relative; z-index: 1; }
+
+        .input-wrap {
+            display: flex; align-items: center;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 9px;
+            padding: 0 14px;
+            background: rgba(255,255,255,0.07);
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+        .input-wrap:focus-within {
+            border-color: rgba(196,141,252,0.6);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 0 3px rgba(168,85,247,0.15);
+        }
+        .input-icon { font-size: 14px; opacity: 0.45; margin-right: 10px; flex-shrink: 0; }
+
+        .inp {
+            flex: 1; border: none; outline: none;
+            padding: 12px 0;
+            font-size: 14px; font-family: 'Inter', sans-serif;
+            color: #fff; background: transparent;
+        }
+        .inp::placeholder { color: rgba(255,255,255,0.3); }
+
+        .row-forgot {
+            width: 100%; display: flex;
+            justify-content: flex-end; margin-bottom: 20px;
+            position: relative; z-index: 1;
+        }
+        .forgot {
+            font-size: 12px; font-weight: 600;
+            color: rgba(216,180,254,0.8);
+            text-decoration: none; transition: opacity 0.2s;
+        }
+        .forgot:hover { opacity: 0.7; }
+
+        .btn {
             width: 100%;
-            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #c084fc);
+            border: none; border-radius: 10px; padding: 13px;
+            font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 700;
+            color: #fff; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+            position: relative; z-index: 1;
+            box-shadow: 0 4px 20px rgba(168,85,247,0.3);
         }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(168,85,247,0.5); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .form-title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 8px; letter-spacing: -0.5px; }
-        .form-subtitle { font-size: 14px; color: var(--white-dim); margin-bottom: 40px; }
+        .alert { width: 100%; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; position: relative; z-index: 1; }
+        .alert.err { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; display: block; }
 
-        .field { margin-bottom: 20px; }
-        .field-label { display: block; font-size: 12px; font-weight: 500; color: var(--white-dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
-
-        .field-input {
-            width: 100%; background: var(--white-faint);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-            padding: 14px 18px; font-size: 15px; font-family: 'Inter', sans-serif;
-            color: var(--white); outline: none; transition: all 0.2s ease;
+        .admin-link {
+            display: block; margin-top: 20px; font-size: 11px;
+            color: rgba(255,255,255,0.2); text-decoration: none; text-align: center;
+            transition: color 0.2s; position: relative; z-index: 1;
         }
-        .field-input::placeholder { color: rgba(255,255,255,0.25); }
-        .field-input:focus { border-color: var(--purple-bright); background: rgba(168,85,247,0.08); box-shadow: 0 0 0 4px rgba(168,85,247,0.12); }
+        .admin-link:hover { color: rgba(216,180,254,0.7); }
 
-        .field-footer { display: flex; justify-content: flex-end; margin-top: 6px; }
-        .forgot-link { font-size: 12px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
-        .forgot-link:hover { color: var(--purple-glow); }
-
-        .btn-login {
-            width: 100%; background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
-            border: none; border-radius: 12px; padding: 15px; font-size: 15px;
-            font-family: 'Inter', sans-serif; font-weight: 700; color: var(--white);
-            cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
-            margin-top: 8px; letter-spacing: 0.3px;
+        .spin {
+            display: inline-block; width: 13px; height: 13px;
+            border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+            border-radius: 50%; animation: rot 0.7s linear infinite;
+            margin-right: 8px; vertical-align: middle;
         }
-        .btn-login::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            transition: left 0.5s ease;
-        }
-        .btn-login:hover::before { left: 100%; }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(168,85,247,0.4); }
-        .btn-login:active { transform: translateY(0); }
-        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        @keyframes rot { to { transform: rotate(360deg); } }
 
-        .alert-box { border-radius: 10px; padding: 12px 16px; font-size: 14px; margin-bottom: 20px; display: none; }
-        .alert-danger { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; display: block; }
-
-        .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 32px 0; }
-
-        .security-note { display: flex; align-items: center; gap: 10px; font-size: 12px; color: rgba(255,255,255,0.3); }
-        .security-note svg { flex-shrink: 0; }
-
-        .back-link { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--white-dim); text-decoration: none; transition: color 0.2s; }
-        .back-link:hover { color: var(--purple-glow); }
-
-        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 900px) {
-            .left-panel { display: none; }
-            .right-panel { width: 100%; border-left: none; }
-        }
+        @media (max-width: 650px) { .left { display: none; } .right { width: 100%; } .card { max-width: 380px; } }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
 
-    <!-- Left Panel -->
-    <div class="left-panel">
-        <div class="brand">
-            <svg class="brand-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="24" cy="24" r="24" fill="rgba(168,85,247,0.15)"/>
-                <path d="M32 12L24 20M24 20L16 28M24 20L32 28M24 20L16 12" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="24" cy="20" r="3" fill="#c084fc"/>
-                <path d="M20 34c0 0 1-4 4-4s4 4 4 4" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span class="brand-name">starcard</span>
-        </div>
+    <div class="depth-1"></div>
+    <div class="depth-2"></div>
+    <div class="depth-3"></div>
+    <div class="depth-4"></div>
+    <div class="bg-watermark">S</div>
 
-        <div class="hero-tag">Portal de Afiliados</div>
+    <div class="card">
 
-        <h1 class="hero-title">
-            Sua central<br>
-            de <span>resultados</span><br>
-            começa aqui.
-        </h1>
-
-        <p class="hero-desc">
-            Acesse seu painel exclusivo, gere links personalizados e acompanhe em tempo real cada cliente que você indica.
-        </p>
-
-        <div class="stats">
-            <div class="stat">
-                <span class="stat-value">100%</span>
-                <span class="stat-label">Digital</span>
-            </div>
-            <div class="stat">
-                <span class="stat-value">24h</span>
-                <span class="stat-label">Suporte</span>
-            </div>
-            <div class="stat">
-                <span class="stat-value">∞</span>
-                <span class="stat-label">Indicações</span>
+        <!-- ESQUERDA -->
+        <div class="left">
+            <img src="/assets/Logo_Starbank.png" alt="StarBank" class="left-logo">
+            <div class="left-main">
+                <div class="left-brand-name">Afiliados</div>
+                <div class="left-by">by <b>STAR</b></div>
             </div>
         </div>
-    </div>
 
-    <!-- Right Panel -->
-    <div class="right-panel">
-        <div class="form-container">
-            <h2 class="form-title">Entrar na conta</h2>
-            <p class="form-subtitle">Bem-vindo de volta ao seu painel</p>
+        <!-- DIREITA -->
+        <div class="right">
+            <img src="/assets/Logo_Starbank.png" alt="StarBank" class="right-logo">
+            <div class="right-title">Bem vindo!</div>
+            <div class="right-sub">Portal de afiliados StarCard.</div>
 
-            <div class="alert-box" id="alertBox"></div>
+            <div class="alert" id="alertBox"></div>
 
-            <form id="loginForm">
+            <form id="loginForm" style="width:100%">
                 <div class="field">
-                    <label class="field-label" for="email">E-mail</label>
-                    <input type="email" class="field-input" id="email" name="email" placeholder="seu@email.com.br" required autocomplete="email">
-                </div>
-
-                <div class="field">
-                    <label class="field-label" for="senha">Senha</label>
-                    <input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••" required autocomplete="current-password">
-                    <div class="field-footer">
-                        <a href="/esqueci-senha" class="forgot-link">Esqueci minha senha</a>
+                    <div class="input-wrap">
+                        <span class="input-icon">✉️</span>
+                        <input type="email" class="inp" name="email" placeholder="Insira seu e-mail" required autocomplete="email">
                     </div>
                 </div>
-
-                <button type="submit" class="btn-login" id="btnLogin">
-                    <span id="btnText">Acessar Painel</span>
+                <div class="field">
+                    <div class="input-wrap">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" class="inp" name="senha" placeholder="Insira sua senha" required autocomplete="current-password">
+                    </div>
+                </div>
+                <div class="row-forgot">
+                    <a href="/esqueci-senha" class="forgot">Esqueci a senha</a>
+                </div>
+                <button type="submit" class="btn" id="btn">
+                    <span id="btnText">Entrar</span>
                 </button>
             </form>
 
-            <div class="divider"></div>
-
-            <div class="security-note">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                Acesso protegido com criptografia de ponta a ponta
-            </div>
-
-            <a href="/admin" class="back-link">⚙ Painel Administrativo</a>
+            <a href="/admin" class="admin-link">⚙ Painel Administrativo</a>
         </div>
+
     </div>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnLogin');
+            const btn = document.getElementById('btn');
             const btnText = document.getElementById('btnText');
             const alertBox = document.getElementById('alertBox');
-
             btn.disabled = true;
-            btnText.innerHTML = '<span class="spinner"></span> Entrando...';
-            alertBox.className = 'alert-box';
-            alertBox.textContent = '';
-
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-
+            btnText.innerHTML = '<span class="spin"></span>Entrando...';
+            alertBox.className = 'alert';
             try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    credentials: 'include',
+                const res = await fetch('/login', {
+                    method: 'POST', credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
                 });
-
-                const result = await response.json();
-
-                if (result.sucesso) {
-                    btnText.innerHTML = '✓ Redirecionando...';
-                    window.location.href = result.redirect;
+                const r = await res.json();
+                if (r.sucesso) {
+                    btnText.textContent = '✓ Redirecionando...';
+                    window.location.href = r.redirect;
                 } else {
-                    alertBox.className = 'alert-box alert-danger';
-                    alertBox.textContent = result.erro || 'Email ou senha incorretos.';
-                    btn.disabled = false;
-                    btnText.textContent = 'Acessar Painel';
+                    alertBox.className = 'alert err';
+                    alertBox.textContent = r.erro || 'Email ou senha incorretos.';
+                    btn.disabled = false; btnText.textContent = 'Entrar';
                 }
-            } catch (error) {
-                alertBox.className = 'alert-box alert-danger';
+            } catch {
+                alertBox.className = 'alert err';
                 alertBox.textContent = 'Erro de conexão. Tente novamente.';
-                btn.disabled = false;
-                btnText.textContent = 'Acessar Painel';
+                btn.disabled = false; btnText.textContent = 'Entrar';
             }
         });
     </script>

@@ -3,577 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StarCard — Acesso Restrito</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <title>StarCard — Admin</title>
+    <link rel="icon" type="image/png" href="/assets/Logo_Starbank.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --black: #080808;
-            --surface: #0e0e0e;
-            --surface-2: #141414;
-            --border: rgba(255,255,255,0.06);
+            --bg: #0a0a0a;
             --amber: #f59e0b;
-            --amber-dim: rgba(245,158,11,0.15);
+            --amber-dim: rgba(245,158,11,0.12);
+            --amber-border: rgba(245,158,11,0.25);
             --amber-glow: rgba(245,158,11,0.06);
             --white: #ffffff;
-            --white-dim: rgba(255,255,255,0.45);
-            --white-faint: rgba(255,255,255,0.05);
-            --red: #ef4444;
+            --white-dim: rgba(255,255,255,0.5);
+            --white-faint: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.07);
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--black);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
-            overflow: hidden;
-            color: var(--white);
+            flex-direction: column;
         }
 
-        /* Scanline overlay */
-        body::after {
+        body::before {
             content: '';
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0,0,0,0.03) 2px,
-                rgba(0,0,0,0.03) 4px
-            );
-            pointer-events: none;
-            z-index: 999;
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
+            background-size: 56px 56px;
+            z-index: 0; pointer-events: none;
         }
 
-        /* Animated corner borders */
-        .corner {
-            position: fixed;
-            width: 60px; height: 60px;
-            z-index: 10;
-        }
-        .corner::before, .corner::after {
-            content: '';
-            position: absolute;
-            background: var(--amber);
-        }
-        .corner::before { width: 2px; height: 100%; }
-        .corner::after { width: 100%; height: 2px; }
-        .corner-tl { top: 20px; left: 20px; }
-        .corner-tr { top: 20px; right: 20px; transform: scaleX(-1); }
-        .corner-bl { bottom: 20px; left: 20px; transform: scaleY(-1); }
-        .corner-br { bottom: 20px; right: 20px; transform: scale(-1); }
+        .orb { position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; }
+        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(245,158,11,0.1), transparent 70%); top: -150px; right: -50px; }
+        .orb-2 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(245,158,11,0.06), transparent 70%); bottom: -80px; left: 20%; }
 
-        /* Left panel */
+        /* Logo topo */
+        .top-logo {
+            position: relative; z-index: 10;
+            display: flex; justify-content: center;
+            padding: 28px 24px 0;
+        }
+        .top-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); }
+
+        /* Split */
+        .split { flex: 1; display: flex; position: relative; z-index: 1; }
+
+        /* Esquerda */
         .left {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 60px;
-            position: relative;
-            border-right: 1px solid var(--border);
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; padding: 60px 72px;
         }
 
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--amber-dim); border: 1px solid var(--amber-border);
+            border-radius: 100px; padding: 6px 16px;
+            font-size: 11px; font-weight: 600; color: var(--amber);
+            letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 28px; width: fit-content;
         }
-
-        .status-dot {
-            width: 8px; height: 8px;
-            background: var(--amber);
-            border-radius: 50%;
-            animation: blink 2s ease-in-out infinite;
-            box-shadow: 0 0 8px var(--amber);
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .status-text {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--amber);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .main-visual {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .eyebrow {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 4px;
-            color: var(--amber);
-            text-transform: uppercase;
-            margin-bottom: 24px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease 0.3s forwards;
-        }
+        .tag-dot { width: 6px; height: 6px; background: var(--amber); border-radius: 50%; animation: blink 2s infinite; box-shadow: 0 0 6px var(--amber); }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
         .hero-title {
-            font-size: clamp(48px, 6vw, 80px);
-            font-weight: 700;
-            line-height: 1.0;
-            letter-spacing: -2px;
-            margin-bottom: 32px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease 0.5s forwards;
+            font-size: clamp(38px, 3.8vw, 54px);
+            font-weight: 800; line-height: 1.08;
+            color: var(--white); letter-spacing: -2px; margin-bottom: 20px;
         }
+        .hero-title em { font-style: normal; color: var(--amber); }
 
-        .hero-title .line-2 {
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+        .hero-sub { font-size: 15px; color: var(--white-dim); line-height: 1.7; max-width: 360px; margin-bottom: 52px; }
+
+        .badges { display: flex; gap: 12px; flex-wrap: wrap; }
+        .badge {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--white-faint); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 16px;
+            font-size: 13px; color: var(--white-dim);
         }
+        .badge-icon { font-size: 16px; }
+        .badge strong { color: var(--white); font-weight: 600; }
 
-        .hero-title .highlight {
-            color: var(--amber);
-            -webkit-text-stroke: 0;
-        }
-
-        .hero-desc {
-            font-size: 15px;
-            color: var(--white-dim);
-            line-height: 1.7;
-            max-width: 380px;
-            margin-bottom: 48px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease 0.7s forwards;
-        }
-
-        .metrics {
-            display: flex;
-            gap: 40px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease 0.9s forwards;
-        }
-
-        .metric {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .metric-val {
-            font-family: 'Space Mono', monospace;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--white);
-        }
-
-        .metric-label {
-            font-size: 11px;
-            color: var(--white-dim);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .bottom-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-mark {
-            width: 36px; height: 36px;
-            border: 1px solid var(--amber);
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--amber);
-        }
-
-        .brand-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--white);
-            letter-spacing: -0.3px;
-        }
-
-        .version {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: rgba(255,255,255,0.2);
-            letter-spacing: 2px;
-        }
-
-        /* Glitch effect on hover */
-        .hero-title:hover .highlight {
-            animation: glitch 0.3s ease;
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
-            40% { transform: translate(2px, -1px); }
-            60% { transform: translate(-1px, 0); }
-            80% { transform: translate(1px, 1px); }
-            100% { transform: translate(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Right panel - form */
+        /* Direita */
         .right {
-            width: 500px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 60px 60px;
-            background: var(--surface);
-            position: relative;
+            width: 480px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 60px 56px;
+            background: rgba(255,255,255,0.02);
+            border-left: 1px solid var(--border);
+            backdrop-filter: blur(16px);
         }
 
-        /* Amber glow top right */
-        .right::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%);
-            pointer-events: none;
-        }
+        .form-wrap { width: 100%; animation: up 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-        .form-header {
-            margin-bottom: 40px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease 0.4s forwards;
-        }
-
-        .form-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--amber);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .form-tag::before {
-            content: '[';
-            opacity: 0.5;
-        }
-        .form-tag::after {
-            content: ']';
-            opacity: 0.5;
-        }
-
-        .form-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--white);
-            letter-spacing: -0.5px;
-            margin-bottom: 6px;
-        }
-
-        .form-subtitle {
-            font-size: 13px;
-            color: var(--white-dim);
-        }
-
-        .field {
+        .restricted-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--amber-dim); border: 1px solid var(--amber-border);
+            border-radius: 6px; padding: 4px 10px;
+            font-size: 10px; font-weight: 700; color: var(--amber);
+            letter-spacing: 1.5px; text-transform: uppercase;
             margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeIn 0.6s ease forwards;
         }
 
-        .field:nth-child(1) { animation-delay: 0.5s; }
-        .field:nth-child(2) { animation-delay: 0.65s; }
+        .form-title { font-size: 24px; font-weight: 700; color: var(--white); margin-bottom: 4px; letter-spacing: -0.4px; }
+        .form-sub { font-size: 14px; color: var(--white-dim); margin-bottom: 36px; }
 
-        .field-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--white-dim);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 10px;
+        .field { margin-bottom: 16px; }
+        .lbl { display: block; font-size: 11px; font-weight: 600; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+        .inp {
+            width: 100%; padding: 13px 16px;
+            background: var(--white-faint); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; font-size: 15px; font-family: 'Inter', sans-serif;
+            color: var(--white); outline: none; transition: all 0.2s;
         }
+        .inp::placeholder { color: rgba(255,255,255,0.18); }
+        .inp:focus { border-color: var(--amber); background: rgba(245,158,11,0.05); box-shadow: 0 0 0 3px rgba(245,158,11,0.08); }
 
-        .field-label::before {
-            content: '//';
-            color: var(--amber);
-            opacity: 0.6;
-        }
-
-        .field-input {
-            width: 100%;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 13px 16px;
-            font-size: 14px;
-            font-family: 'Outfit', sans-serif;
-            color: var(--white);
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .field-input::placeholder { color: rgba(255,255,255,0.15); }
-
-        .field-input:focus {
-            border-color: rgba(245,158,11,0.4);
-            background: rgba(245,158,11,0.03);
-            box-shadow: 0 0 0 3px rgba(245,158,11,0.06);
-        }
-
-        .btn-submit {
-            width: 100%;
+        .btn {
+            width: 100%; margin-top: 8px;
             background: var(--amber);
-            border: none;
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 14px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            color: #000;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            letter-spacing: 0.3px;
-            margin-top: 8px;
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            animation: fadeIn 0.6s ease 0.8s forwards;
+            border: none; border-radius: 10px; padding: 14px;
+            font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 700;
+            color: #000; cursor: pointer; transition: all 0.25s;
+            position: relative; overflow: hidden;
         }
+        .btn::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); transform:translateX(-100%); transition:transform 0.5s; }
+        .btn:hover::after { transform:translateX(100%); }
+        .btn:hover { background: #fbbf24; transform:translateY(-2px); box-shadow:0 14px 40px rgba(245,158,11,0.3); }
+        .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 
-        .btn-submit::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.4s ease;
-        }
+        .alert { border-radius:8px; padding:11px 14px; font-size:13px; margin-bottom:16px; display:none; }
+        .alert.err { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#fca5a5; display:block; }
+        .alert.ok { background:var(--amber-dim); border:1px solid var(--amber-border); color:var(--amber); display:block; }
 
-        .btn-submit:hover::before { left: 100%; }
-        .btn-submit:hover { background: #fbbf24; box-shadow: 0 8px 24px rgba(245,158,11,0.3); transform: translateY(-1px); }
-        .btn-submit:active { transform: translateY(0); }
-        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .divider { height:1px; background:var(--border); margin:28px 0; }
+        .security { display:flex; align-items:center; gap:8px; font-size:11px; color:rgba(255,255,255,0.2); }
+        .back-lnk { display:block; text-align:center; margin-top:14px; font-size:12px; color:rgba(255,255,255,0.22); text-decoration:none; transition:color 0.2s; }
+        .back-lnk:hover { color: var(--amber); }
 
-        .alert-box {
-            border-radius: 8px;
-            padding: 12px 14px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            display: none;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-        }
+        .spin { display:inline-block; width:13px; height:13px; border:2px solid rgba(0,0,0,0.3); border-top-color:#000; border-radius:50%; animation:rot 0.7s linear infinite; margin-right:8px; vertical-align:middle; }
+        @keyframes rot { to{transform:rotate(360deg)} }
 
-        .alert-danger {
-            background: rgba(239,68,68,0.08);
-            border: 1px solid rgba(239,68,68,0.2);
-            color: #fca5a5;
-            display: block;
-        }
-
-        .alert-success {
-            background: rgba(245,158,11,0.08);
-            border: 1px solid rgba(245,158,11,0.2);
-            color: var(--amber);
-            display: block;
-        }
-
-        .form-footer {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            opacity: 0;
-            animation: fadeIn 0.6s ease 1s forwards;
-        }
-
-        .back-link {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: rgba(255,255,255,0.25);
-            text-decoration: none;
-            letter-spacing: 1px;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover { color: var(--amber); }
-
-        .security-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Space Mono', monospace;
-            font-size: 9px;
-            color: rgba(255,255,255,0.2);
-            letter-spacing: 1px;
-        }
-
-        .security-badge::before {
-            content: '🔒';
-            font-size: 10px;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 12px; height: 12px;
-            border: 2px solid rgba(0,0,0,0.3);
-            border-top-color: #000;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 900px) {
-            .left { display: none; }
-            .right { width: 100%; }
-        }
+        @media(max-width:900px){ .left{display:none;} .right{width:100%;border-left:none;} }
     </style>
 </head>
 <body>
-    <div class="corner corner-tl"></div>
-    <div class="corner corner-tr"></div>
-    <div class="corner corner-bl"></div>
-    <div class="corner corner-br"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 
-    <!-- Left -->
-    <div class="left">
-        <div class="status-bar">
-            <div class="status-dot"></div>
-            <span class="status-text">Sistema Operacional</span>
-        </div>
-
-        <div class="main-visual">
-            <div class="eyebrow">StarCard · Painel de Controle</div>
-            <h1 class="hero-title">
-                Acesso<br>
-                <span class="line-2">Restrito</span><br>
-                <span class="highlight">Admin</span>
-            </h1>
-            <p class="hero-desc">
-                Área exclusiva para administradores autorizados. Gerencie afiliados, monitore resultados e controle toda a operação.
-            </p>
-            <div class="metrics">
-                <div class="metric">
-                    <span class="metric-val">2</span>
-                    <span class="metric-label">Admins</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-val">256bit</span>
-                    <span class="metric-label">Criptografia</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-val">24/7</span>
-                    <span class="metric-label">Monitoramento</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="bottom-bar">
-            <div class="brand">
-                <div class="brand-mark">SC</div>
-                <span class="brand-name">starcard</span>
-            </div>
-            <span class="version">v2.0.0</span>
-        </div>
+    <div class="top-logo">
+        <img src="/assets/Logo_Starbank.png" alt="StarBank">
     </div>
 
-    <!-- Right - Form -->
-    <div class="right">
-        <div class="form-header">
-            <div class="form-tag">Autenticação</div>
-            <h2 class="form-title">Entrar como Admin</h2>
-            <p class="form-subtitle">Credenciais restritas ao pessoal autorizado</p>
+    <div class="split">
+        <div class="left">
+            <div class="tag"><span class="tag-dot"></span>Área Restrita</div>
+            <h1 class="hero-title">Painel de<br>controle <em>admin</em><br>StarCard.</h1>
+            <p class="hero-sub">Gerencie afiliados, monitore resultados e controle toda a operação em um único lugar.</p>
+            <div class="badges">
+                <div class="badge"><span class="badge-icon">👥</span><span><strong>2</strong> administradores</span></div>
+                <div class="badge"><span class="badge-icon">🔐</span><span><strong>256-bit</strong> criptografia</span></div>
+                <div class="badge"><span class="badge-icon">📡</span><span><strong>24/7</strong> monitoramento</span></div>
+            </div>
         </div>
 
-        <div class="alert-box" id="alertBox"></div>
+        <div class="right">
+            <div class="form-wrap">
+                <div class="restricted-badge">🔒 Acesso Restrito</div>
+                <div class="form-title">Entrar como Admin</div>
+                <div class="form-sub">Credenciais restritas ao pessoal autorizado</div>
 
-        <form id="adminLoginForm">
-            <div class="field">
-                <label class="field-label">Email Administrativo</label>
-                <input type="email" class="field-input" id="email" name="email" placeholder="admin@starbank.tec.br" required>
-            </div>
-            <div class="field">
-                <label class="field-label">Senha</label>
-                <input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••••" required>
-            </div>
-            <button type="submit" class="btn-submit" id="btnSubmit">
-                <span id="btnText">Acessar Painel</span>
-            </button>
-        </form>
+                <div class="alert" id="alertBox"></div>
 
-        <div class="form-footer">
-            <a href="/login" class="back-link">← Portal Afiliados</a>
-            <span class="security-badge">Acesso Seguro</span>
+                <form id="adminForm">
+                    <div class="field">
+                        <label class="lbl">Email Administrativo</label>
+                        <input type="email" class="inp" name="email" placeholder="admin@starbank.tec.br" required autocomplete="email">
+                    </div>
+                    <div class="field">
+                        <label class="lbl">Senha</label>
+                        <input type="password" class="inp" name="senha" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn" id="btn">
+                        <span id="btnText">Acessar Painel</span>
+                    </button>
+                </form>
+
+                <div class="divider"></div>
+                <div class="security">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Sessão criptografada e monitorada
+                </div>
+                <a href="/login" class="back-lnk">← Portal de Afiliados</a>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnSubmit');
+            const btn = document.getElementById('btn');
             const btnText = document.getElementById('btnText');
             const alertBox = document.getElementById('alertBox');
-
             btn.disabled = true;
-            btnText.innerHTML = '<span class="spinner"></span> Verificando...';
-            alertBox.className = 'alert-box';
-
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-
+            btnText.innerHTML = '<span class="spin"></span>Verificando...';
+            alertBox.className = 'alert';
             try {
-                const response = await fetch('/admin/login', {
-                    method: 'POST',
+                const res = await fetch('/admin/login', {
+                    method: 'POST', credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
                 });
-
-                const result = await response.json();
-
-                if (result.sucesso) {
-                    alertBox.className = 'alert-box alert-success';
-                    alertBox.textContent = '// ACESSO AUTORIZADO — redirecionando...';
+                const r = await res.json();
+                if (r.sucesso) {
+                    alertBox.className = 'alert ok'; alertBox.textContent = '✓ Acesso autorizado — redirecionando...';
                     btnText.textContent = '✓ Autorizado';
-                    setTimeout(() => window.location.href = result.redirect, 1200);
+                    setTimeout(() => window.location.href = r.redirect, 1000);
                 } else {
-                    alertBox.className = 'alert-box alert-danger';
-                    alertBox.textContent = '// ERRO: ' + (result.erro || 'Credenciais inválidas');
-                    btn.disabled = false;
-                    btnText.textContent = 'Acessar Painel';
+                    alertBox.className = 'alert err'; alertBox.textContent = r.erro || 'Credenciais inválidas.';
+                    btn.disabled = false; btnText.textContent = 'Acessar Painel';
                 }
             } catch {
-                alertBox.className = 'alert-box alert-danger';
-                alertBox.textContent = '// ERRO: Falha de conexão com o servidor';
-                btn.disabled = false;
-                btnText.textContent = 'Acessar Painel';
+                alertBox.className = 'alert err'; alertBox.textContent = 'Erro de conexão. Tente novamente.';
+                btn.disabled = false; btnText.textContent = 'Acessar Painel';
             }
         });
     </script>

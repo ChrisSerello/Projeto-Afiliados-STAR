@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benefício ao Servidor — StarBank</title>
+    <link rel="icon" type="image/png" href="/assets/Logo_Starbank.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,467 +25,132 @@
             --error: #dc2626;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f8f7ff;
-            color: var(--text);
-            min-height: 100vh;
-        }
+        body { font-family: 'Inter', sans-serif; background: #f8f7ff; color: var(--text); min-height: 100vh; }
 
         /* ── HEADER ── */
-        .header {
-            background: var(--dark);
-            padding: 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-        }
-
-        .header-inner {
-            max-width: 760px;
-            margin: 0 auto;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-logo {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
-            border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 13px; color: white;
-            letter-spacing: -0.5px;
-        }
-
-        .brand-name {
-            font-size: 16px; font-weight: 700;
-            color: white; letter-spacing: -0.3px;
-        }
-
-        .header-badge {
-            background: rgba(168,85,247,0.15);
-            border: 1px solid rgba(168,85,247,0.3);
-            border-radius: 100px;
-            padding: 4px 12px;
-            font-size: 11px; font-weight: 600;
-            color: var(--purple-bright);
-            letter-spacing: 0.3px;
-        }
+        .header { background: var(--dark); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .header-inner { max-width: 760px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .brand-logo { height: 32px; width: auto; }
+        .header-badge { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); border-radius: 100px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: var(--purple-bright); }
 
         /* ── HERO ── */
-        .hero {
-            background: linear-gradient(135deg, var(--dark) 0%, #1e0a40 60%, #2d1152 100%);
-            padding: 48px 24px 64px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(168,85,247,0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(168,85,247,0.07) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
+        .hero { background: linear-gradient(135deg, var(--dark) 0%, #1e0a40 60%, #2d1152 100%); padding: 48px 24px 64px; text-align: center; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(168,85,247,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,0.07) 1px, transparent 1px); background-size: 40px 40px; }
         .hero-content { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
-
-        .hero-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(168,85,247,0.15);
-            border: 1px solid rgba(168,85,247,0.25);
-            border-radius: 100px;
-            padding: 6px 14px;
-            font-size: 11px; font-weight: 600;
-            color: var(--purple-bright);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .hero-tag::before {
-            content: '';
-            width: 6px; height: 6px;
-            background: var(--purple-bright);
-            border-radius: 50%;
-        }
-
-        .hero-title {
-            font-size: clamp(28px, 5vw, 40px);
-            font-weight: 800;
-            color: white;
-            letter-spacing: -1px;
-            line-height: 1.1;
-            margin-bottom: 14px;
-        }
-
-        .hero-subtitle {
-            font-size: 15px;
-            color: rgba(255,255,255,0.55);
-            line-height: 1.6;
-        }
+        .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.25); border-radius: 100px; padding: 6px 14px; font-size: 11px; font-weight: 600; color: var(--purple-bright); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 20px; }
+        .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--purple-bright); border-radius: 50%; }
+        .hero-title { font-size: clamp(28px, 5vw, 40px); font-weight: 800; color: white; letter-spacing: -1px; line-height: 1.1; margin-bottom: 14px; }
+        .hero-subtitle { font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.6; }
 
         /* ── AFILIADO BAR ── */
-        .afiliado-bar {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 13px;
-            color: var(--text-dim);
-        }
-
+        .afiliado-bar { background: white; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--text-dim); }
         .afiliado-bar strong { color: var(--text); }
-
-        .afiliado-badge {
-            background: var(--purple-faint);
-            border: 1px solid #ddd6fe;
-            border-radius: 6px;
-            padding: 2px 10px;
-            font-size: 11px; font-weight: 600;
-            color: var(--purple-mid);
-            font-family: monospace;
-        }
+        .afiliado-badge { background: var(--purple-faint); border: 1px solid #ddd6fe; border-radius: 6px; padding: 2px 10px; font-size: 11px; font-weight: 600; color: var(--purple-mid); font-family: monospace; }
 
         /* ── FORM WRAPPER ── */
-        .form-wrapper {
-            max-width: 760px;
-            margin: 0 auto;
-            padding: 32px 24px 80px;
-        }
+        .form-wrapper { max-width: 760px; margin: 0 auto; padding: 32px 24px 80px; }
 
         /* ── SECTION ── */
-        .section {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            transition: box-shadow 0.2s;
-        }
-
-        .section:focus-within {
-            box-shadow: 0 0 0 3px rgba(168,85,247,0.1);
-            border-color: rgba(168,85,247,0.3);
-        }
-
-        .section-header {
-            padding: 20px 24px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #fafafa;
-        }
-
-        .section-number {
-            width: 28px; height: 28px;
-            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 800;
-            color: white; flex-shrink: 0;
-        }
-
+        .section { background: white; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 20px; overflow: hidden; transition: box-shadow 0.2s; }
+        .section:focus-within { box-shadow: 0 0 0 3px rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3); }
+        .section-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: #fafafa; }
+        .section-number { width: 28px; height: 28px; background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: white; flex-shrink: 0; }
         .section-info { display: flex; flex-direction: column; gap: 2px; }
-
-        .section-title {
-            font-size: 14px; font-weight: 700;
-            color: var(--text);
-        }
-
-        .section-desc {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-
+        .section-title { font-size: 14px; font-weight: 700; color: var(--text); }
+        .section-desc { font-size: 12px; color: var(--text-dim); }
         .section-body { padding: 24px; }
 
         /* ── FIELDS ── */
         .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .field-row.single { grid-template-columns: 1fr; }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
-
+        .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
         .field:last-child { margin-bottom: 0; }
+        .field-label { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 4px; }
+        .required { color: var(--error); font-size: 12px; }
+        .optional-tag { font-size: 11px; color: var(--text-dim); font-weight: 400; }
 
-        .field-label {
-            font-size: 13px; font-weight: 600;
-            color: var(--text);
-            display: flex; align-items: center; gap: 4px;
-        }
-
-        .required {
-            color: var(--error);
-            font-size: 12px;
-        }
-
-        .field-input, .field-select {
-            background: var(--purple-faint);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            padding: 11px 14px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            color: var(--text);
-            outline: none;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
+        .field-input, .field-select { background: var(--purple-faint); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: 'Inter', sans-serif; color: var(--text); outline: none; transition: all 0.2s; width: 100%; }
         .field-input::placeholder { color: var(--text-dim); opacity: 0.6; }
-
-        .field-input:focus, .field-select:focus {
-            border-color: var(--purple-mid);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(107,33,168,0.08);
-        }
-
-        .field-input.readonly {
-            background: #f0ebff;
-            border-color: #ddd6fe;
-            color: var(--purple-mid);
-            font-weight: 600;
-            cursor: not-allowed;
-        }
-
-        .field-input.loading {
-            color: var(--text-dim);
-            font-style: italic;
-        }
+        .field-input:focus, .field-select:focus { border-color: var(--purple-mid); background: white; box-shadow: 0 0 0 3px rgba(107,33,168,0.08); }
+        .field-input.readonly { background: #f0ebff; border-color: #ddd6fe; color: var(--purple-mid); font-weight: 600; cursor: not-allowed; }
+        .field-input.loading { color: var(--text-dim); font-style: italic; }
 
         /* ── RADIO OPTIONS ── */
         .radio-group { display: flex; flex-direction: column; gap: 10px; }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 13px 16px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: var(--purple-faint);
-        }
-
-        .radio-option:hover {
-            border-color: var(--purple-bright);
-            background: #f5f0ff;
-        }
-
-        .radio-option input[type="radio"] {
-            accent-color: var(--purple-mid);
-            width: 16px; height: 16px;
-            cursor: pointer;
-        }
-
-        .radio-option.selected {
-            border-color: var(--purple-mid);
-            background: #ede9fe;
-        }
-
-        .radio-label {
-            font-size: 14px;
-            color: var(--text);
-            line-height: 1.4;
-        }
+        .radio-option { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; background: var(--purple-faint); }
+        .radio-option:hover { border-color: var(--purple-bright); background: #f5f0ff; }
+        .radio-option input[type="radio"] { accent-color: var(--purple-mid); width: 16px; height: 16px; cursor: pointer; }
+        .radio-option.selected { border-color: var(--purple-mid); background: #ede9fe; }
+        .radio-label { font-size: 14px; color: var(--text); line-height: 1.4; }
 
         /* ── FILE UPLOAD ── */
-        .upload-area {
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 32px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: var(--purple-faint);
-            position: relative;
-        }
-
-        .upload-area:hover, .upload-area.drag-over {
-            border-color: var(--purple-bright);
-            background: #f0ebff;
-        }
-
-        .upload-area input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-        }
-
-        .upload-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .upload-title {
-            font-size: 14px; font-weight: 600;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .upload-desc {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-
-        .upload-preview {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            margin-top: 12px;
-            padding: 10px 14px;
-            background: #ede9fe;
-            border-radius: 8px;
-            font-size: 13px;
-            color: var(--purple-mid);
-            font-weight: 500;
-        }
-
+        .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--purple-faint); position: relative; }
+        .upload-area:hover, .upload-area.drag-over { border-color: var(--purple-bright); background: #f0ebff; }
+        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-icon { font-size: 28px; margin-bottom: 8px; }
+        .upload-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .upload-desc { font-size: 12px; color: var(--text-dim); }
+        .upload-preview { display: none; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 14px; background: #ede9fe; border-radius: 8px; font-size: 13px; color: var(--purple-mid); font-weight: 500; }
         .upload-preview.show { display: flex; }
 
-        /* ── SUBMIT BUTTON ── */
-        .submit-section {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px 24px;
-            text-align: center;
-        }
+        /* ── SUBMIT ── */
+        .submit-section { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; text-align: center; }
+        .btn-submit { width: 100%; max-width: 400px; background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright)); border: none; border-radius: 12px; padding: 15px; font-size: 16px; font-family: 'Inter', sans-serif; font-weight: 700; color: white; cursor: pointer; transition: all 0.3s; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(107,33,168,0.35); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .btn-submit {
-            width: 100%;
-            max-width: 400px;
-            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
-            border: none;
-            border-radius: 12px;
-            padding: 15px;
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 36px rgba(107,33,168,0.35);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px; height: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ── ALERTS ── */
-        .alert {
-            border-radius: 10px;
-            padding: 14px 16px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            display: none;
-            line-height: 1.5;
-        }
-
+        .alert { border-radius: 10px; padding: 14px 16px; font-size: 13px; margin-bottom: 20px; display: none; line-height: 1.5; }
         .alert.show { display: block; }
+        .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: var(--error); }
 
-        .alert-danger {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: var(--error);
-        }
-
-        .alert-success {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: var(--success);
+        /* ── OPERADOR CARD (after success) ── */
+        .operador-card {
+            display: none;
+            background: linear-gradient(135deg, var(--dark) 0%, #1e0a40 100%);
+            border-radius: 16px;
+            padding: 32px;
             text-align: center;
-            padding: 24px;
+            margin-top: 24px;
+            color: white;
+            animation: fadeUp 0.5s ease;
         }
+        .operador-card.show { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-        .alert-success .success-icon {
-            font-size: 40px;
-            margin-bottom: 12px;
-        }
+        .operador-card .check-icon { font-size: 48px; margin-bottom: 16px; }
+        .operador-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .operador-card .subtitle { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 24px; line-height: 1.5; }
 
-        .alert-success h3 {
-            font-size: 18px; font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        /* ── LGPD FOOTER ── */
-        .lgpd-footer {
-            max-width: 760px;
-            margin: 0 auto;
-            padding: 0 24px 40px;
-            text-align: center;
-        }
-
-        .lgpd-text {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            background: white;
-            border: 1px solid var(--border);
+        .operador-info {
+            background: rgba(168,85,247,0.15);
+            border: 1px solid rgba(168,85,247,0.3);
             border-radius: 12px;
-            padding: 14px 18px;
-            font-size: 12px;
-            color: var(--text-dim);
-            line-height: 1.6;
-            text-align: left;
+            padding: 20px;
+            margin-bottom: 16px;
         }
+        .operador-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .operador-nome { font-size: 22px; font-weight: 800; color: white; margin-bottom: 4px; }
+        .operador-tel { font-size: 15px; color: var(--purple-bright); font-weight: 600; }
 
+        .whatsapp-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #25d366; color: white; border: none; border-radius: 10px;
+            padding: 12px 24px; font-size: 14px; font-family: 'Inter', sans-serif;
+            font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .whatsapp-btn:hover { background: #1db954; transform: translateY(-1px); }
+
+        /* ── LGPD ── */
+        .lgpd-footer { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; }
+        .lgpd-text { display: flex; align-items: flex-start; gap: 8px; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; font-size: 12px; color: var(--text-dim); line-height: 1.6; text-align: left; }
         .lgpd-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
 
-        /* ── RESPONSIVE ── */
-        @media (max-width: 600px) {
-            .field-row { grid-template-columns: 1fr; }
-            .hero { padding: 36px 16px 48px; }
-            .form-wrapper { padding: 20px 16px 60px; }
-        }
+        @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } .hero { padding: 36px 16px 48px; } .form-wrapper { padding: 20px 16px 60px; } }
     </style>
 </head>
 <body>
@@ -492,10 +158,7 @@
     <!-- Header -->
     <header class="header">
         <div class="header-inner">
-            <div class="brand">
-                <div class="brand-logo">SB</div>
-                <span class="brand-name">StarBank</span>
-            </div>
+            <img src="/assets/Logo_Starbank.png" alt="StarBank" class="brand-logo">
             <span class="header-badge">Benefício ao Servidor</span>
         </div>
     </header>
@@ -516,14 +179,13 @@
         <span class="afiliado-badge" id="afiliadoCodigoBar">—</span>
     </div>
 
-    <!-- Alert -->
     <div class="form-wrapper" id="mainWrapper">
         <div class="alert alert-danger" id="alertBox"></div>
 
         <form id="formulario" enctype="multipart/form-data">
             <input type="hidden" id="codigoAfiliado" name="codigo_afiliado">
 
-            <!-- SEÇÃO 1: Identificação do Parceiro -->
+            <!-- SEÇÃO 1 -->
             <div class="section">
                 <div class="section-header">
                     <div class="section-number">1</div>
@@ -546,7 +208,7 @@
                 </div>
             </div>
 
-            <!-- SEÇÃO 2: Dados do Servidor -->
+            <!-- SEÇÃO 2 -->
             <div class="section">
                 <div class="section-header">
                     <div class="section-number">2</div>
@@ -597,7 +259,7 @@
                 </div>
             </div>
 
-            <!-- SEÇÃO 3: Diagnóstico Financeiro -->
+            <!-- SEÇÃO 3 -->
             <div class="section">
                 <div class="section-header">
                     <div class="section-number">3</div>
@@ -624,7 +286,6 @@
                             </label>
                         </div>
                     </div>
-
                     <div class="field" style="margin-top: 20px;">
                         <label class="field-label">Possui contratos em quais bancos atualmente?</label>
                         <input type="text" class="field-input" name="bancos_atuais" placeholder="Ex: Caixa, Banco do Brasil, Bradesco...">
@@ -632,23 +293,26 @@
                 </div>
             </div>
 
-            <!-- SEÇÃO 4: Upload -->
+            <!-- SEÇÃO 4 - Holerite OPCIONAL -->
             <div class="section">
                 <div class="section-header">
                     <div class="section-number">4</div>
                     <div class="section-info">
                         <span class="section-title">Upload de Documento</span>
-                        <span class="section-desc">Holerite ou Contracheque mais recente</span>
+                        <span class="section-desc">Opcional — agiliza a análise do seu perfil</span>
                     </div>
                 </div>
                 <div class="section-body">
                     <div class="field">
-                        <label class="field-label">Anexe seu último Holerite / Contracheque <span class="required">*</span></label>
+                        <label class="field-label">
+                            Holerite / Contracheque mais recente
+                            <span class="optional-tag">(opcional)</span>
+                        </label>
                         <div class="upload-area" id="uploadArea">
-                            <input type="file" name="holerite" id="holerite" accept=".pdf,.jpg,.jpeg,.png" required onchange="previewFile(this)">
+                            <input type="file" name="holerite" id="holerite" accept=".pdf,.jpg,.jpeg,.png" onchange="previewFile(this)">
                             <div class="upload-icon">📄</div>
                             <div class="upload-title">Clique ou arraste o arquivo aqui</div>
-                            <div class="upload-desc">PDF, JPG ou PNG · Máximo 10MB</div>
+                            <div class="upload-desc">PDF, JPG ou PNG · Máximo 10MB · <strong>Não obrigatório</strong></div>
                         </div>
                         <div class="upload-preview" id="uploadPreview">
                             <span>📎</span>
@@ -659,23 +323,41 @@
             </div>
 
             <!-- Submit -->
-            <div class="submit-section">
-                <div class="alert" id="successBox" style="display:none;">
-                    <div class="success-icon">✅</div>
-                    <h3>Formulário enviado com sucesso!</h3>
-                    <p>Nossa equipe entrará em contato em breve pelo WhatsApp informado.</p>
-                </div>
+            <div class="submit-section" id="submitSection">
                 <button type="submit" class="btn-submit" id="btnSubmit">
                     <span id="btnText">Enviar Formulário</span>
                 </button>
                 <p style="font-size: 12px; color: var(--text-dim); margin-top: 12px;">
-                    Todos os campos marcados com <span style="color:var(--error)">*</span> são obrigatórios
+                    Campos com <span style="color:var(--error)">*</span> são obrigatórios · Upload do holerite é opcional
                 </p>
             </div>
         </form>
+
+        <!-- Operador Card — aparece após envio bem-sucedido -->
+        <div class="operador-card" id="operadorCard">
+            <div class="check-icon">✅</div>
+            <h3>Formulário enviado com sucesso!</h3>
+            <p class="subtitle">
+                Nossa equipe recebeu suas informações.<br>
+                O operador abaixo entrará em contato com você pelo WhatsApp em breve.
+            </p>
+
+            <div class="operador-info">
+                <div class="operador-label">Seu operador responsável</div>
+                <div class="operador-nome" id="operadorNome">—</div>
+                <div class="operador-tel" id="operadorTel">—</div>
+            </div>
+
+            <p style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 16px;">
+                Ou se preferir, entre em contato primeiro:
+            </p>
+            <a class="whatsapp-btn" id="whatsappBtn" href="#" target="_blank">
+                💬 Chamar no WhatsApp
+            </a>
+        </div>
     </div>
 
-    <!-- LGPD Footer -->
+    <!-- LGPD -->
     <div class="lgpd-footer">
         <div class="lgpd-text">
             <span class="lgpd-icon">🔒</span>
@@ -684,16 +366,11 @@
     </div>
 
     <script>
-        // ── Carregar dados do afiliado ──
         const params = new URLSearchParams(window.location.search);
         const codigoParam = params.get('codigo');
 
         async function carregarAfiliado() {
-            if (!codigoParam) {
-                setAfiliadoFields('Afiliado não identificado', '—', false);
-                return;
-            }
-
+            if (!codigoParam) { setAfiliadoFields('Afiliado não identificado', '—', false); return; }
             try {
                 const r = await fetch(`/api/afiliado-publico?codigo=${codigoParam}`);
                 if (r.ok) {
@@ -702,25 +379,17 @@
                 } else {
                     setAfiliadoFields('Afiliado não encontrado', codigoParam, false);
                 }
-            } catch {
-                setAfiliadoFields('Erro ao carregar', codigoParam, false);
-            }
+            } catch { setAfiliadoFields('Erro ao carregar', codigoParam, false); }
         }
 
         function setAfiliadoFields(nome, codigo, found) {
-            const nomeInput = document.getElementById('nomeAfiliado');
-            const codigoInput = document.getElementById('codigoAfiliadoDisplay');
-            const codigoHidden = document.getElementById('codigoAfiliado');
-            const bar = document.getElementById('afiliadoBar');
-            
-            nomeInput.value = nome;
-            codigoInput.value = codigo;
-            codigoHidden.value = codigo;
-            
-            nomeInput.classList.remove('loading');
-            codigoInput.classList.remove('loading');
-
+            document.getElementById('nomeAfiliado').value = nome;
+            document.getElementById('codigoAfiliadoDisplay').value = codigo;
+            document.getElementById('codigoAfiliado').value = codigo;
+            document.getElementById('nomeAfiliado').classList.remove('loading');
+            document.getElementById('codigoAfiliadoDisplay').classList.remove('loading');
             if (found) {
+                const bar = document.getElementById('afiliadoBar');
                 bar.style.display = 'flex';
                 document.getElementById('afiliadoNomeBar').textContent = nome;
                 document.getElementById('afiliadoCodigoBar').textContent = codigo;
@@ -729,64 +398,53 @@
 
         carregarAfiliado();
 
-        // ── Máscaras ──
+        // Máscaras
         document.getElementById('cpfInput').addEventListener('input', function(e) {
             let v = e.target.value.replace(/\D/g, '');
-            v = v.replace(/(\d{3})(\d)/, '$1.$2');
-            v = v.replace(/(\d{3})(\d)/, '$1.$2');
-            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
             e.target.value = v;
         });
 
         document.getElementById('celularInput').addEventListener('input', function(e) {
             let v = e.target.value.replace(/\D/g, '');
-            v = v.replace(/^(\d{2})(\d)/, '($1) $2');
-            v = v.replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+            v = v.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');
             e.target.value = v;
         });
 
-        // ── Radio visual ──
         function selectRadio(label) {
             document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
             label.classList.add('selected');
         }
 
-        // ── Upload preview ──
         function previewFile(input) {
             if (input.files && input.files[0]) {
-                const file = input.files[0];
-                document.getElementById('uploadFileName').textContent = file.name;
+                document.getElementById('uploadFileName').textContent = input.files[0].name;
                 document.getElementById('uploadPreview').classList.add('show');
                 document.getElementById('uploadArea').style.borderColor = '#6b21a8';
                 document.getElementById('uploadArea').style.background = '#ede9fe';
             }
         }
 
-        // ── Drag & Drop ──
+        // Drag & Drop
         const uploadArea = document.getElementById('uploadArea');
         uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
         uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
         uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
+            e.preventDefault(); uploadArea.classList.remove('drag-over');
             const file = e.dataTransfer.files[0];
-            if (file) {
-                document.getElementById('holerite').files = e.dataTransfer.files;
-                previewFile(document.getElementById('holerite'));
-            }
+            if (file) { document.getElementById('holerite').files = e.dataTransfer.files; previewFile(document.getElementById('holerite')); }
         });
 
-        // ── Submit ──
+        // Submit
         document.getElementById('formulario').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
             const btnText = document.getElementById('btnText');
             const alertBox = document.getElementById('alertBox');
-            
+
             alertBox.className = 'alert';
             alertBox.style.display = 'none';
 
-            // Validar objetivo
             const objetivo = document.querySelector('input[name="objetivo"]:checked');
             if (!objetivo) {
                 alertBox.className = 'alert alert-danger show';
@@ -801,20 +459,34 @@
 
             try {
                 const formData = new FormData(e.target);
-
-                const response = await fetch('/api/enviar-formulario', {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const response = await fetch('/api/enviar-formulario', { method: 'POST', body: formData });
                 const result = await response.json();
 
                 if (result.sucesso) {
+                    // Esconde o formulário
                     e.target.style.display = 'none';
-                    const successBox = document.getElementById('successBox');
-                    successBox.style.display = 'block';
-                    successBox.className = 'alert alert-success show';
-                    successBox.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('alertBox').style.display = 'none';
+
+                    // Mostra card do operador
+                    const card = document.getElementById('operadorCard');
+                    card.classList.add('show');
+
+                    if (result.operador) {
+                        const nomeCompleto = `${result.operador.nome} ${result.operador.sobrenome}`;
+                        document.getElementById('operadorNome').textContent = nomeCompleto;
+                        document.getElementById('operadorTel').textContent = result.operador.telefone;
+
+                        const telLimpo = result.operador.telefone.replace(/\D/g, '');
+                        const nomeCliente = formData.get('nome_completo') || '';
+                        const msgWpp = encodeURIComponent(`Olá ${nomeCompleto}! Acabei de preencher o formulário do StarBank. Meu nome é ${nomeCliente}.`);
+                        document.getElementById('whatsappBtn').href = `https://wa.me/55${telLimpo}?text=${msgWpp}`;
+                    } else {
+                        document.getElementById('operadorNome').textContent = 'Em breve';
+                        document.getElementById('operadorTel').textContent = 'Nossa equipe entrará em contato';
+                        document.getElementById('whatsappBtn').style.display = 'none';
+                    }
+
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 } else {
                     alertBox.className = 'alert alert-danger show';
                     alertBox.style.display = 'block';
