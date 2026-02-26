@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <title>StarCard — Portal de Afiliados</title>
-    <link rel="icon" type="image/png" href="/assets/Logo_Starbank.png">
+    <link rel="icon" type="image/png" href="Logo_Starbank.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -134,6 +134,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            /* text-align: right; */
             padding: 20px 0;
             position: relative; z-index: 1;
         }
@@ -150,6 +151,7 @@
 
         .left-by {
             font-size: 18px;
+            /* text-align: left; */
             color: rgba(255,255,255,0.45);
             font-weight: 300;
             letter-spacing: 1px;
@@ -191,8 +193,9 @@
         }
 
         .right-logo {
-            height: 36px; width: auto;
+            height: 90px; width: auto;
             margin-bottom: 20px;
+            margin-left: 30px;
             filter: brightness(0) invert(1);
             opacity: 0.85;
             position: relative; z-index: 1;
@@ -296,7 +299,7 @@
 
         <!-- ESQUERDA -->
         <div class="left">
-            <img src="/assets/Logo_Starbank.png" alt="StarBank" class="left-logo">
+            <!-- <img src="Logo_Starbank.png" alt="StarBank" class="left-logo"> -->
             <div class="left-main">
                 <div class="left-brand-name">Afiliados</div>
                 <div class="left-by">by <b>STAR</b></div>
@@ -305,7 +308,7 @@
 
         <!-- DIREITA -->
         <div class="right">
-            <img src="/assets/Logo_Starbank.png" alt="StarBank" class="right-logo">
+            <img src="Logo_Starbank.png" alt="StarBank" class="right-logo">
             <div class="right-title">Bem vindo!</div>
             <div class="right-sub">Portal de afiliados StarCard.</div>
 

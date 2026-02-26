@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benefício ao Servidor — StarBank</title>
-    <link rel="icon" type="image/png" href="/assets/Logo_Starbank.png">
+    <link rel="icon" type="image/png" href="Logo_Starbank.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,7 +30,7 @@
         /* ── HEADER ── */
         .header { background: var(--dark); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
         .header-inner { max-width: 760px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
-        .brand-logo { height: 32px; width: auto; }
+        .brand-logo { height: 40px; width: auto; filter: brightness(0) invert(1);}
         .header-badge { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); border-radius: 100px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: var(--purple-bright); }
 
         /* ── HERO ── */
@@ -158,7 +158,7 @@
     <!-- Header -->
     <header class="header">
         <div class="header-inner">
-            <img src="/assets/Logo_Starbank.png" alt="StarBank" class="brand-logo">
+            <img src="Logo_Starbank.png" alt="StarBank" class="brand-logo">
             <span class="header-badge">Benefício ao Servidor</span>
         </div>
     </header>
@@ -240,7 +240,7 @@
                             <input type="tel" class="field-input" name="celular" id="celularInput" placeholder="(00) 00000-0000" maxlength="15" required>
                         </div>
                         <div class="field">
-                            <label class="field-label">Órgão / Prefeitura <span class="required">*</span></label>
+                            <label class="field-label">Prefeitura <span class="required">*</span></label>
                             <input type="text" class="field-input" name="orgao" placeholder="Ex: Prefeitura de Águas Lindas" required>
                         </div>
                     </div>
