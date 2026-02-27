@@ -77,11 +77,62 @@
 
         /* ── RADIO OPTIONS ── */
         .radio-group { display: flex; flex-direction: column; gap: 10px; }
-        .radio-option { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; background: var(--purple-faint); }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--purple-faint);
+        }
         .radio-option:hover { border-color: var(--purple-bright); background: #f5f0ff; }
-        .radio-option input[type="radio"] { accent-color: var(--purple-mid); width: 16px; height: 16px; cursor: pointer; }
+        .radio-option input[type="radio"] { accent-color: var(--purple-mid); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
         .radio-option.selected { border-color: var(--purple-mid); background: #ede9fe; }
-        .radio-label { font-size: 14px; color: var(--text); line-height: 1.4; }
+
+        .radio-option-content { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .radio-emoji { font-size: 20px; line-height: 1; flex-shrink: 0; }
+        .radio-label { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; }
+
+        /* ── DESCRIÇÃO DO PRODUTO ── */
+        .produto-descricao {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .produto-descricao.show {
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 12px;
+        }
+
+        .produto-descricao-inner {
+            background: linear-gradient(135deg, #f0ebff, #ede9fe);
+            border: 1.5px solid #ddd6fe;
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .produto-descricao-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .produto-descricao-texto {
+            font-size: 13px;
+            color: var(--text-mid);
+            line-height: 1.7;
+        }
 
         /* ── FILE UPLOAD ── */
         .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--purple-faint); position: relative; }
@@ -107,7 +158,7 @@
         .alert.show { display: block; }
         .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: var(--error); }
 
-        /* ── OPERADOR CARD (after success) ── */
+        /* ── OPERADOR CARD ── */
         .operador-card {
             display: none;
             background: linear-gradient(135deg, var(--dark) 0%, #1e0a40 100%);
@@ -155,7 +206,6 @@
 </head>
 <body>
 
-    <!-- Header -->
     <header class="header">
         <div class="header-inner">
             <img src="assets/Starcard.png" alt="StarBank" class="brand-logo">
@@ -163,7 +213,6 @@
         </div>
     </header>
 
-    <!-- Hero -->
     <div class="hero">
         <div class="hero-content">
             <div class="hero-tag">Proposta Exclusiva</div>
@@ -172,7 +221,6 @@
         </div>
     </div>
 
-    <!-- Afiliado Bar -->
     <div class="afiliado-bar" id="afiliadoBar" style="display:none;">
         <span>Atendimento por:</span>
         <strong id="afiliadoNomeBar">—</strong>
@@ -265,27 +313,74 @@
                     <div class="section-number">3</div>
                     <div class="section-info">
                         <span class="section-title">Diagnóstico Financeiro</span>
-                        <span class="section-desc">Nos ajude a entender seu objetivo</span>
+                        <span class="section-desc">Selecione o produto de seu interesse</span>
                     </div>
                 </div>
                 <div class="section-body">
                     <div class="field">
                         <label class="field-label">Qual é o seu objetivo principal hoje? <span class="required">*</span></label>
                         <div class="radio-group" id="objetivoGroup">
-                            <label class="radio-option" onclick="selectRadio(this)">
-                                <input type="radio" name="objetivo" value="Portabilidade e liberação de valores" required>
-                                <span class="radio-label">💰 Portabilidade e liberação de valores</span>
+
+                            <label class="radio-option" onclick="selectRadio(this, 'emprestimo')">
+                                <input type="radio" name="objetivo" value="Empréstimo Consignado" required>
+                                <div class="radio-option-content">
+                                    <span class="radio-emoji">🏦</span>
+                                    <span class="radio-label">Empréstimo Consignado</span>
+                                </div>
                             </label>
-                            <label class="radio-option" onclick="selectRadio(this)">
-                                <input type="radio" name="objetivo" value="Dinheiro novo na conta">
-                                <span class="radio-label">💳 Dinheiro novo na conta</span>
+
+                            <label class="radio-option" onclick="selectRadio(this, 'cartao-consignado')">
+                                <input type="radio" name="objetivo" value="Cartão Consignado">
+                                <div class="radio-option-content">
+                                    <span class="radio-emoji">💳</span>
+                                    <span class="radio-label">Cartão Consignado</span>
+                                </div>
                             </label>
-                            <label class="radio-option" onclick="selectRadio(this)">
-                                <input type="radio" name="objetivo" value="Limpar rotativo do cartão / Sair dos juros altos">
-                                <span class="radio-label">📉 Limpar o rotativo do cartão / Sair dos juros altos</span>
+
+                            <label class="radio-option" onclick="selectRadio(this, 'cartao-beneficio')">
+                                <input type="radio" name="objetivo" value="Cartão Benefício">
+                                <div class="radio-option-content">
+                                    <span class="radio-emoji">⭐</span>
+                                    <span class="radio-label">Cartão Benefício</span>
+                                </div>
                             </label>
+
+                            <label class="radio-option" onclick="selectRadio(this, 'auxilio')">
+                                <input type="radio" name="objetivo" value="Auxílio Servidor">
+                                <div class="radio-option-content">
+                                    <span class="radio-emoji">🤝</span>
+                                    <span class="radio-label">Auxílio Servidor</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-option" onclick="selectRadio(this, 'compra-divida')">
+                                <input type="radio" name="objetivo" value="Compra de Dívida">
+                                <div class="radio-option-content">
+                                    <span class="radio-emoji">🔄</span>
+                                    <span class="radio-label">Compra de Dívida</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-option" onclick="selectRadio(this, 'vale-consignado')">
+                                <input type="radio" name="objetivo" value="Vale Consignado">
+                                <div class="radio-option-content">
+                                    <span class="radio-emoji">📅</span>
+                                    <span class="radio-label">Vale Consignado</span>
+                                </div>
+                            </label>
+
                         </div>
+
+                        <!-- Descrição do produto selecionado -->
+                        <div class="produto-descricao" id="produtoDescricao">
+                            <div class="produto-descricao-inner">
+                                <span class="produto-descricao-icon" id="produtoDescricaoIcon">💡</span>
+                                <p class="produto-descricao-texto" id="produtoDescricaoTexto"></p>
+                            </div>
+                        </div>
+
                     </div>
+
                     <div class="field" style="margin-top: 20px;">
                         <label class="field-label">Possui contratos em quais bancos atualmente?</label>
                         <input type="text" class="field-input" name="bancos_atuais" placeholder="Ex: Caixa, Banco do Brasil, Bradesco...">
@@ -293,7 +388,7 @@
                 </div>
             </div>
 
-            <!-- SEÇÃO 4 - Holerite OPCIONAL -->
+            <!-- SEÇÃO 4 -->
             <div class="section">
                 <div class="section-header">
                     <div class="section-number">4</div>
@@ -333,7 +428,7 @@
             </div>
         </form>
 
-        <!-- Operador Card — aparece após envio bem-sucedido -->
+        <!-- Operador Card -->
         <div class="operador-card" id="operadorCard">
             <div class="check-icon">✅</div>
             <h3>Formulário enviado com sucesso!</h3>
@@ -341,13 +436,11 @@
                 Nossa equipe recebeu suas informações.<br>
                 O operador abaixo entrará em contato com você pelo WhatsApp em breve.
             </p>
-
             <div class="operador-info">
                 <div class="operador-label">Seu operador responsável</div>
                 <div class="operador-nome" id="operadorNome">—</div>
                 <div class="operador-tel" id="operadorTel">—</div>
             </div>
-
             <p style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 16px;">
                 Ou se preferir, entre em contato primeiro:
             </p>
@@ -357,7 +450,6 @@
         </div>
     </div>
 
-    <!-- LGPD -->
     <div class="lgpd-footer">
         <div class="lgpd-text">
             <span class="lgpd-icon">🔒</span>
@@ -366,6 +458,54 @@
     </div>
 
     <script>
+        // ── DESCRIÇÕES DOS PRODUTOS ────────────────────────────────────────
+        const produtos = {
+            'emprestimo': {
+                icon: '🏦',
+                texto: 'O Empréstimo Consignado é um tipo de crédito em que as parcelas são descontadas automaticamente direto na folha de pagamento ou benefício do servidor público. Isso significa que o valor da prestação já vem abatido antes mesmo do salário cair na conta, o que traz mais segurança para a instituição financeira e permite oferecer taxas de juros mais baixas do que um empréstimo comum.'
+            },
+            'cartao-consignado': {
+                icon: '💳',
+                texto: 'O Cartão Consignado é um cartão de crédito exclusivo para servidores públicos, vinculado à margem consignável. Diferente do cartão tradicional, uma pequena parte da fatura é descontada automaticamente na folha de pagamento, reduzindo o risco de atraso e, consequentemente, os juros cobrados.'
+            },
+            'cartao-beneficio': {
+                icon: '⭐',
+                texto: 'O Cartão Benefício funciona de forma semelhante ao Cartão Consignado, mas vai além do crédito. Ele oferece limite para compras e saques, com desconto mínimo em folha, e ainda inclui uma série de benefícios adicionais que garantem mais proteção e suporte ao servidor e sua família.'
+            },
+            'auxilio': {
+                icon: '🤝',
+                texto: 'O Auxílio Servidor é uma modalidade de crédito de curto prazo, criada para atender necessidades financeiras imediatas. Diferente de contratos longos que comprometem o orçamento por anos, ele possui prazo reduzido e permite reorganizar as finanças de forma rápida.'
+            },
+            'compra-divida': {
+                icon: '🔄',
+                texto: 'A Compra de Dívida é uma solução para servidores que já possuem contratos ativos, especialmente no rotativo do cartão consignado, e estão pagando juros elevados. Nesse modelo, assumimos a dívida existente, quitamos o saldo anterior e reorganizamos o contrato com condições mais equilibradas.'
+            },
+            'vale-consignado': {
+                icon: '📅',
+                texto: 'O Vale-Consignado funciona como uma antecipação pontual da margem consignável. Na prática, é um crédito de apenas uma parcela, descontado diretamente na folha no mês seguinte.'
+            }
+        };
+
+        function selectRadio(label, produtoKey) {
+            // Marca o selecionado
+            document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
+            label.classList.add('selected');
+
+            // Exibe a descrição
+            const descricao = document.getElementById('produtoDescricao');
+            const icone = document.getElementById('produtoDescricaoIcon');
+            const texto = document.getElementById('produtoDescricaoTexto');
+
+            const produto = produtos[produtoKey];
+            if (produto) {
+                icone.textContent = produto.icon;
+                texto.textContent = produto.texto;
+                descricao.classList.add('show');
+                descricao.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // ── AFILIADO ───────────────────────────────────────────────────────
         const params = new URLSearchParams(window.location.search);
         const codigoParam = params.get('codigo');
 
@@ -398,7 +538,7 @@
 
         carregarAfiliado();
 
-        // Máscaras
+        // ── MÁSCARAS ───────────────────────────────────────────────────────
         document.getElementById('cpfInput').addEventListener('input', function(e) {
             let v = e.target.value.replace(/\D/g, '');
             v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
@@ -411,11 +551,7 @@
             e.target.value = v;
         });
 
-        function selectRadio(label) {
-            document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
-            label.classList.add('selected');
-        }
-
+        // ── FILE UPLOAD ───────────────────────────────────────────────────
         function previewFile(input) {
             if (input.files && input.files[0]) {
                 document.getElementById('uploadFileName').textContent = input.files[0].name;
@@ -425,7 +561,6 @@
             }
         }
 
-        // Drag & Drop
         const uploadArea = document.getElementById('uploadArea');
         uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
         uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
@@ -435,7 +570,7 @@
             if (file) { document.getElementById('holerite').files = e.dataTransfer.files; previewFile(document.getElementById('holerite')); }
         });
 
-        // Submit
+        // ── SUBMIT ────────────────────────────────────────────────────────
         document.getElementById('formulario').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
@@ -463,11 +598,9 @@
                 const result = await response.json();
 
                 if (result.sucesso) {
-                    // Esconde o formulário
                     e.target.style.display = 'none';
                     document.getElementById('alertBox').style.display = 'none';
 
-                    // Mostra card do operador
                     const card = document.getElementById('operadorCard');
                     card.classList.add('show');
 
@@ -475,7 +608,6 @@
                         const nomeCompleto = `${result.operador.nome} ${result.operador.sobrenome}`;
                         document.getElementById('operadorNome').textContent = nomeCompleto;
                         document.getElementById('operadorTel').textContent = result.operador.telefone;
-
                         const telLimpo = result.operador.telefone.replace(/\D/g, '');
                         const nomeCliente = formData.get('nome_completo') || '';
                         const msgWpp = encodeURIComponent(`Olá ${nomeCompleto}! Acabei de preencher o formulário do StarBank. Meu nome é ${nomeCliente}.`);
