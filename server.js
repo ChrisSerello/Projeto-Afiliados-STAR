@@ -466,15 +466,26 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
                 idAfiliado = af?.id || null;
             }
 
-            await supabase.from('clientes').insert({
+            const clientePayload = {
                 nome: nome_completo,
-                email: null,
                 telefone: celular,
                 cpf: cpf,
                 id_afiliado: idAfiliado,
-                codigo_afiliado: codigo_afiliado || null,
                 link_id: null
-            });
+            };
+
+            // Inclui codigo_afiliado apenas se existir (evita erro de coluna inexistente)
+            if (codigo_afiliado) clientePayload.codigo_afiliado = codigo_afiliado;
+
+            const { error: clienteInsertError } = await supabase
+                .from('clientes')
+                .insert(clientePayload);
+
+            if (clienteInsertError) {
+                console.error('Erro ao inserir cliente:', JSON.stringify(clienteInsertError));
+            } else {
+                console.log('Cliente inserido com sucesso na tabela clientes');
+            }
         } catch (clienteErr) {
             console.error('Erro ao espelhar cliente:', clienteErr);
         }
