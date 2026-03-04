@@ -102,18 +102,19 @@ async function enviarNotificacaoCliente(clienteData, afiliado) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/assets', express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── HELPERS JWT ────────────────────────────────────────────────────────────
 
 function criarTokenCookie(res, payload, cookieName) {
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
     res.cookie(cookieName, token, {
-        httpOnly: true,
-        secure: IS_PROD,
-        sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000
-    });
+      httpOnly: true,
+      secure: IS_PROD,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+      path: '/'
+  });
 }
 
 // ─── MIDDLEWARES DE AUTENTICAÇÃO ───────────────────────────────────────────
