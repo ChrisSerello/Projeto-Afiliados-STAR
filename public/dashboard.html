@@ -754,6 +754,9 @@
             <a class="nav-item" onclick="showSection('clientes', this)">
                 <i class="fas fa-users"></i> Meus Clientes
             </a>
+            <a class="nav-item" onclick="showSection('regras', this)">
+                <i class="fas fa-book-open"></i> Regras
+            </a>
         </nav>
 
         <div class="sidebar-bottom">
@@ -947,6 +950,160 @@
                         </table>
                     </div>
                     <div class="pagination" id="paginacao"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── REGRAS ── -->
+        <div id="regras-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Regras & Simulador</h1>
+                <p class="page-subtitle">Tabela de comissões por produto e simulador de liberação</p>
+            </div>
+
+            <!-- REGRAS RÁPIDAS -->
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-header"><span class="card-title">📋 Regras Gerais</span></div>
+                <div class="card-body">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">📅</div>
+                            <div class="step-title">Prazo define a comissão</div>
+                            <div class="step-desc">Para Empréstimo + Compra de Dívida Efetivo, quanto maior o prazo, maior a comissão. De 2% (84x) até 4% (120x).</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">💳</div>
+                            <div class="step-title">Pagamento sobre liberado</div>
+                            <div class="step-desc">A comissão incide sobre o valor efetivamente liberado ao cliente, não sobre o valor total do contrato.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">⚡</div>
+                            <div class="step-title">Temporário e especiais</div>
+                            <div class="step-desc">Produtos temporários e auxílio servidor têm comissão fixa de 1,0%, independente do prazo utilizado.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABELA DE COMISSÕES -->
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-header">
+                    <span class="card-title">Tabela de Comissões</span>
+                    <span class="badge-count">10 produtos</span>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Tipo</th>
+                                    <th>Taxa a.m.</th>
+                                    <th>Prazo</th>
+                                    <th>Comissão</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="td-name">💼 Empréstimo + Compra de Dívida</td><td><span class="badge badge-link">Efetivo</span></td><td>2,99%</td><td>84x</td><td style="color:#4ade80;font-weight:700;">2,0%</td></tr>
+                                <tr><td class="td-name">💼 Empréstimo + Compra de Dívida</td><td><span class="badge badge-link">Efetivo</span></td><td>2,99%</td><td>96x</td><td style="color:#4ade80;font-weight:700;">3,0%</td></tr>
+                                <tr><td class="td-name">💼 Empréstimo + Compra de Dívida</td><td><span class="badge badge-link">Efetivo</span></td><td>2,99%</td><td>120x</td><td style="color:#4ade80;font-weight:700;">4,0%</td></tr>
+                                <tr><td class="td-name">💼 Empréstimo + Compra de Dívida</td><td><span class="badge badge-link">Efetivo</span></td><td>3,29%</td><td>84x</td><td style="color:#4ade80;font-weight:700;">2,0%</td></tr>
+                                <tr><td class="td-name">💼 Empréstimo + Compra de Dívida</td><td><span class="badge badge-link">Efetivo</span></td><td>3,29%</td><td>96x</td><td style="color:#4ade80;font-weight:700;">3,0%</td></tr>
+                                <tr><td class="td-name">💼 Empréstimo + Compra de Dívida</td><td><span class="badge badge-link">Efetivo</span></td><td>3,29%</td><td>120x</td><td style="color:#4ade80;font-weight:700;">4,0%</td></tr>
+                                <tr><td class="td-name">🕐 Empréstimo</td><td><span class="badge badge-direct">Temporário</span></td><td>7,99%</td><td>3x</td><td style="color:#4ade80;font-weight:700;">1,0%</td></tr>
+                                <tr><td class="td-name">🕐 Empréstimo</td><td><span class="badge badge-direct">Temporário</span></td><td>7,99%</td><td>6x</td><td style="color:#4ade80;font-weight:700;">1,0%</td></tr>
+                                <tr><td class="td-name">🏛️ Auxílio Servidor</td><td><span class="badge badge-direct">Todos</span></td><td>7,99%</td><td>2x</td><td style="color:#4ade80;font-weight:700;">1,0%</td></tr>
+                                <tr><td class="td-name">🏧 Vale Consignado</td><td><span class="badge badge-direct">Todos</span></td><td>9,99%</td><td>1x</td><td style="color:#4ade80;font-weight:700;">0,5%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIMULADOR -->
+            <div class="card">
+                <div class="card-header"><span class="card-title">🧮 Simulador de Comissão</span></div>
+                <div class="card-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+                        <!-- Formulário -->
+                        <div>
+                            <p style="font-size:13px; color:var(--white-dim); margin-bottom:20px;">
+                                Preencha os dados para simular o valor da sua comissão estimada.
+                            </p>
+                            <div style="margin-bottom:14px;">
+                                <label style="display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-bottom:7px;">Margem Disponível do Cliente (R$)</label>
+                                <input type="number" id="sim-margem" placeholder="Ex: 1000.00" step="0.01" min="0"
+                                    style="width:100%;background:var(--white-faint);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;font-family:'Inter',sans-serif;color:var(--white);outline:none;"
+                                    onfocus="this.style.borderColor='rgba(168,85,247,0.5)'" onblur="this.style.borderColor='var(--border)'">
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                                <div>
+                                    <label style="display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-bottom:7px;">Taxa Mensal</label>
+                                    <select id="sim-taxa"
+                                        style="width:100%;background:var(--white-faint);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;font-family:'Inter',sans-serif;color:var(--white);outline:none;cursor:pointer;appearance:none;">
+                                        <option value="" style="background:#1a0a2e;">Selecione</option>
+                                        <option value="0.0299" style="background:#1a0a2e;">2,99%</option>
+                                        <option value="0.0329" style="background:#1a0a2e;">3,29%</option>
+                                        <option value="0.0799" style="background:#1a0a2e;">7,99%</option>
+                                        <option value="0.0999" style="background:#1a0a2e;">9,99%</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-bottom:7px;">Prazo (meses)</label>
+                                    <select id="sim-prazo"
+                                        style="width:100%;background:var(--white-faint);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;font-family:'Inter',sans-serif;color:var(--white);outline:none;cursor:pointer;appearance:none;"
+                                        onchange="simAuto()">
+                                        <option value="" style="background:#1a0a2e;">Selecione</option>
+                                        <option value="1" style="background:#1a0a2e;">1x</option>
+                                        <option value="2" style="background:#1a0a2e;">2x</option>
+                                        <option value="3" style="background:#1a0a2e;">3x</option>
+                                        <option value="6" style="background:#1a0a2e;">6x</option>
+                                        <option value="84" style="background:#1a0a2e;">84x</option>
+                                        <option value="96" style="background:#1a0a2e;">96x</option>
+                                        <option value="120" style="background:#1a0a2e;">120x</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="simularComissao()"
+                                style="width:100%;background:linear-gradient(135deg,var(--purple-mid),var(--purple-bright));border:none;border-radius:10px;padding:13px;font-size:14px;font-family:'Inter',sans-serif;font-weight:700;color:#fff;cursor:pointer;transition:all 0.3s;"
+                                onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 30px rgba(168,85,247,0.35)'"
+                                onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+                                ✦ Simular Comissão
+                            </button>
+                        </div>
+
+                        <!-- Resultado -->
+                        <div style="background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.15);border-radius:14px;padding:24px;display:flex;flex-direction:column;justify-content:center;">
+                            <div id="sim-placeholder" style="text-align:center;color:rgba(255,255,255,0.2);">
+                                <div style="font-size:36px;margin-bottom:10px;">🧮</div>
+                                <p style="font-size:13px;line-height:1.6;">Preencha os dados e clique em<br><strong style="color:rgba(255,255,255,0.35)">Simular Comissão</strong></p>
+                            </div>
+                            <div id="sim-resultado" style="display:none;">
+                                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-bottom:16px;">📊 Resultado</div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;">
+                                    <span style="color:var(--white-dim)">Margem informada</span>
+                                    <span style="color:var(--white);font-weight:600;" id="r-margem">—</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;">
+                                    <span style="color:var(--white-dim)">Taxa mensal</span>
+                                    <span style="color:var(--white);font-weight:600;" id="r-taxa">—</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;">
+                                    <span style="color:var(--white-dim)">Prazo</span>
+                                    <span style="color:var(--white);font-weight:600;" id="r-prazo">—</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;">
+                                    <span style="color:var(--white-dim)">💳 Valor liberado</span>
+                                    <span style="color:#a78bfa;font-weight:700;" id="r-liberado">—</span>
+                                </div>
+                                <div style="margin-top:16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:16px;text-align:center;">
+                                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(74,222,128,0.7);margin-bottom:6px;">💰 Sua Comissão Estimada</div>
+                                    <div style="font-size:32px;font-weight:900;color:#4ade80;letter-spacing:-1px;transition:transform 0.2s;" id="r-comissao">R$ 0,00</div>
+                                    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;" id="r-pct">—</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1161,6 +1318,36 @@
             document.getElementById('filtroData').addEventListener('change', aplicarFiltros);
             document.getElementById('filtroLink').addEventListener('change', aplicarFiltros);
         });
+        const comissaoPorPrazo = { 1:0.005, 2:0.01, 3:0.01, 6:0.01, 84:0.02, 96:0.03, 120:0.04 };
+        const fmtBRL = v => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+
+        function simularComissao() {
+            const margem = parseFloat(document.getElementById('sim-margem').value);
+            const taxa = parseFloat(document.getElementById('sim-taxa').value);
+            const prazo = parseInt(document.getElementById('sim-prazo').value);
+            if (!margem || !taxa || !prazo) { alert('Preencha todos os campos.'); return; }
+            const margemLiq = margem / 1.1;
+            const liberado = margemLiq * (1 - Math.pow(1 + taxa, -prazo)) / taxa;
+            const pct = comissaoPorPrazo[prazo] ?? 0.01;
+            const comissao = liberado * pct;
+            document.getElementById('sim-placeholder').style.display = 'none';
+            document.getElementById('sim-resultado').style.display = 'block';
+            document.getElementById('r-margem').textContent = fmtBRL(margem);
+            document.getElementById('r-taxa').textContent = (taxa*100).toFixed(2).replace('.',',') + '% a.m.';
+            document.getElementById('r-prazo').textContent = prazo + 'x';
+            document.getElementById('r-liberado').textContent = fmtBRL(liberado);
+            document.getElementById('r-comissao').textContent = fmtBRL(comissao);
+            document.getElementById('r-pct').textContent = (pct*100).toFixed(1).replace('.',',') + '% sobre o valor liberado';
+            const el = document.getElementById('r-comissao');
+            el.style.transform = 'scale(1.08)';
+            setTimeout(() => el.style.transform = 'scale(1)', 200);
+        }
+
+        function simAuto() {
+            if (document.getElementById('sim-margem').value && document.getElementById('sim-taxa').value)
+                simularComissao();
+        }
+
     </script>
 </body>
 </html>

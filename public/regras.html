@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starcard — Regras e Simulador</title>
+    <link rel="icon" type="image/png" href="assets/Planeta.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #060410;
+            --purple-deep: #0f0620;
+            --purple-mid: #6b21a8;
+            --purple-bright: #a855f7;
+            --purple-glow: #c084fc;
+            --purple-faint: rgba(168,85,247,0.08);
+            --border: rgba(255,255,255,0.07);
+            --border-purple: rgba(168,85,247,0.2);
+            --white: #ffffff;
+            --white-dim: rgba(255,255,255,0.5);
+            --white-faint: rgba(255,255,255,0.05);
+            --green: #4ade80;
+            --green-dim: rgba(74,222,128,0.1);
+            --green-border: rgba(74,222,128,0.2);
+            --sidebar-w: 240px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ── GRID BG ── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: 0;
+            background-image:
+                linear-gradient(rgba(168,85,247,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168,85,247,0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* ── ORBS ── */
+        .orb {
+            position: fixed; border-radius: 50%;
+            filter: blur(100px); pointer-events: none; z-index: 0;
+        }
+        .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(107,33,168,0.2), transparent 65%); top: -200px; right: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(168,85,247,0.12), transparent 65%); bottom: 100px; left: -100px; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: rgba(255,255,255,0.02);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0; z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .sidebar-logo {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo-mark {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px;
+        }
+        .logo-text { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; }
+
+        .sidebar-nav { padding: 16px 12px; flex: 1; }
+        .nav-section-label {
+            font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: rgba(255,255,255,0.2);
+            padding: 0 8px; margin: 16px 0 6px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: 8px;
+            font-size: 13px; font-weight: 500; color: var(--white-dim);
+            text-decoration: none; transition: all 0.2s; cursor: pointer;
+            margin-bottom: 2px;
+        }
+        .nav-item:hover { background: var(--white-faint); color: var(--white); }
+        .nav-item.active {
+            background: rgba(168,85,247,0.15);
+            color: var(--purple-glow);
+            border: 1px solid rgba(168,85,247,0.2);
+        }
+        .nav-item .icon { font-size: 15px; width: 20px; text-align: center; }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1; min-height: 100vh;
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(6,4,16,0.6);
+            backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .topbar-breadcrumb {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--white-dim);
+        }
+        .topbar-breadcrumb .sep { opacity: 0.3; }
+        .topbar-breadcrumb .current { color: var(--white); font-weight: 600; }
+
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; cursor: pointer;
+            border: 2px solid rgba(168,85,247,0.3);
+        }
+
+        /* ── CONTENT ── */
+        .content { padding: 32px; max-width: 1100px; }
+
+        .page-header { margin-bottom: 32px; }
+        .page-title {
+            font-size: 28px; font-weight: 800;
+            letter-spacing: -0.8px; margin-bottom: 6px;
+            font-family: "Funnel Display", sans-serif;
+        }
+        .page-sub { font-size: 14px; color: var(--white-dim); }
+
+        /* ── BADGE TAG ── */
+        .tag-row { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+        .tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(168,85,247,0.1);
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 100px; padding: 5px 14px;
+            font-size: 11px; font-weight: 600; color: var(--purple-glow);
+            letter-spacing: 0.5px;
+        }
+        .tag-dot { width: 5px; height: 5px; background: var(--purple-bright); border-radius: 50%; }
+
+        /* ── SECTION TITLE ── */
+        .section-title {
+            font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--purple-glow);
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(to right, rgba(168,85,247,0.3), transparent);
+        }
+
+        /* ── TABLE ── */
+        .table-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .table-head-row {
+            padding: 14px 20px;
+            background: rgba(168,85,247,0.06);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .table-head-label { font-size: 12px; font-weight: 700; color: var(--purple-glow); letter-spacing: 0.5px; }
+
+        table {
+            width: 100%; border-collapse: collapse;
+        }
+        thead th {
+            padding: 12px 20px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: rgba(255,255,255,0.35);
+            text-align: left; background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--border);
+        }
+        tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.15s;
+        }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: rgba(168,85,247,0.05); }
+        tbody td {
+            padding: 13px 20px;
+            font-size: 13px; color: var(--white-dim);
+        }
+
+        .produto-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 600; color: var(--white);
+        }
+
+        .tipo-badge {
+            display: inline-block; padding: 2px 9px;
+            border-radius: 100px; font-size: 10px; font-weight: 700;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .tipo-efetivo { background: rgba(168,85,247,0.15); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.25); }
+        .tipo-temporario { background: rgba(251,191,36,0.1); color: #fcd34d; border: 1px solid rgba(251,191,36,0.2); }
+        .tipo-todos { background: rgba(99,102,241,0.1); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); }
+
+        .taxa-val { font-family: 'Courier New', monospace; color: var(--white); font-weight: 600; }
+
+        .comissao-highlight {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-weight: 700; color: var(--green);
+        }
+        .comissao-bar {
+            height: 4px; border-radius: 2px;
+            background: var(--green); opacity: 0.6;
+            display: inline-block; vertical-align: middle;
+        }
+
+        /* ── CALCULADORA ── */
+        .calc-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 28px; margin-bottom: 40px;
+        }
+
+        .calc-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .calc-title {
+            font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+        .calc-sub { font-size: 12px; color: var(--white-dim); margin-bottom: 24px; }
+
+        .field { margin-bottom: 16px; }
+        .field-label {
+            display: block; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: rgba(255,255,255,0.35); margin-bottom: 7px;
+        }
+
+        .input-wrap {
+            position: relative; display: flex; align-items: center;
+        }
+        .input-prefix {
+            position: absolute; left: 13px;
+            font-size: 13px; font-weight: 600;
+            color: rgba(255,255,255,0.3);
+        }
+        .inp {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 12px 16px 12px 30px;
+            font-size: 14px; font-family: 'Inter', sans-serif;
+            color: var(--white); outline: none; transition: all 0.2s;
+        }
+        .inp.no-prefix { padding-left: 16px; }
+        .inp::placeholder { color: rgba(255,255,255,0.18); }
+        .inp:focus {
+            border-color: rgba(168,85,247,0.5);
+            background: rgba(168,85,247,0.06);
+            box-shadow: 0 0 0 3px rgba(168,85,247,0.1);
+        }
+
+        select.inp {
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+        select.inp option { background: #1a0a3a; color: white; }
+
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .btn-calc {
+            width: 100%; margin-top: 4px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border: none; border-radius: 10px; padding: 13px;
+            font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 700;
+            color: var(--white); cursor: pointer; transition: all 0.25s;
+            letter-spacing: 0.3px;
+        }
+        .btn-calc:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(168,85,247,0.35);
+        }
+
+        /* Resultado */
+        .result-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px; padding: 28px;
+            display: flex; flex-direction: column; gap: 0;
+        }
+
+        .result-intro {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-label { font-size: 13px; color: var(--white-dim); }
+        .result-val {
+            font-size: 15px; font-weight: 700; color: var(--white);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .result-commission {
+            margin-top: 20px;
+            background: linear-gradient(135deg, rgba(74,222,128,0.08), rgba(74,222,128,0.04));
+            border: 1px solid rgba(74,222,128,0.2);
+            border-radius: 12px; padding: 20px;
+            text-align: center;
+        }
+        .commission-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: rgba(74,222,128,0.7);
+            margin-bottom: 6px;
+        }
+        .commission-amount {
+            font-size: 36px; font-weight: 900;
+            color: var(--green); letter-spacing: -1px;
+            font-family: "Funnel Display", sans-serif;
+            line-height: 1;
+        }
+        .commission-pct {
+            font-size: 12px; color: rgba(255,255,255,0.3);
+            margin-top: 4px;
+        }
+
+        .placeholder-state {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 40px 20px;
+            color: rgba(255,255,255,0.15);
+            gap: 12px;
+        }
+        .placeholder-state .ph-icon { font-size: 40px; opacity: 0.3; }
+        .placeholder-state p { font-size: 13px; line-height: 1.6; }
+
+        /* ── REGRAS CARD ── */
+        .rules-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 16px; margin-bottom: 40px;
+        }
+        .rule-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px;
+            transition: border-color 0.2s;
+        }
+        .rule-item:hover { border-color: rgba(168,85,247,0.25); }
+        .rule-icon { font-size: 24px; margin-bottom: 10px; }
+        .rule-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+        .rule-text { font-size: 12px; color: var(--white-dim); line-height: 1.6; }
+
+        /* ── ALERT ── */
+        .alert-banner {
+            background: rgba(168,85,247,0.08);
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 10px; padding: 12px 16px;
+            font-size: 12px; color: var(--purple-glow);
+            margin-bottom: 24px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .calc-grid { grid-template-columns: 1fr; }
+            .rules-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .content { padding: 20px; }
+            .rules-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-mark">
+                <div class="logo-icon">⭐</div>
+                <span class="logo-text">StarCard</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Principal</div>
+            <a href="/dashboard" class="nav-item">
+                <span class="icon">📊</span> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">🔗</span> Meus Links
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">💰</span> Comissões
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">🏆</span> Ranking
+            </a>
+
+            <div class="nav-section-label">Recursos</div>
+            <a href="#" class="nav-item active">
+                <span class="icon">📋</span> Regras
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">🎨</span> Materiais
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">💬</span> Suporte
+            </a>
+
+            <div class="nav-section-label">Conta</div>
+            <a href="#" class="nav-item">
+                <span class="icon">👤</span> Perfil
+            </a>
+            <a href="/login" class="nav-item">
+                <span class="icon">🚪</span> Sair
+            </a>
+        </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-breadcrumb">
+                <span>Portal</span>
+                <span class="sep">/</span>
+                <span class="current">Regras</span>
+            </div>
+            <div class="topbar-right">
+                <div class="avatar">AF</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <div class="page-header">
+                <h1 class="page-title">Regras & Simulador</h1>
+                <p class="page-sub">Tabela de comissões por produto e simulador de liberação de crédito</p>
+            </div>
+
+            <div class="alert-banner">
+                💡 As comissões são calculadas sobre o <strong>valor liberado</strong> ao cliente, de acordo com o prazo escolhido.
+            </div>
+
+            <!-- REGRAS RÁPIDAS -->
+            <div class="section-title">Regras Gerais</div>
+            <div class="rules-grid">
+                <div class="rule-item">
+                    <div class="rule-icon">📅</div>
+                    <div class="rule-title">Prazo define a comissão</div>
+                    <div class="rule-text">Para Empréstimo + Compra de Dívida Efetivo, quanto maior o prazo, maior a comissão. De 2% (84x) até 4% (120x).</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">💳</div>
+                    <div class="rule-title">Pagamento sobre liberado</div>
+                    <div class="rule-text">A comissão incide sempre sobre o valor efetivamente liberado para o cliente, não sobre o valor total do contrato.</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">⚡</div>
+                    <div class="rule-title">Temporário e especiais</div>
+                    <div class="rule-text">Produtos temporários e auxílio servidor têm comissão fixa de 1,0%, independente do prazo utilizado.</div>
+                </div>
+            </div>
+
+            <!-- TABELA -->
+            <div class="section-title">Tabela de Comissões</div>
+            <div class="table-card">
+                <div class="table-head-row">
+                    <span class="table-head-label">Produtos disponíveis para indicação</span>
+                    <div class="tag"><span class="tag-dot"></span>Atualizado</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Tipo</th>
+                            <th>Taxa a.m.</th>
+                            <th>Prazo (meses)</th>
+                            <th>Comissão</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="produto-chip">💼 Empréstimo + Compra de Dívida</span></td>
+                            <td><span class="tipo-badge tipo-efetivo">Efetivo</span></td>
+                            <td><span class="taxa-val">2,99%</span></td>
+                            <td>84x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:20px"></span>2,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">💼 Empréstimo + Compra de Dívida</span></td>
+                            <td><span class="tipo-badge tipo-efetivo">Efetivo</span></td>
+                            <td><span class="taxa-val">2,99%</span></td>
+                            <td>96x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:30px"></span>3,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">💼 Empréstimo + Compra de Dívida</span></td>
+                            <td><span class="tipo-badge tipo-efetivo">Efetivo</span></td>
+                            <td><span class="taxa-val">2,99%</span></td>
+                            <td>120x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:40px"></span>4,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">💼 Empréstimo + Compra de Dívida</span></td>
+                            <td><span class="tipo-badge tipo-efetivo">Efetivo</span></td>
+                            <td><span class="taxa-val">3,29%</span></td>
+                            <td>84x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:20px"></span>2,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">💼 Empréstimo + Compra de Dívida</span></td>
+                            <td><span class="tipo-badge tipo-efetivo">Efetivo</span></td>
+                            <td><span class="taxa-val">3,29%</span></td>
+                            <td>96x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:30px"></span>3,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">💼 Empréstimo + Compra de Dívida</span></td>
+                            <td><span class="tipo-badge tipo-efetivo">Efetivo</span></td>
+                            <td><span class="taxa-val">3,29%</span></td>
+                            <td>120x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:40px"></span>4,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">🕐 Empréstimo</span></td>
+                            <td><span class="tipo-badge tipo-temporario">Temporário</span></td>
+                            <td><span class="taxa-val">7,99%</span></td>
+                            <td>3x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:10px"></span>1,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">🕐 Empréstimo</span></td>
+                            <td><span class="tipo-badge tipo-temporario">Temporário</span></td>
+                            <td><span class="taxa-val">7,99%</span></td>
+                            <td>6x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:10px"></span>1,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">🏛️ Auxílio Servidor</span></td>
+                            <td><span class="tipo-badge tipo-todos">Todos</span></td>
+                            <td><span class="taxa-val">7,99%</span></td>
+                            <td>2x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:10px"></span>1,0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="produto-chip">🏧 Vale Consignado</span></td>
+                            <td><span class="tipo-badge tipo-todos">Todos</span></td>
+                            <td><span class="taxa-val">9,99%</span></td>
+                            <td>1x</td>
+                            <td><span class="comissao-highlight"><span class="comissao-bar" style="width:5px"></span>0,5%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SIMULADOR -->
+            <div class="section-title">Simulador de Comissão</div>
+            <div class="calc-grid">
+                <!-- FORMULÁRIO -->
+                <div class="calc-card">
+                    <div class="calc-title">Dados do Cliente</div>
+                    <div class="calc-sub">Preencha os dados para simular o valor da sua comissão</div>
+
+                    <div class="field">
+                        <label class="field-label">Margem Disponível do Cliente</label>
+                        <div class="input-wrap">
+                            <span class="input-prefix">R$</span>
+                            <input type="number" class="inp" id="margem" placeholder="0,00" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label class="field-label">Taxa Mensal</label>
+                            <select class="inp no-prefix" id="taxa">
+                                <option value="">Selecione</option>
+                                <optgroup label="Efetivo">
+                                    <option value="0.0299">2,99%</option>
+                                    <option value="0.0329">3,29%</option>
+                                </optgroup>
+                                <optgroup label="Temporário / Outros">
+                                    <option value="0.0799">7,99%</option>
+                                    <option value="0.0999">9,99%</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Prazo (meses)</label>
+                            <select class="inp no-prefix" id="prazo">
+                                <option value="">Selecione</option>
+                                <option value="1">1x</option>
+                                <option value="2">2x</option>
+                                <option value="3">3x</option>
+                                <option value="6">6x</option>
+                                <option value="84">84x</option>
+                                <option value="96">96x</option>
+                                <option value="120">120x</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-calc" onclick="calcular()">✦ Simular Comissão</button>
+                </div>
+
+                <!-- RESULTADO -->
+                <div class="result-card" id="resultCard">
+                    <div class="placeholder-state" id="placeholder">
+                        <div class="ph-icon">🧮</div>
+                        <p>Preencha os dados ao lado e clique em<br><strong style="color:rgba(255,255,255,0.4)">Simular Comissão</strong> para ver o resultado</p>
+                    </div>
+                    <div id="resultContent" style="display:none;">
+                        <div class="result-intro">📊 Resultado da Simulação</div>
+                        <div class="result-item">
+                            <span class="result-label">Margem informada</span>
+                            <span class="result-val" id="r-margem">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Taxa mensal</span>
+                            <span class="result-val" id="r-taxa">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Prazo</span>
+                            <span class="result-val" id="r-prazo">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">💳 Valor liberado ao cliente</span>
+                            <span class="result-val" id="r-liberado" style="color:#a78bfa">—</span>
+                        </div>
+                        <div class="result-commission">
+                            <div class="commission-label">💰 Sua Comissão Estimada</div>
+                            <div class="commission-amount" id="r-comissao">R$ 0,00</div>
+                            <div class="commission-pct" id="r-pct">— sobre o valor liberado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mapa de comissão por prazo
+        const comissaoPorPrazo = {
+            1: 0.005,
+            2: 0.01,
+            3: 0.01,
+            6: 0.01,
+            84: 0.02,
+            96: 0.03,
+            120: 0.04
+        };
+
+        const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const fmtPct = (v) => (v * 100).toFixed(1).replace('.', ',') + '%';
+
+        function calcular() {
+            const margemBruta = parseFloat(document.getElementById('margem').value);
+            const taxa = parseFloat(document.getElementById('taxa').value);
+            const prazo = parseInt(document.getElementById('prazo').value);
+
+            if (!margemBruta || !taxa || !prazo) {
+                alert('Por favor, preencha todos os campos antes de simular.');
+                return;
+            }
+
+            // CAD interno (não exibido)
+            const CAD = 0.1;
+            const margemLiquida = margemBruta / (1 + CAD);
+
+            // Fórmula de valor presente (Price)
+            // PV = PMT × [1 - (1+i)^(-n)] / i
+            const valorLiberado = margemLiquida * (1 - Math.pow(1 + taxa, -prazo)) / taxa;
+
+            const pctComissao = comissaoPorPrazo[prazo] ?? 0.01;
+            const comissao = valorLiberado * pctComissao;
+
+            // Exibir resultado
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('resultContent').style.display = 'block';
+
+            document.getElementById('r-margem').textContent = fmt(margemBruta);
+            document.getElementById('r-taxa').textContent = fmtPct(taxa) + ' a.m.';
+            document.getElementById('r-prazo').textContent = prazo + 'x';
+            document.getElementById('r-liberado').textContent = fmt(valorLiberado);
+            document.getElementById('r-comissao').textContent = fmt(comissao);
+            document.getElementById('r-pct').textContent = fmtPct(pctComissao) + ' sobre o valor liberado';
+
+            // Animação no valor
+            document.getElementById('r-comissao').style.transform = 'scale(1.05)';
+            setTimeout(() => document.getElementById('r-comissao').style.transform = 'scale(1)', 200);
+        }
+
+        // Enter no último campo
+        document.getElementById('prazo').addEventListener('change', () => {
+            if (document.getElementById('margem').value && document.getElementById('taxa').value) {
+                calcular();
+            }
+        });
+    </script>
+</body>
+</html>
