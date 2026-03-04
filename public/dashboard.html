@@ -748,11 +748,8 @@
             <a class="nav-item" onclick="showSection('criar-link', this)">
                 <i class="fas fa-plus-circle"></i> Criar Link
             </a>
-            <a class="nav-item" onclick="showSection('link', this)">
-                <i class="fas fa-link"></i> Meus Links
-            </a>
-            <a class="nav-item" onclick="showSection('clientes', this)">
-                <i class="fas fa-users"></i> Meus Clientes
+            <a class="nav-item" onclick="showSection('produtos', this)">
+                <i class="fas fa-boxes"></i> Produtos & Simulação
             </a>
             <a class="nav-item" onclick="showSection('regras', this)">
                 <i class="fas fa-book-open"></i> Regras
@@ -818,6 +815,61 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Clientes no Dashboard -->
+            <div class="search-row">
+                <input type="text" class="search-input" id="buscaCliente" placeholder="Buscar por nome, email ou CPF...">
+                <select class="select-filter" id="filtroData">
+                    <option value="">Todos os períodos</option>
+                    <option value="hoje">Hoje</option>
+                    <option value="semana">Esta semana</option>
+                    <option value="mes">Este mês</option>
+                </select>
+                <select class="select-filter" id="filtroLink">
+                    <option value="">Todos os links</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Meus Clientes</span>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span class="badge-count" id="badgeTotalClientes">0 clientes</span>
+                        <button class="btn-export" onclick="exportarClientes()">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>CPF</th>
+                                    <th>Link</th>
+                                    <th>Data</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaClientes">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                                            <div class="empty-title">Nenhum cliente ainda</div>
+                                            <div class="empty-desc">Compartilhe seu link para começar a captar clientes</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="paginacao"></div>
+                </div>
+            </div>
         </div>
 
         <!-- ── CRIAR LINK ── -->
@@ -862,103 +914,49 @@
         </div>
 
         <!-- ── MEUS LINKS ── -->
-        <div id="link-section" class="content-section">
+
+        <!-- ── PRODUTOS & SIMULAÇÃO ── -->
+        <div id="produtos-section" class="content-section">
             <div class="page-header">
-                <h1 class="page-title">Meus Links</h1>
-                <p class="page-subtitle">Seu link fixo de afiliado</p>
+                <h1 class="page-title">Produtos & Simulação</h1>
+                <p class="page-subtitle">Conheça os produtos disponíveis e simule sua comissão</p>
             </div>
 
-            <div class="card">
+            <!-- CARROSSEL -->
+            <div class="card" style="margin-bottom:20px; overflow:hidden;">
                 <div class="card-header">
-                    <span class="card-title">Link do Formulário</span>
-                </div>
-                <div class="card-body">
-                    <p style="font-size:14px; color:var(--white-dim); margin-bottom:20px;">
-                        Compartilhe este link com seus clientes. Os campos do formulário serão preenchidos automaticamente com seus dados.
-                    </p>
-                    <div class="link-box">
-                        <input type="text" class="link-input" id="linkFormularioInput" readonly>
-                        <button class="btn-copy" onclick="copyLinkFormulario()">Copiar</button>
-                    </div>
-                    <div class="share-row">
-                        <button class="btn-share btn-whatsapp" onclick="shareWhatsAppFormulario()">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
-                        </button>
-                        <button class="btn-share btn-email-share" onclick="shareEmailFormulario()">
-                            <i class="fas fa-envelope"></i> E-mail
-                        </button>
+                    <span class="card-title">📸 Produtos Starcard</span>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <button onclick="prevSlide()" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.25);border-radius:7px;padding:5px 12px;color:var(--purple-glow);cursor:pointer;font-size:16px;">‹</button>
+                        <button onclick="nextSlide()" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.25);border-radius:7px;padding:5px 12px;color:var(--purple-glow);cursor:pointer;font-size:16px;">›</button>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- ── CLIENTES ── -->
-        <div id="clientes-section" class="content-section">
-            <div class="page-header">
-                <h1 class="page-title">Meus Clientes</h1>
-                <p class="page-subtitle">Todos os clientes indicados por você</p>
-            </div>
-
-            <div class="search-row">
-                <input type="text" class="search-input" id="buscaCliente" placeholder="Buscar por nome, email ou CPF...">
-                <select class="select-filter" id="filtroData">
-                    <option value="">Todos os períodos</option>
-                    <option value="hoje">Hoje</option>
-                    <option value="semana">Esta semana</option>
-                    <option value="mes">Este mês</option>
-                </select>
-                <select class="select-filter" id="filtroLink">
-                    <option value="">Todos os links</option>
-                </select>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Clientes Cadastrados</span>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span class="badge-count" id="badgeTotalClientes">0 clientes</span>
-                        <button class="btn-export" onclick="exportarClientes()">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
+                <div style="position:relative;overflow:hidden;background:#0a041a;">
+                    <div id="carouselTrack" style="display:flex;transition:transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);">
+                        <div style="min-width:100%;display:flex;justify-content:center;padding:24px;">
+                            <img src="assets/carrossel/capa.jpeg" alt="Produtos Exclusivos Starcard" style="max-height:360px;max-width:100%;object-fit:contain;border-radius:12px;">
+                        </div>
+                        <div style="min-width:100%;display:flex;justify-content:center;padding:24px;">
+                            <img src="assets/carrossel/img1.jpeg" alt="Empréstimo + Compra de Dívida" style="max-height:360px;max-width:100%;object-fit:contain;border-radius:12px;">
+                        </div>
+                        <div style="min-width:100%;display:flex;justify-content:center;padding:24px;">
+                            <img src="assets/carrossel/img2.jpeg" alt="Empréstimo Servidores Comissionados" style="max-height:360px;max-width:100%;object-fit:contain;border-radius:12px;">
+                        </div>
+                        <div style="min-width:100%;display:flex;justify-content:center;padding:24px;">
+                            <img src="assets/carrossel/img3.jpeg" alt="Auxílio Servidor" style="max-height:360px;max-width:100%;object-fit:contain;border-radius:12px;">
+                        </div>
+                        <div style="min-width:100%;display:flex;justify-content:center;padding:24px;">
+                            <img src="assets/carrossel/img4.jpeg" alt="Vale Consignado" style="max-height:360px;max-width:100%;object-fit:contain;border-radius:12px;">
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:8px;padding:12px 0 20px;" id="carouselDots">
+                        <span onclick="goToSlide(0)" style="width:8px;height:8px;border-radius:50%;background:var(--purple-bright);cursor:pointer;transition:all 0.3s;display:inline-block;" class="cdot"></span>
+                        <span onclick="goToSlide(1)" style="width:8px;height:8px;border-radius:50%;background:rgba(168,85,247,0.25);cursor:pointer;transition:all 0.3s;display:inline-block;" class="cdot"></span>
+                        <span onclick="goToSlide(2)" style="width:8px;height:8px;border-radius:50%;background:rgba(168,85,247,0.25);cursor:pointer;transition:all 0.3s;display:inline-block;" class="cdot"></span>
+                        <span onclick="goToSlide(3)" style="width:8px;height:8px;border-radius:50%;background:rgba(168,85,247,0.25);cursor:pointer;transition:all 0.3s;display:inline-block;" class="cdot"></span>
+                        <span onclick="goToSlide(4)" style="width:8px;height:8px;border-radius:50%;background:rgba(168,85,247,0.25);cursor:pointer;transition:all 0.3s;display:inline-block;" class="cdot"></span>
                     </div>
                 </div>
-                <div class="card-body" style="padding:0;">
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Email</th>
-                                    <th>Telefone</th>
-                                    <th>CPF</th>
-                                    <th>Link</th>
-                                    <th>Data</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaClientes">
-                                <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                                            <div class="empty-title">Nenhum cliente ainda</div>
-                                            <div class="empty-desc">Compartilhe seu link para começar a captar clientes</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination" id="paginacao"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── REGRAS ── -->
-        <div id="regras-section" class="content-section">
-            <div class="page-header">
-                <h1 class="page-title">Regras & Simulador</h1>
-                <p class="page-subtitle">Tabela de comissões por produto e simulador de liberação</p>
             </div>
 
             <!-- REGRAS RÁPIDAS -->
@@ -1103,6 +1101,28 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+        <!-- ── REGRAS ── -->
+        <div id="regras-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Regras</h1>
+                <p class="page-subtitle">Informações e diretrizes do programa de afiliados</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📋 Em breve</span>
+                </div>
+                <div class="card-body">
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="empty-title">Conteúdo em preparação</div>
+                        <div class="empty-desc">As regras do programa serão publicadas em breve.</div>
                     </div>
                 </div>
             </div>
@@ -1257,14 +1277,6 @@
             }
         }
 
-        function showSection(name, el) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`${name}-section`).classList.add('active');
-            if (el) el.classList.add('active');
-            if (name === 'clientes') carregarMeusClientes();
-        }
-
         function copyLinkFormulario() {
             navigator.clipboard.writeText(document.getElementById('linkFormularioInput').value);
         }
@@ -1314,10 +1326,60 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             carregarDadosAfiliado();
+            carregarMeusClientes();
             document.getElementById('buscaCliente').addEventListener('input', aplicarFiltros);
             document.getElementById('filtroData').addEventListener('change', aplicarFiltros);
             document.getElementById('filtroLink').addEventListener('change', aplicarFiltros);
         });
+        // ── CARROSSEL ──
+        let currentSlide = 0;
+        const totalSlides = 5;
+        let carouselTimer;
+
+        function goToSlide(n) {
+            currentSlide = n;
+            const track = document.getElementById('carouselTrack');
+            if (track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.cdot').forEach((d, i) => {
+                d.style.background = i === currentSlide ? 'var(--purple-bright)' : 'rgba(168,85,247,0.25)';
+                d.style.width = i === currentSlide ? '20px' : '8px';
+                d.style.borderRadius = '4px';
+            });
+        }
+
+        function nextSlide() {
+            goToSlide((currentSlide + 1) % totalSlides);
+            resetCarouselTimer();
+        }
+
+        function prevSlide() {
+            goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+            resetCarouselTimer();
+        }
+
+        function resetCarouselTimer() {
+            clearInterval(carouselTimer);
+            carouselTimer = setInterval(nextSlide, 4000);
+        }
+
+        // Inicia autoplay quando entrar na section
+        const origShowSection = showSection;
+        function showSection(name, el) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`${name}-section`).classList.add('active');
+            if (el) el.classList.add('active');
+            if (name === 'dashboard') carregarMeusClientes();
+            if (name === 'produtos') {
+                goToSlide(0);
+                resetCarouselTimer();
+            } else {
+                clearInterval(carouselTimer);
+            }
+        }
+
+        carouselTimer = setInterval(nextSlide, 4000);
+
         const comissaoPorPrazo = { 1:0.005, 2:0.01, 3:0.01, 6:0.01, 84:0.02, 96:0.03, 120:0.04 };
         const fmtBRL = v => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
 
