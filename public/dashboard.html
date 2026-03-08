@@ -10,7 +10,8 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
+        /* ═══ THEME ENGINE ═══ */
+        :root, [data-theme="galaxy"] {
             --purple-deep: #0f0620;
             --purple-dark: #1a0a2e;
             --purple-mid: #6b21a8;
@@ -23,6 +24,73 @@
             --white-faint: rgba(255,255,255,0.06);
             --card-bg: rgba(255,255,255,0.04);
             --border: rgba(255,255,255,0.08);
+            --grid-line: rgba(168,85,247,0.04);
+            --bg-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+        }
+        [data-theme="neon"] {
+            --purple-deep: #070715;
+            --purple-dark: #0d0d2b;
+            --purple-mid: #4f00c8;
+            --purple-bright: #7c3aed;
+            --purple-glow: #a78bfa;
+            --accent: #06ffd8;
+            --white: #f0f0ff;
+            --white-dim: rgba(200,200,255,0.5);
+            --white-faint: rgba(124,58,237,0.08);
+            --card-bg: rgba(79,0,200,0.06);
+            --border: rgba(124,58,237,0.15);
+            --grid-line: rgba(6,255,216,0.04);
+        }
+        [data-theme="minimal"] {
+            --purple-deep: #18131f;
+            --purple-dark: #221a2c;
+            --purple-mid: #7c3aed;
+            --purple-bright: #8b5cf6;
+            --purple-glow: #a78bfa;
+            --accent: #f472b6;
+            --white: #f8f5ff;
+            --white-dim: rgba(200,190,220,0.55);
+            --white-faint: rgba(255,255,255,0.04);
+            --card-bg: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.07);
+            --grid-line: transparent;
+        }
+
+        /* Theme: Neon glow effects */
+        [data-theme="neon"] body::before {
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        [data-theme="neon"] .sidebar {
+            background: rgba(13,13,43,0.95);
+            border-right-color: rgba(124,58,237,0.2);
+            box-shadow: 4px 0 30px rgba(6,255,216,0.04);
+        }
+        [data-theme="neon"] .stat-card::after,
+        [data-theme="neon"] .pipeline-card::before,
+        [data-theme="neon"] .admin-stat::after {
+            background: linear-gradient(90deg, transparent, rgba(6,255,216,0.4), transparent);
+        }
+        [data-theme="neon"] .btn-generate,
+        [data-theme="neon"] .btn-nova-tarefa,
+        [data-theme="neon"] .btn-criar-tarefa {
+            box-shadow: 0 0 20px rgba(6,255,216,0.2);
+        }
+        /* Theme: Minimal clean */
+        [data-theme="minimal"] body::before { display: none; }
+        [data-theme="minimal"] .sidebar { background: rgba(34,26,44,0.98); }
+        [data-theme="minimal"] .stat-card,
+        [data-theme="minimal"] .pipeline-card,
+        [data-theme="minimal"] .card,
+        [data-theme="minimal"] .chart-card { backdrop-filter: none; }
+        /* Theme: Galaxy deep space */
+        [data-theme="galaxy"] body::after {
+            content: '';
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background: radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.07) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 80%, rgba(232,121,249,0.05) 0%, transparent 50%);
         }
 
         body {
@@ -596,13 +664,654 @@
             min-height: 60px;
         }
 
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
-            .sidebar.open { transform: translateX(0); }
-            .main { margin-left: 0; padding: 20px; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .steps { grid-template-columns: 1fr; }
+        /* ══════════════════════════════════════════════
+           CRM PIPELINE SYSTEM
+        ══════════════════════════════════════════════ */
+
+        /* ── Metrics Row ── */
+        .crm-metrics-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
         }
+        .crm-metric {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .crm-metric:hover { border-color: rgba(168,85,247,0.25); transform: translateY(-2px); }
+        .crm-metric-icon {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .crm-metric-icon.purple { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: var(--purple-glow); }
+        .crm-metric-icon.green  { background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.2);  color: #4ade80; }
+        .crm-metric-icon.blue   { background: rgba(96,165,250,0.1);  border: 1px solid rgba(96,165,250,0.2);  color: #60a5fa; }
+        .crm-metric-icon.orange { background: rgba(251,146,60,0.1);  border: 1px solid rgba(251,146,60,0.2);  color: #fb923c; }
+        .crm-metric-val  { font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -1px; line-height: 1; }
+        .crm-metric-label{ font-size: 12px; color: var(--white-dim); margin-top: 2px; }
+        .crm-metric-tasks { cursor: pointer; }
+        .crm-metric-tasks:hover { border-color: rgba(251,146,60,0.4); }
+        .crm-tasks-urgent {
+            position: absolute; top: 10px; right: 12px;
+            background: #ef4444; color: #fff;
+            width: 18px; height: 18px; border-radius: 50%;
+            font-size: 11px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            animation: urgentPulse 1.8s ease infinite;
+        }
+        @keyframes urgentPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+        }
+
+        /* ── Pipeline Card ── */
+        .pipeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .pipeline-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .pipeline-title {
+            font-size: 15px; font-weight: 700; color: var(--white);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pipeline-title i { color: var(--purple-glow); }
+        .pipeline-subtitle { font-size: 12px; color: var(--white-dim); }
+        .pipeline-stages {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0;
+            padding: 20px;
+            gap: 10px;
+        }
+        .pipeline-stage {
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.15s;
+            cursor: pointer;
+            position: relative;
+        }
+        .pipeline-stage:hover { transform: translateY(-3px); }
+        .pipeline-stage-head {
+            padding: 10px 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .pipeline-stage-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .pipeline-stage-icon { font-size: 16px; }
+        .pipeline-stage-count {
+            font-size: 22px; font-weight: 900; color: var(--white);
+            letter-spacing: -1px;
+        }
+        .pipeline-stage-name {
+            font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .pipeline-stage-pct {
+            font-size: 10px; color: var(--white-dim);
+        }
+        .pipeline-stage-bar {
+            height: 3px;
+            background: rgba(255,255,255,0.05);
+        }
+        .pipeline-stage-bar-fill {
+            height: 100%;
+            border-radius: 0;
+            transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+        }
+        /* Stage colour themes */
+        .stage-lead     { border-color: rgba(148,163,184,0.2); }
+        .stage-lead .pipeline-stage-name { color: #94a3b8; }
+        .stage-lead .pipeline-stage-bar-fill { background: #94a3b8; }
+        .stage-lead:hover { border-color: rgba(148,163,184,0.5); }
+
+        .stage-contato  { border-color: rgba(96,165,250,0.2); }
+        .stage-contato .pipeline-stage-name { color: #60a5fa; }
+        .stage-contato .pipeline-stage-bar-fill { background: #60a5fa; }
+        .stage-contato:hover { border-color: rgba(96,165,250,0.5); }
+
+        .stage-doc      { border-color: rgba(168,85,247,0.2); }
+        .stage-doc .pipeline-stage-name { color: var(--purple-glow); }
+        .stage-doc .pipeline-stage-bar-fill { background: var(--purple-bright); }
+        .stage-doc:hover { border-color: rgba(168,85,247,0.5); }
+
+        .stage-analise  { border-color: rgba(251,191,36,0.2); }
+        .stage-analise .pipeline-stage-name { color: #fbbf24; }
+        .stage-analise .pipeline-stage-bar-fill { background: #fbbf24; }
+        .stage-analise:hover { border-color: rgba(251,191,36,0.5); }
+
+        .stage-aprovado { border-color: rgba(74,222,128,0.2); }
+        .stage-aprovado .pipeline-stage-name { color: #4ade80; }
+        .stage-aprovado .pipeline-stage-bar-fill { background: #4ade80; }
+        .stage-aprovado:hover { border-color: rgba(74,222,128,0.5); }
+
+        .stage-reprovado{ border-color: rgba(248,113,113,0.2); }
+        .stage-reprovado .pipeline-stage-name { color: #f87171; }
+        .stage-reprovado .pipeline-stage-bar-fill { background: #f87171; }
+        .stage-reprovado:hover { border-color: rgba(248,113,113,0.5); }
+
+        /* Stage filter pill (active state) */
+        .pipeline-stage.stage-filter-active {
+            box-shadow: 0 0 0 2px var(--purple-bright);
+        }
+
+        /* ── Status pill in table ── */
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 100px;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.3px; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .status-pill:hover { opacity: 0.75; }
+        .sp-lead     { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+        .sp-contato  { background: rgba(96,165,250,0.12);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
+        .sp-doc      { background: rgba(168,85,247,0.12);  color: var(--purple-glow); border: 1px solid rgba(168,85,247,0.2); }
+        .sp-analise  { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+        .sp-aprovado { background: rgba(74,222,128,0.12);  color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+        .sp-reprovado{ background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+
+        /* ── Agenda Card ── */
+        .agenda-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .agenda-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .agenda-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: #fb923c;
+        }
+        .agenda-title { font-size: 15px; font-weight: 700; color: var(--white); }
+        .agenda-date  { font-size: 12px; color: var(--white-dim); margin-top: 1px; }
+        .btn-nova-tarefa {
+            display: flex; align-items: center; gap: 7px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border: none; border-radius: 9px;
+            padding: 9px 18px; font-size: 13px;
+            font-family: 'Inter', sans-serif; font-weight: 700;
+            color: #fff; cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn-nova-tarefa:hover { opacity: 0.88; transform: translateY(-1px); }
+        .agenda-body { padding: 12px 24px 16px; }
+        .agenda-empty {
+            display: flex; align-items: center; gap: 10px;
+            padding: 20px 0; color: rgba(255,255,255,0.2);
+            font-size: 13px;
+        }
+        .agenda-empty i { font-size: 20px; color: rgba(251,191,36,0.3); }
+        .agenda-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .agenda-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .agenda-item:hover { border-color: rgba(168,85,247,0.2); background: rgba(168,85,247,0.04); }
+        .agenda-item.done { opacity: 0.45; }
+        .agenda-item.done .agenda-item-title { text-decoration: line-through; }
+        .agenda-check {
+            width: 20px; height: 20px; border-radius: 6px;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            background: none; cursor: pointer;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; color: transparent; font-size: 10px;
+        }
+        .agenda-check:hover { border-color: #4ade80; color: #4ade80; }
+        .agenda-item.done .agenda-check { background: rgba(74,222,128,0.15); border-color: #4ade80; color: #4ade80; }
+        .agenda-item-info { flex: 1; min-width: 0; }
+        .agenda-item-title { font-size: 13px; font-weight: 600; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .agenda-item-sub   { font-size: 11px; color: var(--white-dim); margin-top: 2px; }
+        .agenda-item-tipo  {
+            font-size: 11px; font-weight: 700; padding: 3px 8px;
+            border-radius: 6px; background: rgba(168,85,247,0.1);
+            color: var(--purple-glow); border: 1px solid rgba(168,85,247,0.15);
+            flex-shrink: 0;
+        }
+        .agenda-item-del {
+            background: none; border: none; color: rgba(255,255,255,0.15);
+            cursor: pointer; font-size: 13px; padding: 4px;
+            transition: color 0.2s; flex-shrink: 0;
+        }
+        .agenda-item-del:hover { color: #f87171; }
+
+        /* ── CRM Modal ── */
+        .modal-crm { max-width: 540px; }
+        .modal-client-avatar {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 15px; flex-shrink: 0;
+        }
+        .modal-tabs {
+            display: flex; gap: 2px;
+            padding: 10px 16px 0;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+        .modal-tab {
+            padding: 9px 16px; font-size: 13px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            border: none; background: none; color: var(--white-dim);
+            cursor: pointer; border-bottom: 2px solid transparent;
+            margin-bottom: -1px; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .modal-tab:hover { color: var(--white); }
+        .modal-tab.active { color: var(--purple-glow); border-bottom-color: var(--purple-bright); }
+        .modal-tab-badge {
+            background: rgba(168,85,247,0.2); color: var(--purple-glow);
+            padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 800;
+        }
+        .modal-tab-content { padding: 20px 24px 24px; max-height: 65vh; overflow-y: auto; }
+        .modal-tab-content.active { display: block; }
+
+        /* Modal status selector */
+        .modal-status-selector { margin-top: 20px; }
+        .mss-label { font-size: 11px; font-weight: 700; color: var(--white-dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+        .mss-buttons { display: flex; flex-wrap: wrap; gap: 7px; }
+        .mss-btn {
+            padding: 7px 14px; border-radius: 8px; font-size: 12px;
+            font-family: 'Inter', sans-serif; font-weight: 600;
+            border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+            color: var(--white-dim); cursor: pointer; transition: all 0.2s;
+        }
+        .mss-btn:hover { border-color: rgba(168,85,247,0.3); color: var(--white); }
+        .mss-btn.active { box-shadow: 0 0 0 2px currentColor; }
+        .mss-btn.ms-lead     { }
+        .mss-btn.ms-contato  { color: #60a5fa; border-color: rgba(96,165,250,0.3); }
+        .mss-btn.ms-doc      { color: var(--purple-glow); border-color: rgba(168,85,247,0.3); }
+        .mss-btn.ms-analise  { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+        .mss-btn.ms-aprovado { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+        .mss-btn.ms-reprovado{ color: #f87171; border-color: rgba(248,113,113,0.3); }
+        .mss-btn.active.ms-lead     { background: rgba(148,163,184,0.12); }
+        .mss-btn.active.ms-contato  { background: rgba(96,165,250,0.12); }
+        .mss-btn.active.ms-doc      { background: rgba(168,85,247,0.12); }
+        .mss-btn.active.ms-analise  { background: rgba(251,191,36,0.12); }
+        .mss-btn.active.ms-aprovado { background: rgba(74,222,128,0.12); }
+        .mss-btn.active.ms-reprovado{ background: rgba(248,113,113,0.12); }
+
+        /* Timeline */
+        .timeline-add {
+            display: flex; gap: 8px; margin-bottom: 20px;
+        }
+        .timeline-input {
+            flex: 1; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border); border-radius: 9px;
+            padding: 10px 14px; font-size: 13px;
+            font-family: 'Inter', sans-serif; color: var(--white); outline: none;
+            transition: border-color 0.2s;
+        }
+        .timeline-input:focus { border-color: rgba(168,85,247,0.4); }
+        .timeline-input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn-timeline-add {
+            width: 38px; height: 38px; border-radius: 9px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border: none; color: #fff; cursor: pointer; font-size: 14px;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.2s;
+        }
+        .btn-timeline-add:hover { opacity: 0.85; }
+        .timeline-list { list-style: none; display: flex; flex-direction: column; }
+        .timeline-item {
+            display: flex; gap: 12px;
+            padding-bottom: 16px;
+            position: relative;
+        }
+        .timeline-item:not(:last-child)::before {
+            content: ''; position: absolute;
+            left: 13px; top: 26px; bottom: 0;
+            width: 1px; background: var(--border);
+        }
+        .timeline-dot {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--purple-glow); font-size: 10px; flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .timeline-body { flex: 1; }
+        .timeline-text { font-size: 13px; color: var(--white); line-height: 1.5; }
+        .timeline-meta { font-size: 11px; color: var(--white-dim); margin-top: 3px; }
+        .timeline-del {
+            background: none; border: none; color: rgba(255,255,255,0.12);
+            cursor: pointer; font-size: 12px; padding: 2px;
+            transition: color 0.2s; flex-shrink: 0;
+        }
+        .timeline-del:hover { color: #f87171; }
+        .timeline-empty { padding: 30px 0; text-align: center; color: rgba(255,255,255,0.2); font-size: 13px; }
+
+        /* Tasks in modal */
+        .task-form {
+            display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px;
+        }
+        .task-form-label { font-size: 11px; font-weight: 600; color: var(--white-dim); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .task-select {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 8px; padding: 9px 12px; font-size: 12px;
+            font-family: 'Inter', sans-serif; color: var(--white); outline: none;
+            cursor: pointer; transition: border-color 0.2s;
+        }
+        .task-select:focus { border-color: rgba(168,85,247,0.4); }
+        .task-select option { background: #1a0a2e; }
+        .task-date-input {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 8px; padding: 9px 12px; font-size: 12px;
+            font-family: 'Inter', sans-serif; color: var(--white); outline: none;
+            color-scheme: dark; transition: border-color 0.2s;
+        }
+        .task-date-input:focus { border-color: rgba(168,85,247,0.4); }
+        .task-comment-input {
+            flex: 1; min-width: 120px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 8px; padding: 9px 12px; font-size: 12px;
+            font-family: 'Inter', sans-serif; color: var(--white); outline: none;
+            transition: border-color 0.2s;
+        }
+        .task-comment-input:focus { border-color: rgba(168,85,247,0.4); }
+        .task-comment-input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn-criar-tarefa {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.25);
+            border-radius: 8px; padding: 9px 16px; font-size: 12px;
+            font-family: 'Inter', sans-serif; font-weight: 700;
+            color: var(--purple-glow); cursor: pointer; transition: all 0.2s;
+        }
+        .btn-criar-tarefa:hover { background: rgba(168,85,247,0.25); }
+        .task-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+        .task-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 9px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            transition: border-color 0.2s;
+        }
+        .task-item.done { opacity: 0.4; }
+        .task-item.done .task-item-title { text-decoration: line-through; }
+        .task-item.overdue { border-color: rgba(248,113,113,0.25); background: rgba(248,113,113,0.04); }
+        .task-check {
+            width: 18px; height: 18px; border-radius: 5px;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            background: none; cursor: pointer; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; color: transparent; font-size: 9px;
+        }
+        .task-check:hover { border-color: #4ade80; color: #4ade80; }
+        .task-item.done .task-check { background: rgba(74,222,128,0.15); border-color: #4ade80; color: #4ade80; }
+        .task-item-body { flex: 1; min-width: 0; }
+        .task-item-title { font-size: 13px; font-weight: 600; color: var(--white); }
+        .task-item-meta  { font-size: 11px; color: var(--white-dim); margin-top: 2px; }
+        .task-item-del {
+            background: none; border: none; color: rgba(255,255,255,0.12);
+            cursor: pointer; font-size: 12px; padding: 3px; transition: color 0.2s;
+        }
+        .task-item-del:hover { color: #f87171; }
+        .task-empty { padding: 24px 0; text-align: center; color: rgba(255,255,255,0.2); font-size: 13px; }
+
+        @media (max-width: 1100px) {
+            .crm-metrics-row { grid-template-columns: repeat(2, 1fr); }
+            .pipeline-stages  { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 700px) {
+            .crm-metrics-row { grid-template-columns: 1fr 1fr; }
+            .pipeline-stages  { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* ══ THEME SWITCHER ══ */
+        .theme-switcher {
+            padding: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .theme-switcher-label {
+            font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.25);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 9px; display: flex; align-items: center; gap: 6px;
+        }
+        .theme-switcher-row { display: flex; gap: 6px; }
+        .theme-btn {
+            flex: 1; padding: 7px 4px;
+            border-radius: 8px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            font-size: 10px; font-weight: 700; font-family: 'Inter', sans-serif;
+            color: var(--white-dim); cursor: pointer;
+            transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .theme-btn:hover { border-color: rgba(168,85,247,0.3); color: var(--white); }
+        .theme-btn.active { border-color: var(--purple-bright); color: var(--white); background: rgba(168,85,247,0.12); }
+        .theme-preview { width: 28px; height: 14px; border-radius: 4px; display: block; }
+        .theme-galaxy .theme-preview { background: linear-gradient(135deg, #0f0620 40%, #a855f7); }
+        .theme-neon    .theme-preview { background: linear-gradient(135deg, #070715 40%, #06ffd8); }
+        .theme-minimal .theme-preview { background: linear-gradient(135deg, #221a2c 40%, #f472b6); }
+
+        /* ══ NOTES CARD ══ */
+        .notes-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden; margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+        .notes-card:focus-within { border-color: rgba(168,85,247,0.3); }
+        .notes-header {
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .notes-icon {
+            width: 36px; height: 36px; border-radius: 9px;
+            background: rgba(232,121,249,0.1); border: 1px solid rgba(232,121,249,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: var(--accent);
+        }
+        .notes-title { font-size: 14px; font-weight: 700; color: var(--white); }
+        .notes-sub    { font-size: 11px; color: var(--white-dim); margin-top: 1px; }
+        .notes-chars  { font-size: 11px; color: rgba(255,255,255,0.2); }
+        .btn-notes-clear {
+            background: none; border: none; color: rgba(255,255,255,0.15);
+            cursor: pointer; font-size: 12px; padding: 6px;
+            border-radius: 6px; transition: all 0.2s;
+        }
+        .btn-notes-clear:hover { color: #f87171; background: rgba(239,68,68,0.1); }
+        .notes-body { padding: 0; }
+        .notes-textarea {
+            width: 100%; min-height: 140px; max-height: 400px;
+            background: transparent; border: none; resize: vertical;
+            padding: 16px 20px; font-size: 13px; line-height: 1.75;
+            font-family: 'Inter', sans-serif; color: rgba(255,255,255,0.85);
+            outline: none;
+        }
+        .notes-textarea::placeholder { color: rgba(255,255,255,0.18); }
+
+        /* ══ CAMPAIGNS ══ */
+        .btn-nova-campanha {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border: none; border-radius: 11px; padding: 11px 22px;
+            font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 700;
+            color: #fff; cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(168,85,247,0.3);
+        }
+        .btn-nova-campanha:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(168,85,247,0.45); }
+        .camp-metrics {
+            display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; margin-bottom: 20px;
+        }
+        .camp-metric-item {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 13px; padding: 16px 14px;
+            display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .camp-metric-item:hover { border-color: rgba(168,85,247,0.25); transform: translateY(-2px); }
+        .camp-metric-icon {
+            width: 36px; height: 36px; border-radius: 9px; border: 1px solid;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        .camp-metric-val   { font-size: 24px; font-weight: 900; color: var(--white); letter-spacing: -1px; line-height: 1; }
+        .camp-metric-label { font-size: 11px; color: var(--white-dim); }
+        .camp-filter-bar {
+            display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .camp-view-toggle {
+            display: flex; gap: 3px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 9px; padding: 3px;
+        }
+        .cvt-btn {
+            width: 32px; height: 32px; border-radius: 7px; border: none;
+            background: none; color: var(--white-dim); cursor: pointer; font-size: 13px;
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .cvt-btn.active { background: rgba(168,85,247,0.2); color: var(--purple-glow); }
+        .ab-notice {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2);
+            border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+            font-size: 13px; color: #fbbf24;
+        }
+        .ab-notice button { background: none; border: none; color: rgba(251,191,36,0.5); cursor: pointer; margin-left: auto; font-size: 14px; }
+        .camp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+        .camp-grid.list-view { grid-template-columns: 1fr; }
+        .camp-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; position: relative;
+        }
+        .camp-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--purple-mid), var(--purple-bright));
+        }
+        .camp-card:hover { border-color: rgba(168,85,247,0.3); transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+        .camp-card.is-ab { border-color: rgba(251,191,36,0.2); }
+        .camp-card.is-ab::before { background: linear-gradient(90deg, #92400e, #fbbf24); }
+        .camp-card-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); }
+        .camp-card-toprow { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .camp-card-canal {
+            font-size: 20px; width: 40px; height: 40px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .camp-card-info { flex: 1; min-width: 0; }
+        .camp-card-name { font-size: 15px; font-weight: 700; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+        .camp-card-desc { font-size: 12px; color: var(--white-dim); }
+        .camp-card-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        .camp-icon-btn {
+            width: 30px; height: 30px; border-radius: 7px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: var(--white-dim); cursor: pointer; font-size: 12px;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .camp-icon-btn:hover { background: rgba(168,85,247,0.15); border-color: rgba(168,85,247,0.3); color: var(--purple-glow); }
+        .camp-icon-btn.danger:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #f87171; }
+        .camp-icon-btn.clone:hover { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fbbf24; }
+        .camp-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .camp-tag { padding: 2px 9px; border-radius: 100px; font-size: 10px; font-weight: 700; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.15); color: var(--purple-glow); }
+        .camp-tag.ab-tag { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.2); color: #fbbf24; }
+        .camp-link-row {
+            display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 10px;
+            background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 9px;
+        }
+        .camp-link-text { flex: 1; font-size: 11px; color: var(--white-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: monospace; }
+        .camp-copy-btn {
+            background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700;
+            font-family: 'Inter', sans-serif; color: var(--purple-glow); cursor: pointer;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .camp-copy-btn:hover { background: rgba(168,85,247,0.2); }
+        .camp-copy-btn.copied { background: rgba(74,222,128,0.1); color: #4ade80; border-color: rgba(74,222,128,0.2); }
+        .camp-stats { padding: 14px 20px; display: grid; grid-template-columns: repeat(4,1fr); }
+        .camp-stat { text-align: center; padding: 6px 4px; border-right: 1px solid var(--border); }
+        .camp-stat:last-child { border-right: none; }
+        .camp-stat-val { font-size: 18px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
+        .camp-stat-label { font-size: 10px; color: var(--white-dim); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .camp-conv-bar { height: 3px; background: rgba(255,255,255,0.05); margin: 0 20px 14px; }
+        .camp-conv-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--purple-mid), var(--purple-bright)); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .camp-empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.2); }
+        .camp-empty i { font-size: 40px; display: block; margin-bottom: 16px; opacity: 0.3; }
+        .camp-canal-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
+        .camp-canal-btn {
+            padding: 9px 8px; border-radius: 9px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03); font-size: 12px; font-weight: 600;
+            font-family: 'Inter', sans-serif; color: var(--white-dim); cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .camp-canal-btn:hover { border-color: rgba(168,85,247,0.3); color: var(--white); }
+        .camp-canal-btn.active { background: rgba(168,85,247,0.15); border-color: rgba(168,85,247,0.4); color: var(--purple-glow); }
+        .ab-clone-note { display: flex; align-items: center; gap: 8px; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #fbbf24; }
+
+        /* ══ ONBOARDING TOUR ══ */
+        .tour-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; }
+        .tour-overlay.active { pointer-events: all; }
+        .tour-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); }
+        .tour-card {
+            position: absolute; z-index: 10001;
+            background: #1a0a2e; border: 1px solid rgba(168,85,247,0.35);
+            border-radius: 20px; padding: 28px 28px 24px; width: 340px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(168,85,247,0.1);
+            animation: tourCardIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes tourCardIn {
+            from { opacity:0; transform: scale(0.88) translateY(20px); }
+            to   { opacity:1; transform: scale(1) translateY(0); }
+        }
+        .tour-step-indicator { display: flex; gap: 5px; margin-bottom: 18px; }
+        .tour-step-dot { height: 3px; border-radius: 2px; background: rgba(168,85,247,0.2); flex: 1; transition: background 0.3s; }
+        .tour-step-dot.done { background: var(--purple-bright); }
+        .tour-icon { font-size: 36px; margin-bottom: 12px; }
+        .tour-title { font-size: 18px; font-weight: 800; color: var(--white); margin-bottom: 10px; letter-spacing: -0.4px; }
+        .tour-body  { font-size: 13px; color: var(--white-dim); line-height: 1.7; margin-bottom: 22px; }
+        .tour-actions { display: flex; align-items: center; justify-content: space-between; }
+        .tour-btn-skip { background: none; border: none; font-size: 12px; color: rgba(255,255,255,0.25); cursor: pointer; font-family: 'Inter', sans-serif; transition: color 0.2s; }
+        .tour-btn-skip:hover { color: var(--white-dim); }
+        .tour-btn-next {
+            background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+            border: none; border-radius: 10px; padding: 10px 22px; font-size: 13px; font-weight: 700;
+            font-family: 'Inter', sans-serif; color: #fff; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .tour-btn-next:hover { box-shadow: 0 6px 20px rgba(168,85,247,0.4); transform: translateY(-1px); }
+        .tour-highlight {
+            position: absolute; z-index: 10000; border: 2px solid var(--purple-bright);
+            border-radius: 14px; box-shadow: 0 0 0 4px rgba(168,85,247,0.15), 0 0 40px rgba(168,85,247,0.3);
+            pointer-events: none; transition: all 0.45s cubic-bezier(0.4,0,0.2,1); display: none;
+        }
+        @media (max-width: 1100px) { .camp-metrics { grid-template-columns: repeat(3,1fr); } }
+        @media (max-width: 768px)  { .camp-metrics { grid-template-columns: repeat(2,1fr); } .camp-grid { grid-template-columns: 1fr; } .sidebar { transform: translateX(-100%); transition: transform 0.3s; } .sidebar.open { transform: translateX(0); } .main { margin-left: 0; padding: 20px; } }
 
 
         /* ── GENERATED LINK CARD ── */
@@ -1190,10 +1899,12 @@
             <a class="nav-item active" onclick="showSection('dashboard', this)">
                 <i class="fas fa-chart-line"></i> Dashboard
             </a>
-            <a class="nav-item" onclick="showSection('criar-link', this)">
-                <i class="fas fa-plus-circle"></i> Criar Link
+            <a class="nav-item" onclick="showSection('campanhas', this)">
+                <i class="fas fa-rocket"></i> Campanhas &amp; Links
             </a>
-
+            <a class="nav-item" onclick="showSection('criar-link', this)">
+                <i class="fas fa-plus-circle"></i> Link Rápido
+            </a>
             <a class="nav-item" onclick="showSection('regras', this)">
                 <i class="fas fa-book-open"></i> Regras
             </a>
@@ -1207,7 +1918,22 @@
         </nav>
 
         <div class="sidebar-bottom">
-            <a href="/logout" class="nav-item danger">
+            <!-- Theme Switcher -->
+            <div class="theme-switcher">
+                <div class="theme-switcher-label"><i class="fas fa-palette"></i> Tema</div>
+                <div class="theme-switcher-row">
+                    <button class="theme-btn theme-galaxy active" data-theme="galaxy" onclick="setTheme('galaxy',this)" title="Galaxy">
+                        <span class="theme-preview"></span>Galaxy
+                    </button>
+                    <button class="theme-btn theme-neon" data-theme="neon" onclick="setTheme('neon',this)" title="Neon">
+                        <span class="theme-preview"></span>Neon
+                    </button>
+                    <button class="theme-btn theme-minimal" data-theme="minimal" onclick="setTheme('minimal',this)" title="Minimal">
+                        <span class="theme-preview"></span>Minimal
+                    </button>
+                </div>
+            </div>
+            <a href="/logout" class="nav-item danger" style="margin-top:8px;">
                 <i class="fas fa-sign-out-alt"></i> Sair
             </a>
         </div>
@@ -1222,21 +1948,70 @@
                 <p class="page-subtitle">Acompanhe sua performance em tempo real</p>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon-wrap"><i class="fas fa-users"></i></div>
-                    <div class="stat-value" id="totalClientes">0</div>
-                    <div class="stat-label">Clientes Indicados</div>
+            <!-- ── PIPELINE HEADER METRICS ── -->
+            <div class="crm-metrics-row">
+                <div class="crm-metric">
+                    <div class="crm-metric-icon purple"><i class="fas fa-users"></i></div>
+                    <div>
+                        <div class="crm-metric-val" id="totalClientes">0</div>
+                        <div class="crm-metric-label">Total de Leads</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon-wrap"><i class="fas fa-id-badge"></i></div>
-                    <div class="stat-value" id="codigoAfiliado" style="font-size:18px; letter-spacing:0">-</div>
-                    <div class="stat-label">Código do Afiliado</div>
+                <div class="crm-metric">
+                    <div class="crm-metric-icon green"><i class="fas fa-check-circle"></i></div>
+                    <div>
+                        <div class="crm-metric-val" id="totalAprovados">0</div>
+                        <div class="crm-metric-label">Aprovados</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon-wrap"><i class="fas fa-calendar-check"></i></div>
-                    <div class="stat-value" id="dataCadastro" style="font-size:18px; letter-spacing:0">-</div>
-                    <div class="stat-label">Membro desde</div>
+                <div class="crm-metric">
+                    <div class="crm-metric-icon blue"><i class="fas fa-hourglass-half"></i></div>
+                    <div>
+                        <div class="crm-metric-val" id="totalEmAnalise">0</div>
+                        <div class="crm-metric-label">Em Análise</div>
+                    </div>
+                </div>
+                <div class="crm-metric crm-metric-tasks" id="crmMetricTasks">
+                    <div class="crm-metric-icon orange"><i class="fas fa-tasks"></i></div>
+                    <div>
+                        <div class="crm-metric-val" id="totalTarefasHoje">0</div>
+                        <div class="crm-metric-label">Tarefas Hoje</div>
+                    </div>
+                    <div class="crm-tasks-urgent" id="crmTasksUrgent" style="display:none">!</div>
+                </div>
+            </div>
+
+            <!-- ── PIPELINE FUNNEL ── -->
+            <div class="pipeline-card">
+                <div class="pipeline-header">
+                    <div class="pipeline-title"><i class="fas fa-filter"></i> Pipeline de Vendas</div>
+                    <div class="pipeline-subtitle" id="pipelineSubtitle">Arraste os clientes entre as etapas</div>
+                </div>
+                <div class="pipeline-stages" id="pipelineStages">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <!-- ── ANOTAÇÕES PESSOAIS ── -->
+            <div class="notes-card" id="notesCard">
+                <div class="notes-header">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="notes-icon"><i class="fas fa-pen-nib"></i></div>
+                        <div>
+                            <div class="notes-title">Anotações Pessoais</div>
+                            <div class="notes-sub" id="notesSavedAt">Salvo automaticamente</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <span class="notes-chars" id="notesChars">0 / 2000</span>
+                        <button class="btn-notes-clear" onclick="limparNotes()" title="Limpar tudo"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div class="notes-body">
+                    <textarea class="notes-textarea" id="notesTextarea"
+                        placeholder="Escreva aqui suas notas privadas — estratégias, lembretes, scripts de abordagem, metas pessoais...&#10;&#10;Apenas você vê isso. Salvo automaticamente."
+                        maxlength="2000"
+                        oninput="onNotesInput(this)"></textarea>
                 </div>
             </div>
 
@@ -1308,7 +2083,7 @@
                                     <th>Email</th>
                                     <th>Telefone</th>
                                     <th>CPF</th>
-                                    <th>Link</th>
+                                    <th>Etapa Pipeline</th>
                                     <th>Data</th>
                                     <th></th>
                                 </tr>
@@ -1327,6 +2102,119 @@
                         </table>
                     </div>
                     <div class="pagination" id="paginacao"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             CAMPANHAS & LINKS SECTION
+        ══════════════════════════════════════════ -->
+        <div id="campanhas-section" class="content-section">
+            <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+                <div>
+                    <h1 class="page-title">🚀 Campanhas &amp; Links</h1>
+                    <p class="page-subtitle">Crie links nomeados, monitore performance e faça testes A/B</p>
+                </div>
+                <button class="btn-nova-campanha" onclick="abrirModalCampanha()">
+                    <i class="fas fa-plus"></i> Nova Campanha
+                </button>
+            </div>
+
+            <!-- Summary metrics -->
+            <div class="camp-metrics" id="campMetrics">
+                <div class="camp-metric-item">
+                    <div class="camp-metric-icon" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.2);color:var(--purple-glow);"><i class="fas fa-rocket"></i></div>
+                    <div class="camp-metric-val" id="campTotalLinks">0</div>
+                    <div class="camp-metric-label">Campanhas Ativas</div>
+                </div>
+                <div class="camp-metric-item">
+                    <div class="camp-metric-icon" style="background:rgba(96,165,250,0.1);border-color:rgba(96,165,250,0.2);color:#60a5fa;"><i class="fas fa-mouse-pointer"></i></div>
+                    <div class="camp-metric-val" id="campTotalVisitas">0</div>
+                    <div class="camp-metric-label">Total de Cliques</div>
+                </div>
+                <div class="camp-metric-item">
+                    <div class="camp-metric-icon" style="background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.2);color:#4ade80;"><i class="fas fa-user-plus"></i></div>
+                    <div class="camp-metric-val" id="campTotalCadastros">0</div>
+                    <div class="camp-metric-label">Leads Gerados</div>
+                </div>
+                <div class="camp-metric-item">
+                    <div class="camp-metric-icon" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.2);color:#fbbf24;"><i class="fas fa-percent"></i></div>
+                    <div class="camp-metric-val" id="campConvRate">0%</div>
+                    <div class="camp-metric-label">Taxa de Conversão</div>
+                </div>
+                <div class="camp-metric-item">
+                    <div class="camp-metric-icon" style="background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.2);color:#4ade80;"><i class="fas fa-check-double"></i></div>
+                    <div class="camp-metric-val" id="campTotalAprovados">0</div>
+                    <div class="camp-metric-label">Aprovados</div>
+                </div>
+                <div class="camp-metric-item">
+                    <div class="camp-metric-icon" style="background:rgba(251,146,60,0.1);border-color:rgba(251,146,60,0.2);color:#fb923c;"><i class="fas fa-coins"></i></div>
+                    <div class="camp-metric-val" id="campComissaoTotal">R$0</div>
+                    <div class="camp-metric-label">Comissão Estimada</div>
+                </div>
+            </div>
+
+            <!-- Filter bar -->
+            <div class="camp-filter-bar">
+                <input class="search-input" id="campBusca" placeholder="🔍  Buscar campanha ou tag..." oninput="renderCampanhas()" style="flex:1;min-width:180px;">
+                <select class="select-filter" id="campFiltroTag" onchange="renderCampanhas()">
+                    <option value="">Todas as tags</option>
+                </select>
+                <div class="camp-view-toggle">
+                    <button class="cvt-btn active" id="cvtGrid" onclick="setCampView('grid',this)"><i class="fas fa-th-large"></i></button>
+                    <button class="cvt-btn" id="cvtList" onclick="setCampView('list',this)"><i class="fas fa-list"></i></button>
+                </div>
+            </div>
+
+            <!-- A/B Group notice -->
+            <div class="ab-notice" id="abNotice" style="display:none;">
+                <i class="fas fa-flask"></i>
+                <span id="abNoticeText"></span>
+                <button onclick="document.getElementById('abNotice').style.display='none'">✕</button>
+            </div>
+
+            <!-- Campaign list -->
+            <div id="campListWrap" class="camp-grid"></div>
+        </div>
+
+        <!-- Modal Nova / Editar Campanha -->
+        <div class="modal-overlay" id="modalCampanha" onclick="fecharModalCampanha(event)">
+            <div class="modal" style="max-width:500px;">
+                <div class="modal-header">
+                    <span class="modal-title" id="modalCampTitulo"><i class="fas fa-rocket" style="color:var(--purple-glow);margin-right:8px;"></i>Nova Campanha</span>
+                    <button class="modal-close" onclick="fecharModalCampanha()">✕</button>
+                </div>
+                <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
+                    <input type="hidden" id="campEditId">
+                    <div>
+                        <label class="task-form-label">Nome da Campanha *</label>
+                        <input class="search-input" id="campNome" placeholder="ex: WhatsApp Servidores Maio" style="width:100%;">
+                    </div>
+                    <div>
+                        <label class="task-form-label">Canal / UTM Source</label>
+                        <div class="camp-canal-grid" id="campCanalGrid">
+                            <button class="camp-canal-btn active" data-canal="whatsapp" onclick="selectCanal(this)">💬 WhatsApp</button>
+                            <button class="camp-canal-btn" data-canal="instagram" onclick="selectCanal(this)">📷 Instagram</button>
+                            <button class="camp-canal-btn" data-canal="facebook" onclick="selectCanal(this)">👥 Facebook</button>
+                            <button class="camp-canal-btn" data-canal="email" onclick="selectCanal(this)">✉️ E-mail</button>
+                            <button class="camp-canal-btn" data-canal="indicacao" onclick="selectCanal(this)">🤝 Indicação</button>
+                            <button class="camp-canal-btn" data-canal="outro" onclick="selectCanal(this)">📌 Outro</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="task-form-label">Tags (separadas por vírgula)</label>
+                        <input class="search-input" id="campTags" placeholder="ex: servidores, mayo-25, teste-a" style="width:100%;">
+                    </div>
+                    <div>
+                        <label class="task-form-label">Descrição / Objetivo (opcional)</label>
+                        <input class="search-input" id="campDesc" placeholder="ex: Campanha para servidores municipais" style="width:100%;">
+                    </div>
+                    <div id="campCloneFromWrap" style="display:none;">
+                        <div class="ab-clone-note"><i class="fas fa-flask"></i> Será criado como variante A/B da campanha original</div>
+                    </div>
+                    <button class="btn-nova-campanha" style="width:100%;justify-content:center;font-size:14px;" onclick="salvarCampanha()">
+                        <i class="fas fa-check"></i> <span id="btnSalvarCampTxt">Criar Campanha</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1690,14 +2578,114 @@
 
     </main>
 
-    <!-- Modal de Detalhes -->
+    <!-- ══ ONBOARDING TOUR ══ -->
+    <div id="tourOverlay" class="tour-overlay" style="display:none;">
+        <div class="tour-backdrop"></div>
+        <div class="tour-card" id="tourCard">
+            <div class="tour-step-indicator" id="tourStepIndicator"></div>
+            <div class="tour-icon" id="tourIcon">🚀</div>
+            <div class="tour-title" id="tourTitle">Bem-vindo ao Starcard!</div>
+            <div class="tour-body" id="tourBody">Vamos fazer um tour rápido para você aproveitar tudo.</div>
+            <div class="tour-actions">
+                <button class="tour-btn-skip" onclick="skipTour()">Pular tour</button>
+                <button class="tour-btn-next" id="tourBtnNext" onclick="tourNext()">Próximo <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+        <div class="tour-highlight" id="tourHighlight"></div>
+    </div>
+
+    <!-- Modal de Detalhes CRM -->
     <div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
-        <div class="modal">
+        <div class="modal modal-crm">
             <div class="modal-header">
-                <span class="modal-title">Detalhes do Cliente</span>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="modal-client-avatar" id="modalClientAvatar">--</div>
+                    <div>
+                        <span class="modal-title" id="modalClientName">Cliente</span>
+                        <div id="modalStatusPill" style="margin-top:4px;"></div>
+                    </div>
+                </div>
                 <button class="modal-close" onclick="fecharModal()">✕</button>
             </div>
-            <div id="modalContent"></div>
+            <!-- Tabs -->
+            <div class="modal-tabs">
+                <button class="modal-tab active" onclick="switchModalTab('info', this)"><i class="fas fa-user"></i> Dados</button>
+                <button class="modal-tab" onclick="switchModalTab('timeline', this)"><i class="fas fa-history"></i> Timeline</button>
+                <button class="modal-tab" onclick="switchModalTab('tarefas', this)"><i class="fas fa-tasks"></i> Tarefas <span class="modal-tab-badge" id="modalTaskBadge">0</span></button>
+            </div>
+            <!-- Tab: Info -->
+            <div id="modalTabInfo" class="modal-tab-content active">
+                <div id="modalContent"></div>
+                <div class="modal-status-selector" id="modalStatusSelector">
+                    <div class="mss-label">Etapa do Pipeline</div>
+                    <div class="mss-buttons" id="mssButtons"></div>
+                </div>
+            </div>
+            <!-- Tab: Timeline -->
+            <div id="modalTabTimeline" class="modal-tab-content" style="display:none">
+                <div class="timeline-add">
+                    <input class="timeline-input" id="timelineInput" placeholder="Registrar evento (ligou, enviou doc, retornou...)" />
+                    <button class="btn-timeline-add" onclick="addTimelineEvent()"><i class="fas fa-plus"></i></button>
+                </div>
+                <ul class="timeline-list" id="timelineList"></ul>
+            </div>
+            <!-- Tab: Tarefas -->
+            <div id="modalTabTarefas" class="modal-tab-content" style="display:none">
+                <div class="task-form" id="taskFormModal">
+                    <select class="task-select" id="taskTipoModal">
+                        <option value="ligacao">📞 Ligação</option>
+                        <option value="whatsapp">💬 WhatsApp</option>
+                        <option value="documento">📄 Solicitar Documento</option>
+                        <option value="visita">🏠 Visita</option>
+                        <option value="retorno">🔄 Retorno</option>
+                        <option value="outro">📌 Outro</option>
+                    </select>
+                    <input type="date" class="task-date-input" id="taskDateModal" />
+                    <input class="task-comment-input" id="taskCommentModal" placeholder="Comentário (opcional)" />
+                    <button class="btn-criar-tarefa" onclick="criarTarefaDoModal()"><i class="fas fa-plus"></i> Criar</button>
+                </div>
+                <ul class="task-list" id="taskListModal"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nova Tarefa (standalone, sem cliente) -->
+    <div class="modal-overlay" id="modalNovaTarefa" onclick="fecharModalNovaTarefa(event)">
+        <div class="modal" style="max-width:420px;">
+            <div class="modal-header">
+                <span class="modal-title"><i class="fas fa-plus-circle" style="color:var(--purple-glow);margin-right:8px;"></i>Nova Tarefa</span>
+                <button class="modal-close" onclick="fecharModalNovaTarefa()">✕</button>
+            </div>
+            <div style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+                <div>
+                    <label class="task-form-label">Cliente (opcional)</label>
+                    <select class="task-select" id="ntClienteSelect" style="width:100%;">
+                        <option value="">— Sem cliente vinculado —</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="task-form-label">Tipo</label>
+                    <select class="task-select" id="ntTipo" style="width:100%;">
+                        <option value="ligacao">📞 Ligação</option>
+                        <option value="whatsapp">💬 WhatsApp</option>
+                        <option value="documento">📄 Solicitar Documento</option>
+                        <option value="visita">🏠 Visita</option>
+                        <option value="retorno">🔄 Retorno</option>
+                        <option value="outro">📌 Outro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="task-form-label">Data</label>
+                    <input type="date" class="task-date-input" id="ntData" style="width:100%;" />
+                </div>
+                <div>
+                    <label class="task-form-label">Comentário</label>
+                    <input class="task-comment-input" id="ntComentario" placeholder="O que precisa fazer?" style="width:100%;" />
+                </div>
+                <button class="btn-criar-tarefa" style="width:100%;justify-content:center;" onclick="criarTarefaStandalone()">
+                    <i class="fas fa-check"></i> Criar Tarefa
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1730,19 +2718,376 @@
             document.getElementById('emailAfiliado').textContent = dadosAfiliado.afiliado.email;
             document.getElementById('userInitials').textContent = nome.substring(0, 2).toUpperCase();
             document.getElementById('totalClientes').textContent = dadosAfiliado.total_clientes;
-            document.getElementById('codigoAfiliado').textContent = dadosAfiliado.afiliado.codigo_afiliado;
-            document.getElementById('dataCadastro').textContent = new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
 
             const codigo = dadosAfiliado.afiliado.codigo_afiliado;
             const linkFormulario = `${window.location.origin}/formulario-starbank?codigo=${codigo}`;
             if (document.getElementById('novoLinkInput')) document.getElementById('novoLinkInput').value = linkFormulario;
 
-            // Show admin nav if user is admin
+            // Subtitle: code + member since
+            const dataStr = new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+            const subtitle = document.querySelector('#dashboard-section .page-subtitle');
+            if (subtitle) subtitle.innerHTML = `Código: <strong style="color:var(--purple-glow)">${codigo}</strong> &nbsp;·&nbsp; Membro desde ${dataStr}`;
+
             if (dadosAfiliado.afiliado.is_admin || dadosAfiliado.afiliado.role === 'admin') {
                 const navAdmin = document.getElementById('navAdmin');
                 if (navAdmin) navAdmin.style.display = 'flex';
             }
         }
+
+        // ══════════════════════════════════════════════
+        //   CRM ENGINE
+        // ══════════════════════════════════════════════
+
+        const CRM_STAGES = [
+            { id: 'lead',      label: 'Lead Novo',     icon: '🌱', cls: 'stage-lead'     },
+            { id: 'contato',   label: 'Em Contato',    icon: '📞', cls: 'stage-contato'  },
+            { id: 'doc',       label: 'Doc. Enviada',  icon: '📄', cls: 'stage-doc'      },
+            { id: 'analise',   label: 'Em Análise',    icon: '🔍', cls: 'stage-analise'  },
+            { id: 'aprovado',  label: 'Aprovado',      icon: '✅', cls: 'stage-aprovado' },
+            { id: 'reprovado', label: 'Reprovado',     icon: '❌', cls: 'stage-reprovado'},
+        ];
+
+        const TIPO_LABELS = {
+            ligacao:'📞 Ligação', whatsapp:'💬 WhatsApp',
+            documento:'📄 Solicitar Documento', visita:'🏠 Visita',
+            retorno:'🔄 Retorno', outro:'📌 Outro'
+        };
+
+        let _crmKey = 'crm_data_starcard';
+        let _crmData = {}; // { clientId: { status, timeline:[], tasks:[] } }
+        let _pipelineFilter = null;
+        let _modalClientId = null;
+
+        function crmLoad() {
+            try { _crmData = JSON.parse(localStorage.getItem(_crmKey) || '{}'); } catch(e) { _crmData = {}; }
+        }
+        function crmSave() {
+            try { localStorage.setItem(_crmKey, JSON.stringify(_crmData)); } catch(e) {}
+        }
+        function crmGet(id) {
+            if (!_crmData[id]) _crmData[id] = { status: 'lead', timeline: [], tasks: [] };
+            if (!_crmData[id].timeline) _crmData[id].timeline = [];
+            if (!_crmData[id].tasks)    _crmData[id].tasks    = [];
+            return _crmData[id];
+        }
+        function crmSetStatus(id, status) {
+            crmGet(id).status = status;
+            const stageObj = CRM_STAGES.find(s => s.id === status);
+            crmGet(id).timeline.unshift({
+                id: Date.now(), text: `Etapa alterada para "${stageObj?.label}"`,
+                at: new Date().toISOString(), auto: true
+            });
+            crmSave();
+        }
+
+        // ── Pipeline render ──
+        function renderPipeline(clientes) {
+            const counts = {};
+            CRM_STAGES.forEach(s => counts[s.id] = 0);
+            clientes.forEach(c => {
+                const st = crmGet(c.id).status || 'lead';
+                counts[st] = (counts[st] || 0) + 1;
+            });
+            const total = clientes.length || 1;
+
+            // Update header metrics
+            document.getElementById('totalAprovados').textContent = counts['aprovado'] || 0;
+            document.getElementById('totalEmAnalise').textContent = counts['analise']  || 0;
+
+            const el = document.getElementById('pipelineStages');
+            el.innerHTML = CRM_STAGES.map(s => {
+                const n   = counts[s.id] || 0;
+                const pct = Math.round((n / total) * 100);
+                const isActive = _pipelineFilter === s.id;
+                return `
+                <div class="pipeline-stage ${s.cls} ${isActive ? 'stage-filter-active' : ''}"
+                     onclick="togglePipelineFilter('${s.id}')">
+                    <div class="pipeline-stage-head">
+                        <div class="pipeline-stage-label-row">
+                            <span class="pipeline-stage-icon">${s.icon}</span>
+                            <span class="pipeline-stage-count">${n}</span>
+                        </div>
+                        <div class="pipeline-stage-name">${s.label}</div>
+                        <div class="pipeline-stage-pct">${pct}% do total</div>
+                    </div>
+                    <div class="pipeline-stage-bar">
+                        <div class="pipeline-stage-bar-fill" style="width:${pct}%"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function togglePipelineFilter(stageId) {
+            _pipelineFilter = _pipelineFilter === stageId ? null : stageId;
+            renderPipeline(meusClientes);
+            aplicarFiltros();
+            const sub = document.getElementById('pipelineSubtitle');
+            if (_pipelineFilter) {
+                const s = CRM_STAGES.find(x => x.id === _pipelineFilter);
+                sub.innerHTML = `Filtrando por: <strong style="color:var(--purple-glow)">${s.icon} ${s.label}</strong> — <a href="#" onclick="togglePipelineFilter('${_pipelineFilter}');return false;" style="color:var(--white-dim);font-size:11px;">limpar</a>`;
+            } else {
+                sub.textContent = 'Clique em uma etapa para filtrar';
+            }
+        }
+
+        // ── Agenda ──
+        function renderAgenda() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const dateEl = document.getElementById('agendaDate');
+            if (dateEl) dateEl.textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+
+            let allTasks = [];
+            Object.entries(_crmData).forEach(([clientId, data]) => {
+                if (!data.tasks) return;
+                data.tasks.filter(t => t.date === hoje).forEach(t => {
+                    const cliente = meusClientes.find(c => String(c.id) === String(clientId));
+                    allTasks.push({ ...t, clientId, clientName: cliente?.nome || 'Cliente #' + clientId });
+                });
+            });
+            // standalone tasks (clientId = 0)
+            if (_crmData['standalone']?.tasks) {
+                _crmData['standalone'].tasks.filter(t => t.date === hoje).forEach(t => {
+                    allTasks.push({ ...t, clientId: 'standalone', clientName: null });
+                });
+            }
+            allTasks.sort((a, b) => a.done - b.done);
+
+            const pending = allTasks.filter(t => !t.done).length;
+            document.getElementById('totalTarefasHoje').textContent = pending;
+            const urgEl = document.getElementById('crmTasksUrgent');
+            if (urgEl) urgEl.style.display = pending > 0 ? 'flex' : 'none';
+
+            const listEl  = document.getElementById('agendaList');
+            const emptyEl = document.getElementById('agendaEmpty');
+            if (!allTasks.length) {
+                listEl.style.display  = 'none';
+                emptyEl.style.display = 'flex';
+                return;
+            }
+            listEl.style.display  = '';
+            emptyEl.style.display = 'none';
+            listEl.innerHTML = allTasks.map(t => `
+                <li class="agenda-item ${t.done ? 'done' : ''}">
+                    <button class="agenda-check" onclick="toggleTaskDone('${t.clientId}','${t.id}',this)">
+                        ${t.done ? '<i class="fas fa-check"></i>' : ''}
+                    </button>
+                    <div class="agenda-item-info">
+                        <div class="agenda-item-title">${t.comment || TIPO_LABELS[t.tipo] || t.tipo}</div>
+                        <div class="agenda-item-sub">${t.clientName ? '👤 ' + t.clientName + ' · ' : ''}${TIPO_LABELS[t.tipo] || t.tipo}</div>
+                    </div>
+                    <span class="agenda-item-tipo">${(TIPO_LABELS[t.tipo]||'').split(' ')[0]}</span>
+                    <button class="agenda-item-del" onclick="deleteTask('${t.clientId}','${t.id}')" title="Remover">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </li>`).join('');
+        }
+
+        function toggleTaskDone(clientId, taskId, btn) {
+            const data = crmGet(clientId === 'standalone' ? 'standalone' : clientId);
+            const task = data.tasks.find(t => String(t.id) === String(taskId));
+            if (task) { task.done = !task.done; crmSave(); renderAgenda(); }
+        }
+
+        function deleteTask(clientId, taskId) {
+            const data = crmGet(clientId === 'standalone' ? 'standalone' : clientId);
+            data.tasks = data.tasks.filter(t => String(t.id) !== String(taskId));
+            crmSave(); renderAgenda();
+            if (String(_modalClientId) === String(clientId)) renderModalTasks(clientId);
+        }
+
+        // ── Modal ──
+        let _currentModalTab = 'info';
+
+        async function verDetalhes(id) {
+            try {
+                const r = await fetch(`/api/cliente/${id}`, { credentials: 'include' });
+                if (!r.ok) return;
+                const c = await r.json();
+                _modalClientId = id;
+                openClientModal(c);
+            } catch(e) {}
+        }
+
+        function openClientModal(c) {
+            _modalClientId = c.id;
+            const initials = (c.nome || '?').substring(0,2).toUpperCase();
+            document.getElementById('modalClientAvatar').textContent = initials;
+            document.getElementById('modalClientName').textContent = c.nome;
+
+            // Status pill in header
+            const st = crmGet(c.id).status || 'lead';
+            const stageObj = CRM_STAGES.find(s => s.id === st);
+            document.getElementById('modalStatusPill').innerHTML =
+                `<span class="status-pill sp-${st}">${stageObj?.icon} ${stageObj?.label}</span>`;
+
+            // Info tab
+            document.getElementById('modalContent').innerHTML = `
+                <div class="detail-row"><span class="detail-key">Nome</span><span class="detail-val">${c.nome}</span></div>
+                <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">${c.email}</span></div>
+                <div class="detail-row"><span class="detail-key">Telefone</span><span class="detail-val">${c.telefone||'—'}</span></div>
+                <div class="detail-row"><span class="detail-key">CPF</span><span class="detail-val">${c.cpf||'—'}</span></div>
+                <div class="detail-row"><span class="detail-key">Link</span><span class="detail-val">${c.link_id||'Direto'}</span></div>
+                <div class="detail-row"><span class="detail-key">Indicado em</span><span class="detail-val">${new Date(c.criado_em).toLocaleString('pt-BR')}</span></div>
+            `;
+
+            // Status selector
+            const mssButtons = document.getElementById('mssButtons');
+            mssButtons.innerHTML = CRM_STAGES.map(s =>
+                `<button class="mss-btn ms-${s.id} ${st === s.id ? 'active' : ''}"
+                    onclick="setClientStatus(${c.id},'${s.id}',this)">
+                    ${s.icon} ${s.label}
+                </button>`
+            ).join('');
+
+            // Task badge
+            renderModalTaskBadge(c.id);
+
+            // Default to info tab
+            switchModalTab('info', document.querySelector('.modal-tab'));
+
+            document.getElementById('modalOverlay').classList.add('open');
+
+            // Pre-fill task date
+            const td = document.getElementById('taskDateModal');
+            if (td) td.value = new Date().toISOString().split('T')[0];
+        }
+
+        function switchModalTab(tab, btn) {
+            _currentModalTab = tab;
+            document.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.modal-tab-content').forEach(c => c.style.display = 'none');
+            if (btn) btn.classList.add('active');
+            else document.querySelectorAll('.modal-tab')[['info','timeline','tarefas'].indexOf(tab)]?.classList.add('active');
+            document.getElementById('modalTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
+            if (tab === 'timeline') renderTimeline(_modalClientId);
+            if (tab === 'tarefas')  renderModalTasks(_modalClientId);
+        }
+
+        function setClientStatus(clientId, status, btn) {
+            crmSetStatus(clientId, status);
+            const stageObj = CRM_STAGES.find(s => s.id === status);
+            // Update header pill
+            document.getElementById('modalStatusPill').innerHTML =
+                `<span class="status-pill sp-${status}">${stageObj?.icon} ${stageObj?.label}</span>`;
+            // Update buttons
+            document.querySelectorAll('.mss-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            // Refresh pipeline & table
+            renderPipeline(meusClientes);
+            atualizarTabelaClientes();
+        }
+
+        // Timeline
+        function renderTimeline(clientId) {
+            const data = crmGet(clientId);
+            const list = document.getElementById('timelineList');
+            if (!data.timeline.length) {
+                list.innerHTML = '<div class="timeline-empty"><i class="fas fa-history" style="opacity:.3;font-size:24px;display:block;margin-bottom:8px;"></i>Nenhum evento registrado</div>';
+                return;
+            }
+            list.innerHTML = data.timeline.map(ev => `
+                <li class="timeline-item">
+                    <div class="timeline-dot"><i class="fas fa-${ev.auto ? 'cog' : 'comment-alt'}"></i></div>
+                    <div class="timeline-body">
+                        <div class="timeline-text">${ev.text}</div>
+                        <div class="timeline-meta">${new Date(ev.at).toLocaleString('pt-BR')}</div>
+                    </div>
+                    ${ev.auto ? '' : `<button class="timeline-del" onclick="delTimelineEvent(${clientId},'${ev.id}')"><i class="fas fa-times"></i></button>`}
+                </li>`).join('');
+        }
+
+        function addTimelineEvent() {
+            const inp = document.getElementById('timelineInput');
+            const text = inp.value.trim();
+            if (!text || !_modalClientId) return;
+            crmGet(_modalClientId).timeline.unshift({ id: Date.now(), text, at: new Date().toISOString(), auto: false });
+            crmSave(); inp.value = '';
+            renderTimeline(_modalClientId);
+        }
+
+        function delTimelineEvent(clientId, evId) {
+            const data = crmGet(clientId);
+            data.timeline = data.timeline.filter(e => String(e.id) !== String(evId));
+            crmSave(); renderTimeline(clientId);
+        }
+
+        // Tasks in modal
+        function renderModalTasks(clientId) {
+            const data = crmGet(clientId);
+            const list = document.getElementById('taskListModal');
+            const tasks = data.tasks || [];
+            renderModalTaskBadge(clientId);
+            if (!tasks.length) {
+                list.innerHTML = '<div class="task-empty"><i class="fas fa-clipboard-check" style="font-size:20px;display:block;margin-bottom:6px;opacity:.3;"></i>Nenhuma tarefa criada</div>';
+                return;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            list.innerHTML = [...tasks].reverse().map(t => {
+                const overdue = !t.done && t.date < today;
+                return `<li class="task-item ${t.done ? 'done' : ''} ${overdue ? 'overdue' : ''}">
+                    <button class="task-check" onclick="toggleTaskDone('${clientId}','${t.id}',this)">
+                        ${t.done ? '<i class="fas fa-check"></i>' : ''}
+                    </button>
+                    <div class="task-item-body">
+                        <div class="task-item-title">${t.comment || TIPO_LABELS[t.tipo] || t.tipo}</div>
+                        <div class="task-item-meta">${TIPO_LABELS[t.tipo]||t.tipo} · ${t.date ? new Date(t.date + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}${overdue ? ' <span style="color:#f87171;font-weight:700;">· Atrasado</span>' : ''}</div>
+                    </div>
+                    <button class="task-item-del" onclick="deleteTask('${clientId}','${t.id}')"><i class="fas fa-times"></i></button>
+                </li>`;
+            }).join('');
+        }
+
+        function renderModalTaskBadge(clientId) {
+            const tasks = crmGet(clientId).tasks || [];
+            const pending = tasks.filter(t => !t.done).length;
+            const badge = document.getElementById('modalTaskBadge');
+            if (badge) badge.textContent = pending;
+        }
+
+        function criarTarefaDoModal() {
+            if (!_modalClientId) return;
+            const tipo    = document.getElementById('taskTipoModal').value;
+            const date    = document.getElementById('taskDateModal').value;
+            const comment = document.getElementById('taskCommentModal').value.trim();
+            const task = { id: Date.now(), tipo, date, comment, done: false };
+            crmGet(_modalClientId).tasks.push(task);
+            crmSave();
+            document.getElementById('taskCommentModal').value = '';
+            renderModalTasks(_modalClientId);
+            renderAgenda();
+        }
+
+        // Standalone task modal
+        function abrirModalNovaTarefa() {
+            // Populate client select
+            const sel = document.getElementById('ntClienteSelect');
+            sel.innerHTML = '<option value="">— Sem cliente vinculado —</option>' +
+                meusClientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+            document.getElementById('ntData').value = new Date().toISOString().split('T')[0];
+            document.getElementById('ntComentario').value = '';
+            document.getElementById('modalNovaTarefa').classList.add('open');
+        }
+
+        function fecharModalNovaTarefa(e) {
+            if (!e || e.target === document.getElementById('modalNovaTarefa') || e.currentTarget?.tagName === 'BUTTON') {
+                document.getElementById('modalNovaTarefa').classList.remove('open');
+            }
+        }
+
+        function criarTarefaStandalone() {
+            const clientId = document.getElementById('ntClienteSelect').value || 'standalone';
+            const tipo    = document.getElementById('ntTipo').value;
+            const date    = document.getElementById('ntData').value;
+            const comment = document.getElementById('ntComentario').value.trim();
+            const task    = { id: Date.now(), tipo, date, comment, done: false };
+            crmGet(clientId === '' ? 'standalone' : clientId).tasks.push(task);
+            crmSave();
+            fecharModalNovaTarefa();
+            renderAgenda();
+        }
+
+        // ── Hook into existing table to show status pill ──
+        const _origAtualizarTabelaClientes = atualizarTabelaClientes;  // will override below
 
         async function carregarMeusClientes() {
             try {
@@ -1750,10 +3095,13 @@
                 if (response.ok) {
                     meusClientes = await response.json();
                     clientesFiltrados = [...meusClientes];
+                    document.getElementById('totalClientes').textContent = meusClientes.length;
+                    renderPipeline(meusClientes);
                     atualizarTabelaClientes();
                     atualizarFiltros();
                     atualizarChartDash(7);
                     atualizarRankingsDash();
+                    renderAgenda();
                 }
             } catch (error) { console.error(error); }
         }
@@ -1761,28 +3109,47 @@
         function atualizarTabelaClientes() {
             const tbody = document.getElementById('tabelaClientes');
             const inicio = (paginaAtual - 1) * itensPorPagina;
-            const clientesPagina = clientesFiltrados.slice(inicio, inicio + itensPorPagina);
 
-            document.getElementById('badgeTotalClientes').textContent = `${clientesFiltrados.length} cliente(s)`;
+            // Apply pipeline filter on top of normal filters
+            let visibles = clientesFiltrados;
+            if (_pipelineFilter) {
+                visibles = clientesFiltrados.filter(c => (crmGet(c.id).status || 'lead') === _pipelineFilter);
+            }
+
+            const clientesPagina = visibles.slice(inicio, inicio + itensPorPagina);
+            document.getElementById('badgeTotalClientes').textContent = `${visibles.length} cliente(s)`;
 
             if (!clientesPagina.length) {
                 tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><i class="fas fa-search"></i></div><div class="empty-title">Nenhum resultado</div><div class="empty-desc">Tente ajustar os filtros</div></div></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = clientesPagina.map(c => `
+            tbody.innerHTML = clientesPagina.map(c => {
+                const st = crmGet(c.id).status || 'lead';
+                const stageObj = CRM_STAGES.find(s => s.id === st);
+                return `
                 <tr>
                     <td class="td-name">${c.nome}</td>
                     <td>${c.email}</td>
                     <td>${c.telefone || '-'}</td>
                     <td>${c.cpf || '-'}</td>
-                    <td>${c.link_id ? `<span class="badge badge-link">${c.link_id}</span>` : '<span class="badge badge-direct">Direto</span>'}</td>
+                    <td>
+                        <span class="status-pill sp-${st}" onclick="verDetalhes(${c.id})" title="Mudar etapa">
+                            ${stageObj?.icon} ${stageObj?.label}
+                        </span>
+                    </td>
                     <td>${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td>
-                    <td><button class="btn-action" onclick="verDetalhes(${c.id})">Ver</button></td>
-                </tr>
-            `).join('');
+                    <td><button class="btn-action" onclick="verDetalhes(${c.id})">CRM</button></td>
+                </tr>`;
+            }).join('');
 
-            atualizarPaginacao();
+            // Update pagination based on filtered count
+            const total = Math.ceil(visibles.length / itensPorPagina);
+            const el = document.getElementById('paginacao');
+            if (total <= 1) { el.innerHTML = ''; return; }
+            el.innerHTML = Array.from({length: total}, (_, i) =>
+                `<button class="page-btn ${i+1 === paginaAtual ? 'active' : ''}" onclick="mudarPagina(${i+1})">${i+1}</button>`
+            ).join('');
         }
 
         function atualizarPaginacao() {
@@ -1842,8 +3209,9 @@
         }
 
         function fecharModal(e) {
-            if (!e || e.target === document.getElementById('modalOverlay') || e.currentTarget.tagName === 'BUTTON') {
+            if (!e || e.target === document.getElementById('modalOverlay') || e.currentTarget?.tagName === 'BUTTON') {
                 document.getElementById('modalOverlay').classList.remove('open');
+                _modalClientId = null;
             }
         }
 
@@ -2000,6 +3368,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            crmLoad();
             carregarDadosAfiliado();
             carregarMeusClientes();
             document.getElementById('buscaCliente').addEventListener('input', aplicarFiltros);
@@ -2466,7 +3835,447 @@
             regrasEditando = false;
         }
 
+        // ══════════════════════════════════════════════
+        //   THEME ENGINE
+        // ══════════════════════════════════════════════
+        function setTheme(theme, btn) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('starcard_theme', theme);
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            else document.querySelector(`.theme-btn[data-theme="${theme}"]`)?.classList.add('active');
+        }
+        (function initTheme() {
+            const saved = localStorage.getItem('starcard_theme') || 'galaxy';
+            setTheme(saved);
+        })();
+
+        // ══════════════════════════════════════════════
+        //   NOTES
+        // ══════════════════════════════════════════════
+        let _notesTimer = null;
+        function initNotes() {
+            const ta = document.getElementById('notesTextarea');
+            if (!ta) return;
+            ta.value = localStorage.getItem('starcard_notes') || '';
+            updateNotesChars(ta);
+        }
+        function onNotesInput(ta) {
+            updateNotesChars(ta);
+            clearTimeout(_notesTimer);
+            _notesTimer = setTimeout(() => {
+                localStorage.setItem('starcard_notes', ta.value);
+                const sub = document.getElementById('notesSavedAt');
+                if (sub) {
+                    sub.textContent = 'Salvo às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+                    sub.style.color = '#4ade80';
+                    setTimeout(() => { sub.style.color = ''; }, 2000);
+                }
+            }, 800);
+        }
+        function updateNotesChars(ta) {
+            const el = document.getElementById('notesChars');
+            if (el) el.textContent = `${ta.value.length} / 2000`;
+        }
+        function limparNotes() {
+            if (!confirm('Apagar todas as anotações?')) return;
+            const ta = document.getElementById('notesTextarea');
+            if (ta) { ta.value = ''; updateNotesChars(ta); }
+            localStorage.removeItem('starcard_notes');
+        }
+
+        // ══════════════════════════════════════════════
+        //   CAMPAIGN ENGINE
+        // ══════════════════════════════════════════════
+        const CAMP_CANAIS = {
+            whatsapp:'💬', instagram:'📷', facebook:'👥',
+            email:'✉️', indicacao:'🤝', outro:'📌'
+        };
+        const CAMP_KEY = 'starcard_campanhas';
+        let _campanhas = [];   // [{id, nome, canal, tags[], desc, link, criado_em, abOf, stats:{visitas,cadastros,aprovados,comissao}}]
+        let _campView  = 'grid';
+        let _cloneFrom = null;
+        let _editingCampId = null;
+
+        function campLoad() {
+            try { _campanhas = JSON.parse(localStorage.getItem(CAMP_KEY) || '[]'); } catch(e) { _campanhas = []; }
+        }
+        function campSave() {
+            localStorage.setItem(CAMP_KEY, JSON.stringify(_campanhas));
+        }
+
+        function buildCampLink(camp) {
+            if (!dadosAfiliado) return '';
+            const base = `${window.location.origin}/formulario-starbank`;
+            const codigo = dadosAfiliado.afiliado.codigo_afiliado;
+            const utm = `utm_source=${encodeURIComponent(camp.canal)}&utm_campaign=${encodeURIComponent(camp.nome.replace(/\s+/g,'_').toLowerCase())}`;
+            return `${base}?codigo=${codigo}&camp=${camp.id}&${utm}`;
+        }
+
+        function abrirModalCampanha(campId = null, cloneId = null) {
+            _editingCampId = campId;
+            _cloneFrom     = cloneId;
+            const isEdit   = !!campId;
+            const isClone  = !!cloneId;
+
+            document.getElementById('modalCampTitulo').innerHTML =
+                isEdit  ? '<i class="fas fa-edit" style="color:var(--purple-glow);margin-right:8px;"></i>Editar Campanha' :
+                isClone ? '<i class="fas fa-flask" style="color:#fbbf24;margin-right:8px;"></i>Clonar para A/B' :
+                          '<i class="fas fa-rocket" style="color:var(--purple-glow);margin-right:8px;"></i>Nova Campanha';
+            document.getElementById('btnSalvarCampTxt').textContent =
+                isEdit ? 'Salvar alterações' : isClone ? 'Criar variante A/B' : 'Criar Campanha';
+
+            const source = isEdit ? _campanhas.find(c => c.id === campId) :
+                           isClone ? _campanhas.find(c => c.id === cloneId) : null;
+
+            document.getElementById('campNome').value = source ? (isClone ? source.nome + ' — Variante B' : source.nome) : '';
+            document.getElementById('campTags').value = source ? source.tags.join(', ') : '';
+            document.getElementById('campDesc').value = source ? (source.desc || '') : '';
+
+            // Select canal
+            const canalBtns = document.querySelectorAll('.camp-canal-btn');
+            canalBtns.forEach(b => b.classList.remove('active'));
+            const canalToSelect = source?.canal || 'whatsapp';
+            document.querySelector(`.camp-canal-btn[data-canal="${canalToSelect}"]`)?.classList.add('active');
+
+            document.getElementById('campCloneFromWrap').style.display = isClone ? 'block' : 'none';
+            document.getElementById('modalCampanha').classList.add('open');
+        }
+
+        function fecharModalCampanha(e) {
+            if (!e || e.target === document.getElementById('modalCampanha') || e.currentTarget?.tagName === 'BUTTON') {
+                document.getElementById('modalCampanha').classList.remove('open');
+                _cloneFrom = null; _editingCampId = null;
+            }
+        }
+
+        function selectCanal(btn) {
+            document.querySelectorAll('.camp-canal-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function salvarCampanha() {
+            const nome = document.getElementById('campNome').value.trim();
+            if (!nome) { document.getElementById('campNome').focus(); return; }
+            const canal  = document.querySelector('.camp-canal-btn.active')?.dataset.canal || 'outro';
+            const tags   = document.getElementById('campTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+            const desc   = document.getElementById('campDesc').value.trim();
+
+            if (_editingCampId) {
+                // Edit existing
+                const camp = _campanhas.find(c => c.id === _editingCampId);
+                if (camp) { camp.nome = nome; camp.canal = canal; camp.tags = tags; camp.desc = desc; camp.link = buildCampLink(camp); }
+            } else {
+                // New or clone
+                const newCamp = {
+                    id: Date.now().toString(),
+                    nome, canal, tags, desc,
+                    abOf: _cloneFrom || null,
+                    criado_em: new Date().toISOString(),
+                    stats: { visitas: 0, cadastros: 0, aprovados: 0, comissao: 0 }
+                };
+                newCamp.link = buildCampLink(newCamp);
+                _campanhas.unshift(newCamp);
+
+                if (_cloneFrom) {
+                    const notice = document.getElementById('abNotice');
+                    const src = _campanhas.find(c => c.id === _cloneFrom);
+                    document.getElementById('abNoticeText').innerHTML =
+                        `Variante A/B criada a partir de <strong>${src?.nome}</strong>. Compare a performance entre as duas!`;
+                    notice.style.display = 'flex';
+                }
+            }
+            campSave();
+            fecharModalCampanha();
+            renderCampanhas();
+            updateCampMetrics();
+            refreshTagFilter();
+        }
+
+        function deleteCampanha(id) {
+            if (!confirm('Excluir esta campanha?')) return;
+            _campanhas = _campanhas.filter(c => c.id !== id);
+            campSave(); renderCampanhas(); updateCampMetrics();
+        }
+
+        function copyCampLink(id, btn) {
+            const camp = _campanhas.find(c => c.id === id);
+            if (!camp) return;
+            navigator.clipboard.writeText(camp.link || buildCampLink(camp)).then(() => {
+                btn.textContent = '✓ Copiado';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        function shareCampWhatsApp(id) {
+            const camp = _campanhas.find(c => c.id === id);
+            if (!camp) return;
+            window.open(`https://wa.me/?text=${encodeURIComponent('Acesse: ' + (camp.link || buildCampLink(camp)))}`, '_blank');
+        }
+
+        // Simulate random visit/cadastro increments for demo (replace with real API data)
+        function setCampView(view, btn) {
+            _campView = view;
+            document.querySelectorAll('.cvt-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            const wrap = document.getElementById('campListWrap');
+            if (wrap) { wrap.className = view === 'list' ? 'camp-grid list-view' : 'camp-grid'; }
+        }
+
+        function refreshTagFilter() {
+            const sel = document.getElementById('campFiltroTag');
+            if (!sel) return;
+            const allTags = [...new Set(_campanhas.flatMap(c => c.tags))].filter(Boolean);
+            sel.innerHTML = '<option value="">Todas as tags</option>' +
+                allTags.map(t => `<option value="${t}">${t}</option>`).join('');
+        }
+
+        function renderCampanhas() {
+            const wrap = document.getElementById('campListWrap');
+            if (!wrap) return;
+            const busca    = (document.getElementById('campBusca')?.value || '').toLowerCase();
+            const tagFilt  = document.getElementById('campFiltroTag')?.value || '';
+            let filtered   = _campanhas.filter(c => {
+                const matchBusca = !busca || c.nome.toLowerCase().includes(busca) || c.tags.some(t => t.toLowerCase().includes(busca));
+                const matchTag   = !tagFilt || c.tags.includes(tagFilt);
+                return matchBusca && matchTag;
+            });
+
+            wrap.className = _campView === 'list' ? 'camp-grid list-view' : 'camp-grid';
+
+            if (!filtered.length) {
+                wrap.innerHTML = `<div class="camp-empty">
+                    <i class="fas fa-rocket"></i>
+                    <p>${_campanhas.length ? 'Nenhuma campanha encontrada' : 'Nenhuma campanha criada ainda'}</p>
+                    ${!_campanhas.length ? '<button class="btn-nova-campanha" onclick="abrirModalCampanha()"><i class="fas fa-plus"></i> Criar primeira campanha</button>' : ''}
+                </div>`;
+                return;
+            }
+
+            wrap.innerHTML = filtered.map(camp => {
+                const s = camp.stats || {};
+                const conv = s.visitas ? Math.round((s.cadastros / s.visitas) * 100) : 0;
+                const isAB = !!camp.abOf;
+                const link = camp.link || buildCampLink(camp);
+                return `
+                <div class="camp-card ${isAB ? 'is-ab' : ''}">
+                    <div class="camp-card-head">
+                        <div class="camp-card-toprow">
+                            <div class="camp-card-canal">${CAMP_CANAIS[camp.canal] || '📌'}</div>
+                            <div class="camp-card-info">
+                                <div class="camp-card-name" title="${camp.nome}">${camp.nome}</div>
+                                <div class="camp-card-desc">${camp.desc || camp.canal}</div>
+                            </div>
+                            <div class="camp-card-actions">
+                                <button class="camp-icon-btn clone" onclick="abrirModalCampanha(null,'${camp.id}')" title="Clonar A/B"><i class="fas fa-flask"></i></button>
+                                <button class="camp-icon-btn" onclick="abrirModalCampanha('${camp.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                <button class="camp-icon-btn" onclick="shareCampWhatsApp('${camp.id}')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                                <button class="camp-icon-btn danger" onclick="deleteCampanha('${camp.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="camp-tags">
+                            ${isAB ? '<span class="camp-tag ab-tag">🧪 A/B Teste</span>' : ''}
+                            ${camp.tags.map(t => `<span class="camp-tag">${t}</span>`).join('')}
+                            <span class="camp-tag" style="background:rgba(255,255,255,0.05);color:var(--white-dim);border-color:var(--border);">${new Date(camp.criado_em).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        <div class="camp-link-row">
+                            <i class="fas fa-link" style="color:var(--purple-glow);font-size:11px;flex-shrink:0;"></i>
+                            <span class="camp-link-text">${link}</span>
+                            <button class="camp-copy-btn" onclick="copyCampLink('${camp.id}',this)">Copiar</button>
+                        </div>
+                    </div>
+                    <div class="camp-stats">
+                        <div class="camp-stat">
+                            <div class="camp-stat-val">${s.visitas || 0}</div>
+                            <div class="camp-stat-label">Cliques</div>
+                        </div>
+                        <div class="camp-stat">
+                            <div class="camp-stat-val">${s.cadastros || 0}</div>
+                            <div class="camp-stat-label">Leads</div>
+                        </div>
+                        <div class="camp-stat">
+                            <div class="camp-stat-val" style="color:#4ade80;">${s.aprovados || 0}</div>
+                            <div class="camp-stat-label">Aprovados</div>
+                        </div>
+                        <div class="camp-stat">
+                            <div class="camp-stat-val" style="color:#fbbf24;">${conv}%</div>
+                            <div class="camp-stat-label">Conversão</div>
+                        </div>
+                    </div>
+                    <div class="camp-conv-bar">
+                        <div class="camp-conv-fill" style="width:${conv}%"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateCampMetrics() {
+            const totals = _campanhas.reduce((acc, c) => {
+                acc.v += (c.stats?.visitas   || 0);
+                acc.c += (c.stats?.cadastros || 0);
+                acc.a += (c.stats?.aprovados || 0);
+                acc.m += (c.stats?.comissao  || 0);
+                return acc;
+            }, { v:0, c:0, a:0, m:0 });
+
+            const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+            setEl('campTotalLinks',    _campanhas.length);
+            setEl('campTotalVisitas',  totals.v);
+            setEl('campTotalCadastros',totals.c);
+            setEl('campConvRate',      totals.v ? Math.round((totals.c / totals.v) * 100) + '%' : '0%');
+            setEl('campTotalAprovados',totals.a);
+            setEl('campComissaoTotal', 'R$' + totals.m.toLocaleString('pt-BR', {minimumFractionDigits:0}));
+        }
+
+        // ══════════════════════════════════════════════
+        //   ONBOARDING TOUR
+        // ══════════════════════════════════════════════
+        const TOUR_STEPS = [
+            {
+                icon: '🚀', title: 'Bem-vindo ao Starcard!',
+                body: 'Em menos de 2 minutos você vai aprender tudo que precisa para começar a captar clientes e gerar comissões.',
+                targetId: null, position: 'center'
+            },
+            {
+                icon: '🔥', title: 'Pipeline de Vendas',
+                body: 'Aqui você acompanha cada lead em tempo real — de <strong>Lead Novo</strong> até <strong>Aprovado</strong>. Clique em uma etapa para filtrar a tabela.',
+                targetId: 'pipelineStages', position: 'below'
+            },
+            {
+                icon: '🚀', title: 'Campanhas &amp; Links',
+                body: 'Crie links únicos por canal (WhatsApp, Instagram, e-mail...) e veja qual campanha converte mais. Clone qualquer link para fazer teste A/B!',
+                targetId: 'navAdmin', position: 'right', nav: 'campanhas'
+            },
+            {
+                icon: '✍️', title: 'Suas Anotações Privadas',
+                body: 'Escreva seus scripts de abordagem, metas e estratégias. Só você vê — salvo automaticamente no seu navegador.',
+                targetId: 'notesCard', position: 'below'
+            },
+            {
+                icon: '🎨', title: 'Escolha seu Tema',
+                body: 'Três temas visuais para deixar o dashboard com a sua cara: <strong>Galaxy</strong>, <strong>Neon</strong> e <strong>Minimal</strong>.',
+                targetId: null, position: 'center'
+            },
+            {
+                icon: '🏆', title: 'Tudo pronto!',
+                body: 'Você está pronto para fechar negócios. Crie sua primeira campanha e comece a enviar o link agora mesmo!',
+                targetId: null, position: 'center',
+                btnLabel: 'Começar agora!'
+            }
+        ];
+        let _tourStep = 0;
+
+        function startTour() {
+            _tourStep = 0;
+            const overlay = document.getElementById('tourOverlay');
+            overlay.style.display = 'block';
+            overlay.classList.add('active');
+            showTourStep(_tourStep);
+        }
+
+        function skipTour() {
+            const overlay = document.getElementById('tourOverlay');
+            overlay.style.display = 'none';
+            overlay.classList.remove('active');
+            localStorage.setItem('starcard_tour_done', '1');
+            document.getElementById('tourHighlight').style.display = 'none';
+        }
+
+        function tourNext() {
+            _tourStep++;
+            if (_tourStep >= TOUR_STEPS.length) { skipTour(); return; }
+            showTourStep(_tourStep);
+        }
+
+        function showTourStep(idx) {
+            const step = TOUR_STEPS[idx];
+            document.getElementById('tourIcon').innerHTML  = step.icon;
+            document.getElementById('tourTitle').innerHTML = step.title;
+            document.getElementById('tourBody').innerHTML  = step.body;
+            document.getElementById('tourBtnNext').innerHTML = (step.btnLabel || 'Próximo') + (idx < TOUR_STEPS.length-1 ? ' <i class="fas fa-arrow-right"></i>' : ' 🎉');
+
+            // Step dots
+            const dots = document.getElementById('tourStepIndicator');
+            dots.innerHTML = TOUR_STEPS.map((_, i) =>
+                `<div class="tour-step-dot ${i <= idx ? 'done' : ''}"></div>`).join('');
+
+            // Highlight target
+            const hl = document.getElementById('tourHighlight');
+            if (step.targetId) {
+                let target = document.getElementById(step.targetId);
+                if (!target) { hl.style.display = 'none'; }
+                else {
+                    const r = target.getBoundingClientRect();
+                    hl.style.display = 'block';
+                    hl.style.top    = (r.top  + window.scrollY - 6)  + 'px';
+                    hl.style.left   = (r.left + window.scrollX - 6)  + 'px';
+                    hl.style.width  = (r.width  + 12) + 'px';
+                    hl.style.height = (r.height + 12) + 'px';
+                }
+            } else {
+                hl.style.display = 'none';
+            }
+
+            // Position card
+            const card = document.getElementById('tourCard');
+            card.style.animation = 'none';
+            void card.offsetWidth;
+            card.style.animation = 'tourCardIn 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+
+            if (step.position === 'center' || !step.targetId) {
+                card.style.top  = '50%'; card.style.left = '50%';
+                card.style.transform = 'translate(-50%, -50%)';
+            } else {
+                let target = document.getElementById(step.targetId);
+                if (target) {
+                    const r = target.getBoundingClientRect();
+                    const scrollY = window.scrollY;
+                    if (step.position === 'below') {
+                        card.style.top  = (r.bottom + scrollY + 20) + 'px';
+                        card.style.left = Math.max(20, r.left + window.scrollX) + 'px';
+                    } else {
+                        card.style.top  = (r.top + scrollY) + 'px';
+                        card.style.left = (r.right + window.scrollX + 20) + 'px';
+                    }
+                    card.style.transform = 'none';
+                }
+            }
+        }
+
+        // Check if first visit
+        function checkOnboarding() {
+            if (!localStorage.getItem('starcard_tour_done')) {
+                setTimeout(startTour, 1200);
+            }
+        }
+
+        // ══════════════════════════════════════════════
+        //   HOOK: extend DOMContentLoaded
+        // ══════════════════════════════════════════════
+        const _origDCL = window.onload;
+        document.addEventListener('DOMContentLoaded', () => {
+            campLoad();
+            initNotes();
+            checkOnboarding();
+            // If already on campanhas section
+            if (document.querySelector('[onclick*="campanhas"]')) {
+                // do nothing — loaded on demand
+            }
+        });
+
+        // Extend showSection to handle campanhas
+        const _origShowSection = showSection;
+        function showSection(name, el) {
+            _origShowSection(name, el);
+            if (name === 'campanhas') {
+                campLoad();
+                renderCampanhas();
+                updateCampMetrics();
+                refreshTagFilter();
+            }
+        }
+
     </script>
 </body>
 </html>
-
