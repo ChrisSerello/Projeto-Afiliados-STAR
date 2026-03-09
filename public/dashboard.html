@@ -945,27 +945,42 @@
         /* Modal status selector */
         .modal-status-selector { margin-top: 20px; }
         .mss-label { font-size: 11px; font-weight: 700; color: var(--white-dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
-        .mss-buttons { display: flex; flex-wrap: wrap; gap: 7px; }
-        .mss-btn {
-            padding: 7px 14px; border-radius: 8px; font-size: 12px;
-            font-family: 'Inter', sans-serif; font-weight: 600;
-            border: 1px solid var(--border); background: rgba(255,255,255,0.04);
-            color: var(--white-dim); cursor: pointer; transition: all 0.2s;
+
+        /* Admin-driven status read-only tracker */
+        .admin-status-readonly { margin-top: 4px; }
+        .asr-stages { display: flex; align-items: stretch; gap: 0; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+        .asr-stage {
+            flex: 1; min-width: 68px; display: flex; flex-direction: column; align-items: center;
+            gap: 5px; padding: 10px 5px; border-radius: 10px; position: relative;
+            text-align: center; transition: all 0.2s;
         }
-        .mss-btn:hover { border-color: rgba(168,85,247,0.3); color: var(--white); }
-        .mss-btn.active { box-shadow: 0 0 0 2px currentColor; }
-        .mss-btn.ms-lead     { }
-        .mss-btn.ms-contato  { color: #60a5fa; border-color: rgba(96,165,250,0.3); }
-        .mss-btn.ms-doc      { color: var(--purple-glow); border-color: rgba(168,85,247,0.3); }
-        .mss-btn.ms-analise  { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
-        .mss-btn.ms-aprovado { color: #4ade80; border-color: rgba(74,222,128,0.3); }
-        .mss-btn.ms-reprovado{ color: #f87171; border-color: rgba(248,113,113,0.3); }
-        .mss-btn.active.ms-lead     { background: rgba(148,163,184,0.12); }
-        .mss-btn.active.ms-contato  { background: rgba(96,165,250,0.12); }
-        .mss-btn.active.ms-doc      { background: rgba(168,85,247,0.12); }
-        .mss-btn.active.ms-analise  { background: rgba(251,191,36,0.12); }
-        .mss-btn.active.ms-aprovado { background: rgba(74,222,128,0.12); }
-        .mss-btn.active.ms-reprovado{ background: rgba(248,113,113,0.12); }
+        .asr-stage::after {
+            content: '›'; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+            color: rgba(255,255,255,0.12); font-size: 14px; z-index: 1;
+        }
+        .asr-stage:last-child::after { display: none; }
+        .asr-icon { font-size: 18px; line-height: 1; }
+        .asr-label { font-size: 10px; font-weight: 600; color: var(--white-dim); letter-spacing: 0.2px; line-height: 1.3; }
+        .asr-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 2px; }
+        .asr-inactive { opacity: 0.28; }
+        .asr-active .asr-label { color: var(--white); }
+        .asr-active.asr-lead     { background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.2); }
+        .asr-active.asr-lead .asr-dot     { background: #94a3b8; box-shadow: 0 0 6px #94a3b8; }
+        .asr-active.asr-doc      { background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25); }
+        .asr-active.asr-doc .asr-dot      { background: var(--purple-bright); box-shadow: 0 0 6px var(--purple-bright); }
+        .asr-active.asr-analise  { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); }
+        .asr-active.asr-analise .asr-dot  { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; }
+        .asr-active.asr-aprovado { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); }
+        .asr-active.asr-aprovado .asr-dot { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+        .asr-active.asr-reprovado{ background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); }
+        .asr-active.asr-reprovado .asr-dot{ background: #f87171; box-shadow: 0 0 6px #f87171; }
+        .asr-note {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 11px; color: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 8px; padding: 9px 12px;
+        }
+        .asr-note i { color: rgba(168,85,247,0.4); font-size: 10px; }
 
         /* Timeline */
         .timeline-add {
@@ -2768,12 +2783,11 @@
         // ══════════════════════════════════════════════
 
         const CRM_STAGES = [
-            { id: 'lead',      label: 'Lead Novo',     icon: '🌱', cls: 'stage-lead'     },
-            { id: 'contato',   label: 'Em Contato',    icon: '📞', cls: 'stage-contato'  },
-            { id: 'doc',       label: 'Doc. Enviada',  icon: '📄', cls: 'stage-doc'      },
-            { id: 'analise',   label: 'Em Análise',    icon: '🔍', cls: 'stage-analise'  },
-            { id: 'aprovado',  label: 'Aprovado',      icon: '✅', cls: 'stage-aprovado' },
-            { id: 'reprovado', label: 'Reprovado',     icon: '❌', cls: 'stage-reprovado'},
+            { id: 'lead',      label: 'Lead Novo',    icon: '🌱', cls: 'stage-lead'     },
+            { id: 'doc',       label: 'Doc. Enviada', icon: '📄', cls: 'stage-doc'      },
+            { id: 'analise',   label: 'Em Análise',   icon: '🔍', cls: 'stage-analise'  },
+            { id: 'aprovado',  label: 'Aprovado',     icon: '✅', cls: 'stage-aprovado' },
+            { id: 'reprovado', label: 'Reprovado',    icon: '❌', cls: 'stage-reprovado'},
         ];
 
         const TIPO_LABELS = {
@@ -2799,22 +2813,14 @@
             if (!_crmData[id].tasks)    _crmData[id].tasks    = [];
             return _crmData[id];
         }
-        function crmSetStatus(id, status) {
-            crmGet(id).status = status;
-            const stageObj = CRM_STAGES.find(s => s.id === status);
-            crmGet(id).timeline.unshift({
-                id: Date.now(), text: `Etapa alterada para "${stageObj?.label}"`,
-                at: new Date().toISOString(), auto: true
-            });
-            crmSave();
-        }
+        // Status is managed server-side by Admin — read from c.status
 
         // ── Pipeline render ──
         function renderPipeline(clientes) {
             const counts = {};
             CRM_STAGES.forEach(s => counts[s.id] = 0);
             clientes.forEach(c => {
-                const st = crmGet(c.id).status || 'lead';
+                const st = c.status || 'lead';  // server-side field
                 counts[st] = (counts[st] || 0) + 1;
             });
             const total = clientes.length || 1;
@@ -2943,8 +2949,8 @@
             document.getElementById('modalClientAvatar').textContent = initials;
             document.getElementById('modalClientName').textContent = c.nome;
 
-            // Status pill in header
-            const st = crmGet(c.id).status || 'lead';
+            // Status pill in header — server-driven, read-only for affiliate
+            const st = c.status || 'lead';
             const stageObj = CRM_STAGES.find(s => s.id === st);
             document.getElementById('modalStatusPill').innerHTML =
                 `<span class="status-pill sp-${st}">${stageObj?.icon} ${stageObj?.label}</span>`;
@@ -2959,14 +2965,20 @@
                 <div class="detail-row"><span class="detail-key">Indicado em</span><span class="detail-val">${new Date(c.criado_em).toLocaleString('pt-BR')}</span></div>
             `;
 
-            // Status selector
+            // Status display — read-only, managed by Admin
             const mssButtons = document.getElementById('mssButtons');
-            mssButtons.innerHTML = CRM_STAGES.map(s =>
-                `<button class="mss-btn ms-${s.id} ${st === s.id ? 'active' : ''}"
-                    onclick="setClientStatus(${c.id},'${s.id}',this)">
-                    ${s.icon} ${s.label}
-                </button>`
-            ).join('');
+            mssButtons.innerHTML = `
+                <div class="admin-status-readonly">
+                    <div class="asr-stages">
+                        ${CRM_STAGES.map(s => `
+                            <div class="asr-stage ${s.id === st ? 'asr-active asr-' + st : 'asr-inactive'}">
+                                <span class="asr-icon">${s.icon}</span>
+                                <span class="asr-label">${s.label}</span>
+                                ${s.id === st ? '<div class="asr-dot"></div>' : ''}
+                            </div>`).join('')}
+                    </div>
+                    <div class="asr-note"><i class="fas fa-lock"></i> Status gerenciado pelo Admin. Você pode registrar observações na aba Timeline.</div>
+                </div>`;
 
             // Task badge
             renderModalTaskBadge(c.id);
@@ -2990,20 +3002,6 @@
             document.getElementById('modalTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
             if (tab === 'timeline') renderTimeline(_modalClientId);
             if (tab === 'tarefas')  renderModalTasks(_modalClientId);
-        }
-
-        function setClientStatus(clientId, status, btn) {
-            crmSetStatus(clientId, status);
-            const stageObj = CRM_STAGES.find(s => s.id === status);
-            // Update header pill
-            document.getElementById('modalStatusPill').innerHTML =
-                `<span class="status-pill sp-${status}">${stageObj?.icon} ${stageObj?.label}</span>`;
-            // Update buttons
-            document.querySelectorAll('.mss-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            // Refresh pipeline & table
-            renderPipeline(meusClientes);
-            atualizarTabelaClientes();
         }
 
         // Timeline
@@ -3142,7 +3140,7 @@
             // Apply pipeline filter on top of normal filters
             let visibles = clientesFiltrados;
             if (_pipelineFilter) {
-                visibles = clientesFiltrados.filter(c => (crmGet(c.id).status || 'lead') === _pipelineFilter);
+                visibles = clientesFiltrados.filter(c => (c.status || 'lead') === _pipelineFilter);
             }
 
             const clientesPagina = visibles.slice(inicio, inicio + itensPorPagina);
@@ -3154,7 +3152,7 @@
             }
 
             tbody.innerHTML = clientesPagina.map(c => {
-                const st = crmGet(c.id).status || 'lead';
+                const st = c.status || 'lead';
                 const stageObj = CRM_STAGES.find(s => s.id === st);
                 return `
                 <tr>
@@ -3163,7 +3161,7 @@
                     <td>${c.telefone || '-'}</td>
                     <td>${c.cpf || '-'}</td>
                     <td>
-                        <span class="status-pill sp-${st}" onclick="verDetalhes(${c.id})" title="Mudar etapa">
+                        <span class="status-pill sp-${st}">
                             ${stageObj?.icon} ${stageObj?.label}
                         </span>
                     </td>

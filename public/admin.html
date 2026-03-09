@@ -26,6 +26,7 @@
         }
         body { font-family: 'Outfit', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; display: flex; }
 
+        /* ── SIDEBAR ── */
         .sidebar {
             width: var(--sidebar-w); min-height: 100vh;
             background: var(--surface); border-right: 1px solid var(--border);
@@ -46,11 +47,8 @@
             display: flex; align-items: center; gap: 8px; padding: 8px 12px;
             background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.15); border-radius: 8px;
         }
-        .status-dot {
-            width: 6px; height: 6px; background: var(--green); border-radius: 50%;
-            box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+        .status-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; box-shadow: 0 0 6px var(--green); animation: blink 2s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1}50%{opacity:.4} }
         .status-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--green); letter-spacing: 1.5px; text-transform: uppercase; }
         .sidebar-nav { padding: 16px 12px; flex: 1; }
         .nav-label { font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 2px; padding: 12px 8px 6px; }
@@ -66,11 +64,13 @@
         .nav-item.danger:hover { background: rgba(239,68,68,0.07); color: #fca5a5; }
         .sidebar-bottom { padding: 16px 12px; border-top: 1px solid var(--border); }
 
+        /* ── LAYOUT ── */
         .main { margin-left: var(--sidebar-w); flex: 1; padding: 32px 36px; min-height: 100vh; }
         .page-header { margin-bottom: 32px; }
         .page-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
         .page-title { font-size: 26px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
 
+        /* ── STATS ── */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
         .stat-card {
             background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
@@ -86,27 +86,29 @@
         .stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--white); letter-spacing: -1px; margin-bottom: 4px; }
         .stat-label { font-size: 11px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 0.5px; }
 
+        /* ── TABS ── */
         .tabs-header { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
         .tab-btn {
             display: flex; align-items: center; gap: 8px; padding: 10px 18px;
             font-size: 13px; font-weight: 500; color: var(--white-dim);
             background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer;
-            transition: all 0.2s; margin-bottom: -1px;
+            transition: all 0.2s; margin-bottom: -1px; font-family: 'Outfit', sans-serif;
         }
         .tab-btn:hover { color: var(--white); }
         .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
         .tab-btn i { font-size: 12px; }
-
         .tab-panel { display: none; }
         .tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
 
+        /* ── CARDS ── */
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-        .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap:wrap; gap:10px; }
         .card-title { font-size: 14px; font-weight: 600; color: var(--white); }
         .card-tag { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1.5px; text-transform: uppercase; }
         .card-body { padding: 24px; }
 
+        /* ── FORM ── */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
         .field { display: flex; flex-direction: column; gap: 8px; }
         .field-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1.5px; }
@@ -120,23 +122,73 @@
         .btn-primary {
             background: var(--amber); border: none; border-radius: 8px; padding: 11px 24px;
             font-size: 13px; font-family: 'Outfit', sans-serif; font-weight: 700; color: #000; cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
         }
         .btn-primary:hover { background: #fbbf24; box-shadow: 0 6px 20px rgba(245,158,11,0.25); transform: translateY(-1px); }
 
+        /* ── TABLE ── */
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        thead th { padding: 10px 16px; font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1.5px; text-align: left; border-bottom: 1px solid var(--border); }
-        tbody td { padding: 13px 16px; font-size: 13px; color: var(--white-dim); border-bottom: 1px solid rgba(255,255,255,0.03); }
+        thead th {
+            padding: 10px 16px; font-family: 'Space Mono', monospace; font-size: 9px;
+            color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1.5px;
+            text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        tbody td { padding: 13px 16px; font-size: 13px; color: var(--white-dim); border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
         tbody tr:hover td { background: var(--white-faint); color: var(--white); }
         tbody tr:last-child td { border-bottom: none; }
         .td-primary { color: var(--white) !important; font-weight: 500; }
 
-        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.5px; }
-        .badge-amber { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); }
-        .badge-green { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); color: var(--green); }
-        .badge-gray { background: var(--white-faint); border: 1px solid var(--border); color: var(--white-dim); }
+        /* ── BADGES ── */
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.5px; white-space: nowrap; }
+        .badge-amber  { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); }
+        .badge-green  { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); color: var(--green); }
+        .badge-gray   { background: var(--white-faint); border: 1px solid var(--border); color: var(--white-dim); }
+        .badge-red    { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+        .badge-blue   { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.15); color: #60a5fa; }
+        .badge-yellow { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: #fbbf24; }
+        .badge-purple { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); color: #a78bfa; }
 
-        .filters-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        /* ── STATUS SELECT ── */
+        .status-select {
+            background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px;
+            padding: 6px 10px; font-size: 12px; font-family: 'Outfit', sans-serif; font-weight: 600;
+            color: var(--white); cursor: pointer; outline: none; transition: all 0.2s;
+            min-width: 150px;
+        }
+        .status-select:focus { border-color: var(--amber-border); }
+        .status-select option { background: #0e0e0e; }
+
+        /* Per-status colors on select */
+        .status-select[data-status="lead"]      { color: #94a3b8; border-color: rgba(148,163,184,0.25); }
+        .status-select[data-status="doc"]       { color: #a78bfa; border-color: rgba(167,139,250,0.3); }
+        .status-select[data-status="analise"]   { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+        .status-select[data-status="aprovado"]  { color: #4ade80; border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.04); }
+        .status-select[data-status="reprovado"] { color: #f87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04); }
+
+        .status-saving { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1px; padding-left: 6px; display: none; }
+        .status-saved  { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--green); letter-spacing: 1px; padding-left: 6px; display: none; }
+
+        /* ── PIPELINE SUMMARY ── */
+        .pipeline-summary {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+        }
+        .ps-pill {
+            display: flex; align-items: center; gap: 5px;
+            padding: 5px 12px; border-radius: 100px; border: 1px solid;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .ps-pill:hover { transform: translateY(-1px); }
+        .ps-pill.active { box-shadow: 0 0 0 2px currentColor; }
+        .ps-count { font-family: 'Space Mono', monospace; font-size: 11px; }
+        .ps-lead     { color: #94a3b8; border-color: rgba(148,163,184,0.2); background: rgba(148,163,184,0.06); }
+        .ps-doc      { color: #a78bfa; border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.06); }
+        .ps-analise  { color: #fbbf24; border-color: rgba(251,191,36,0.2);  background: rgba(251,191,36,0.06);  }
+        .ps-aprovado { color: #4ade80; border-color: rgba(74,222,128,0.2);  background: rgba(74,222,128,0.06);  }
+        .ps-reprovado{ color: #f87171; border-color: rgba(248,113,113,0.2); background: rgba(248,113,113,0.06); }
+
+        /* ── FILTERS ── */
+        .filters-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
         .filter-input {
             background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
             padding: 9px 13px; font-size: 12px; font-family: 'Outfit', sans-serif; color: var(--white); outline: none; transition: border-color 0.2s;
@@ -148,6 +200,7 @@
         .btn-filter {
             background: var(--amber-dim); border: 1px solid var(--amber-border); border-radius: 8px;
             padding: 9px 16px; font-size: 12px; font-family: 'Outfit', sans-serif; font-weight: 600; color: var(--amber); cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
         }
         .btn-filter:hover { background: rgba(245,158,11,0.2); }
         .btn-clear {
@@ -155,17 +208,47 @@
             padding: 9px 16px; font-size: 12px; font-family: 'Outfit', sans-serif; color: var(--white-dim); cursor: pointer; transition: all 0.2s;
         }
         .btn-clear:hover { color: var(--white); }
+        .results-count { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--white-dim); letter-spacing: 1px; margin-left: auto; }
 
+        /* ── ALERT ── */
         .alert-box { border-radius: 8px; padding: 11px 14px; margin-bottom: 16px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.5px; display: none; }
         .alert-success { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); display: block; }
-        .alert-danger { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; display: block; }
+        .alert-danger  { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; display: block; }
 
+        /* ── EMPTY ── */
         .empty-state { text-align: center; padding: 48px 20px; }
-        .empty-icon { font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.15); letter-spacing: 2px; margin-bottom: 12px; }
-        .empty-text { font-size: 13px; color: rgba(255,255,255,0.2); }
+        .empty-icon  { font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.15); letter-spacing: 2px; margin-bottom: 12px; }
+        .empty-text  { font-size: 13px; color: rgba(255,255,255,0.2); }
+
+        /* ── TOAST ── */
+        #toastAdmin {
+            position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+            background: #0e0e0e; border: 1px solid var(--amber-border);
+            border-radius: 10px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 500; color: var(--white);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            transform: translateY(80px); opacity: 0;
+            transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            pointer-events: none;
+        }
+        #toastAdmin.show { transform: translateY(0); opacity: 1; }
+        #toastAdmin i { color: var(--green); }
+        #toastAdmin.error i { color: #f87171; }
+
+        /* Pagination */
+        .pagination { display: flex; gap: 5px; padding: 14px 20px; border-top: 1px solid var(--border); }
+        .page-btn {
+            width: 32px; height: 32px; border-radius: 7px; border: 1px solid var(--border);
+            background: var(--white-faint); color: var(--white-dim); font-size: 12px; font-family: 'Outfit', sans-serif;
+            cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+        }
+        .page-btn:hover { background: var(--amber-dim); border-color: var(--amber-border); color: var(--amber); }
+        .page-btn.active { background: var(--amber-dim); border-color: var(--amber-border); color: var(--amber); font-weight: 700; }
     </style>
 </head>
 <body>
+
     <aside class="sidebar">
         <div class="sidebar-top">
             <div class="brand">
@@ -182,9 +265,15 @@
         </div>
         <nav class="sidebar-nav">
             <div class="nav-label">Navegação</div>
-            <a class="nav-item active" onclick="showTab('criar')"><i class="fas fa-user-plus"></i> Criar Afiliado</a>
-            <a class="nav-item" onclick="showTab('afiliados')"><i class="fas fa-users"></i> Afiliados</a>
-            <a class="nav-item" onclick="showTab('clientes')"><i class="fas fa-user-check"></i> Clientes</a>
+            <a class="nav-item active" id="nav-criar" onclick="showTab('criar')">
+                <i class="fas fa-user-plus"></i> Criar Afiliado
+            </a>
+            <a class="nav-item" id="nav-afiliados" onclick="showTab('afiliados')">
+                <i class="fas fa-users"></i> Afiliados
+            </a>
+            <a class="nav-item" id="nav-clientes" onclick="showTab('clientes')">
+                <i class="fas fa-user-check"></i> Clientes &amp; Pipeline
+            </a>
         </nav>
         <div class="sidebar-bottom">
             <a href="/admin/logout" class="nav-item danger"><i class="fas fa-sign-out-alt"></i> Sair</a>
@@ -197,124 +286,241 @@
             <h1 class="page-title">Painel de Controle</h1>
         </div>
 
+        <!-- Stats -->
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-icon">AFILIADOS</div><div class="stat-value" id="totalAfiliados">—</div><div class="stat-label">Total Cadastrados</div></div>
-            <div class="stat-card"><div class="stat-icon">CLIENTES</div><div class="stat-value" id="totalClientes">—</div><div class="stat-label">Total Indicados</div></div>
-            <div class="stat-card"><div class="stat-icon">MÉDIA</div><div class="stat-value" id="mediaClientes">—</div><div class="stat-label">Por Afiliado</div></div>
-            <div class="stat-card"><div class="stat-icon">TOP</div><div class="stat-value" id="topAfiliado" style="font-size:14px;letter-spacing:0">—</div><div class="stat-label">Melhor Afiliado</div></div>
+            <div class="stat-card">
+                <div class="stat-icon">AFILIADOS</div>
+                <div class="stat-value" id="totalAfiliados">—</div>
+                <div class="stat-label">Total Cadastrados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">CLIENTES</div>
+                <div class="stat-value" id="totalClientes">—</div>
+                <div class="stat-label">Total Indicados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">APROVADOS</div>
+                <div class="stat-value" id="totalAprovados" style="color:#4ade80;">—</div>
+                <div class="stat-label">Clientes Aprovados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">TOP</div>
+                <div class="stat-value" id="topAfiliado" style="font-size:14px;letter-spacing:0">—</div>
+                <div class="stat-label">Melhor Afiliado</div>
+            </div>
         </div>
 
+        <!-- Tabs header -->
         <div class="tabs-header">
-            <button class="tab-btn active" id="tab-criar" onclick="showTab('criar')"><i class="fas fa-user-plus"></i> Criar Afiliado</button>
-            <button class="tab-btn" id="tab-afiliados" onclick="showTab('afiliados')"><i class="fas fa-users"></i> Afiliados</button>
-            <button class="tab-btn" id="tab-clientes" onclick="showTab('clientes')"><i class="fas fa-user-check"></i> Clientes</button>
+            <button class="tab-btn active" id="tab-criar" onclick="showTab('criar')">
+                <i class="fas fa-user-plus"></i> Criar Afiliado
+            </button>
+            <button class="tab-btn" id="tab-afiliados" onclick="showTab('afiliados')">
+                <i class="fas fa-users"></i> Afiliados
+            </button>
+            <button class="tab-btn" id="tab-clientes" onclick="showTab('clientes')">
+                <i class="fas fa-user-check"></i> Clientes &amp; Pipeline
+            </button>
         </div>
 
+        <!-- ── TAB: CRIAR AFILIADO ── -->
         <div class="tab-panel active" id="panel-criar">
             <div class="card">
-                <div class="card-header"><span class="card-title">Novo Afiliado</span><span class="card-tag">Criar Acesso</span></div>
+                <div class="card-header">
+                    <span class="card-title">Novo Afiliado</span>
+                    <span class="card-tag">Criar Acesso</span>
+                </div>
                 <div class="card-body">
                     <div class="alert-box" id="alertCriar"></div>
                     <form id="criarAfiliadoForm">
                         <div class="form-grid">
-                            <div class="field"><label class="field-label">Nome Completo</label><input type="text" class="field-input" id="nome" name="nome" placeholder="Nome do afiliado" required></div>
-                            <div class="field"><label class="field-label">E-mail</label><input type="email" class="field-input" id="email" name="email" placeholder="email@exemplo.com" required></div>
-                            <div class="field"><label class="field-label">Senha</label><input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••" required></div>
-                            <div class="field"><label class="field-label">Confirmar Senha</label><input type="password" class="field-input" id="confirmar_senha" name="confirmar_senha" placeholder="••••••••" required></div>
+                            <div class="field">
+                                <label class="field-label">Nome Completo</label>
+                                <input type="text" class="field-input" id="nome" name="nome" placeholder="Nome do afiliado" required>
+                            </div>
+                            <div class="field">
+                                <label class="field-label">E-mail</label>
+                                <input type="email" class="field-input" id="email" name="email" placeholder="email@exemplo.com" required>
+                            </div>
+                            <div class="field">
+                                <label class="field-label">Senha</label>
+                                <input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••" required>
+                            </div>
+                            <div class="field">
+                                <label class="field-label">Confirmar Senha</label>
+                                <input type="password" class="field-input" id="confirmar_senha" name="confirmar_senha" placeholder="••••••••" required>
+                            </div>
                         </div>
-                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> &nbsp;Criar Afiliado</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-plus"></i> Criar Afiliado
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
 
+        <!-- ── TAB: AFILIADOS ── -->
         <div class="tab-panel" id="panel-afiliados">
             <div class="card">
-                <div class="card-header"><span class="card-title">Lista de Afiliados</span><span class="card-tag" id="countAfiliados">—</span></div>
+                <div class="card-header">
+                    <span class="card-title">Lista de Afiliados</span>
+                    <span class="card-tag" id="countAfiliados">—</span>
+                </div>
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Código</th><th>Clientes</th><th>Cadastro</th></tr></thead>
-                        <tbody id="tabelaAfiliados"><tr><td colspan="6"><div class="empty-state"><div class="empty-icon">// LOADING</div></div></td></tr></tbody>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Código</th>
+                                <th>Total Clientes</th>
+                                <th>Aprovados</th>
+                                <th>Cadastro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAfiliados">
+                            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        <!-- ── TAB: CLIENTES & PIPELINE ── -->
         <div class="tab-panel" id="panel-clientes">
+
+            <!-- Pipeline summary pills -->
+            <div class="pipeline-summary" id="pipelineSummary"></div>
+
+            <!-- Filters -->
             <div class="filters-row">
-                <input type="text" class="filter-input grow" id="buscaClienteAdmin" placeholder="Buscar por nome, email ou CPF...">
-                <select class="filter-input" id="filtroAfiliado"><option value="">Todos os afiliados</option></select>
-                <input type="date" class="filter-input" id="dataInicio">
-                <input type="date" class="filter-input" id="dataFim">
-                <button class="btn-filter" onclick="aplicarFiltrosAdmin()"><i class="fas fa-filter"></i> Filtrar</button>
-                <button class="btn-clear" onclick="limparFiltrosAdmin()">Limpar</button>
+                <input type="text" class="filter-input grow" id="buscaClienteAdmin"
+                    placeholder="🔍  Buscar por nome, email ou CPF..."
+                    oninput="debounceFilter()">
+                <select class="filter-input" id="filtroAfiliado" onchange="aplicarFiltros()">
+                    <option value="">Todos os afiliados</option>
+                </select>
+                <select class="filter-input" id="filtroStatus" onchange="aplicarFiltros()">
+                    <option value="">Todos os status</option>
+                    <option value="lead">🌱 Lead Novo</option>
+                    <option value="doc">📄 Doc. Enviada</option>
+                    <option value="analise">🔍 Em Análise</option>
+                    <option value="aprovado">✅ Aprovado</option>
+                    <option value="reprovado">❌ Reprovado</option>
+                </select>
+                <input type="date" class="filter-input" id="dataInicio" onchange="aplicarFiltros()">
+                <input type="date" class="filter-input" id="dataFim" onchange="aplicarFiltros()">
+                <button class="btn-clear" onclick="limparFiltros()">Limpar</button>
+                <span class="results-count" id="resultsCount">— registros</span>
             </div>
+
             <div class="card">
-                <div class="card-header"><span class="card-title">Todos os Clientes</span><span class="card-tag" id="countClientes">—</span></div>
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-user-check" style="color:var(--amber);margin-right:8px;font-size:13px;"></i>Todos os Clientes</span>
+                    <span class="card-tag" id="countClientes">—</span>
+                </div>
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Afiliado</th><th>Link</th><th>Cadastro</th></tr></thead>
-                        <tbody id="tabelaClientes"><tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// LOADING</div></div></td></tr></tbody>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>CPF</th>
+                                <th>Afiliado</th>
+                                <th>Status do Pipeline</th>
+                                <th>Cadastro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaClientes">
+                            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>
+                        </tbody>
                     </table>
                 </div>
+                <div class="pagination" id="paginacaoAdmin"></div>
             </div>
         </div>
     </main>
 
+    <!-- Toast notification -->
+    <div id="toastAdmin"><i class="fas fa-check-circle"></i> <span id="toastMsg">Status atualizado</span></div>
+
     <script>
+        // ══════════════════════════════════════════
+        // HELPERS
+        // ══════════════════════════════════════════
+        const PIPELINE_STAGES = [
+            { id: 'lead',      label: 'Lead Novo',    icon: '🌱' },
+            { id: 'doc',       label: 'Doc. Enviada', icon: '📄' },
+            { id: 'analise',   label: 'Em Análise',   icon: '🔍' },
+            { id: 'aprovado',  label: 'Aprovado',     icon: '✅' },
+            { id: 'reprovado', label: 'Reprovado',    icon: '❌' },
+        ];
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toastAdmin');
+            const m = document.getElementById('toastMsg');
+            t.className = isError ? 'error' : '';
+            t.querySelector('i').className = isError ? 'fas fa-times-circle' : 'fas fa-check-circle';
+            m.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
         function showTab(name) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.nav-item:not(.danger)').forEach(n => n.classList.remove('active'));
             document.getElementById(`panel-${name}`).classList.add('active');
             document.getElementById(`tab-${name}`).classList.add('active');
+            document.getElementById(`nav-${name}`)?.classList.add('active');
             if (name === 'afiliados') carregarAfiliados();
-            if (name === 'clientes') { carregarAfiliadosFiltro(); carregarClientes(); }
+            if (name === 'clientes')  { carregarAfiliadosFiltro(); carregarClientes(); }
         }
 
+        // ══════════════════════════════════════════
+        // STATS
+        // ══════════════════════════════════════════
         async function carregarEstatisticas() {
             try {
                 const r = await fetch('/api/estatisticas');
                 if (!r.ok) return;
                 const s = await r.json();
-                document.getElementById('totalAfiliados').textContent = s.total_afiliados;
-                document.getElementById('totalClientes').textContent = s.total_clientes;
-                document.getElementById('mediaClientes').textContent = s.media_clientes.toFixed(1);
-                document.getElementById('topAfiliado').textContent = s.top_afiliado || '—';
-            } catch(e) {}
+                document.getElementById('totalAfiliados').textContent = s.total_afiliados ?? '—';
+                document.getElementById('totalClientes').textContent  = s.total_clientes  ?? '—';
+                document.getElementById('totalAprovados').textContent = s.total_aprovados ?? '—';
+                document.getElementById('topAfiliado').textContent    = s.top_afiliado    || '—';
+            } catch(e) { console.error(e); }
         }
 
+        // ══════════════════════════════════════════
+        // AFILIADOS
+        // ══════════════════════════════════════════
         async function carregarAfiliados() {
+            const tbody = document.getElementById('tabelaAfiliados');
+            tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>`;
             try {
                 const r = await fetch('/api/afiliados');
                 if (!r.ok) return;
                 const afiliados = await r.json();
-                const tbody = document.getElementById('tabelaAfiliados');
                 document.getElementById('countAfiliados').textContent = `${afiliados.length} registros`;
-                if (!afiliados.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum afiliado cadastrado</div></div></td></tr>`; return; }
-                tbody.innerHTML = afiliados.map(a => `<tr><td><span class="badge badge-gray">#${a.id}</span></td><td class="td-primary">${a.nome}</td><td>${a.email}</td><td><span class="badge badge-amber">${a.codigo_afiliado}</span></td><td><span class="badge badge-green">${a.total_clientes||0}</span></td><td>${new Date(a.criado_em).toLocaleDateString('pt-BR')}</td></tr>`).join('');
-            } catch(e) {}
-        }
-
-        async function carregarClientes() {
-            try {
-                const params = new URLSearchParams();
-                const afiliadoId = document.getElementById('filtroAfiliado').value;
-                const busca = document.getElementById('buscaClienteAdmin').value;
-                const dataInicio = document.getElementById('dataInicio').value;
-                const dataFim = document.getElementById('dataFim').value;
-                if (afiliadoId) params.append('afiliado_id', afiliadoId);
-                if (busca) params.append('busca', busca);
-                if (dataInicio) params.append('data_inicio', dataInicio);
-                if (dataFim) params.append('data_fim', dataFim);
-                const r = await fetch(`/api/admin/clientes?${params}`);
-                if (!r.ok) return;
-                const clientes = await r.json();
-                const tbody = document.getElementById('tabelaClientes');
-                document.getElementById('countClientes').textContent = `${clientes.length} registros`;
-                if (!clientes.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum resultado encontrado</div></div></td></tr>`; return; }
-                tbody.innerHTML = clientes.map(c => `<tr><td><span class="badge badge-gray">#${c.id}</span></td><td class="td-primary">${c.nome}</td><td>${c.email}</td><td>${c.telefone||'—'}</td><td>${c.codigo_afiliado?`<span class="badge badge-amber">${c.codigo_afiliado}</span><br><small style="color:var(--white-dim);font-size:11px">${c.nome_afiliado}</small>`:'<span class="badge badge-gray">Direto</span>'}</td><td>${c.link_id?`<span class="badge badge-green">${c.link_id}</span>`:'—'}</td><td>${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td></tr>`).join('');
-            } catch(e) {}
+                if (!afiliados.length) {
+                    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum afiliado cadastrado</div></div></td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = afiliados.map(a => `
+                    <tr>
+                        <td><span class="badge badge-gray">#${a.id}</span></td>
+                        <td class="td-primary">${a.nome}</td>
+                        <td style="font-size:12px;">${a.email}</td>
+                        <td><span class="badge badge-amber">${a.codigo_afiliado}</span></td>
+                        <td><span class="badge badge-gray">${a.total_clientes || 0}</span></td>
+                        <td><span class="badge badge-green">${a.total_aprovados || 0}</span></td>
+                        <td style="font-size:12px;color:var(--white-dim);">${new Date(a.criado_em).toLocaleDateString('pt-BR')}</td>
+                    </tr>`).join('');
+            } catch(e) { console.error(e); }
         }
 
         async function carregarAfiliadosFiltro() {
@@ -323,21 +529,214 @@
                 if (!r.ok) return;
                 const afiliados = await r.json();
                 const filtro = document.getElementById('filtroAfiliado');
-                filtro.innerHTML = '<option value="">Todos os afiliados</option>' + afiliados.map(a => `<option value="${a.id}">${a.nome} — ${a.total_clientes} clientes</option>`).join('');
+                filtro.innerHTML = '<option value="">Todos os afiliados</option>' +
+                    afiliados.map(a => `<option value="${a.id}">${a.nome} (${a.total_clientes || 0} clientes)</option>`).join('');
             } catch(e) {}
         }
 
-        function aplicarFiltrosAdmin() { carregarClientes(); }
-        function limparFiltrosAdmin() {
-            ['filtroAfiliado','buscaClienteAdmin','dataInicio','dataFim'].forEach(id => document.getElementById(id).value = '');
+        // ══════════════════════════════════════════
+        // CLIENTES & PIPELINE
+        // ══════════════════════════════════════════
+        let allClientes = [];
+        let clientesFiltrados = [];
+        let _adminPage = 1;
+        const PER_PAGE = 25;
+        let _statusFilter = null;
+        let _debounceTimer = null;
+
+        function debounceFilter() {
+            clearTimeout(_debounceTimer);
+            _debounceTimer = setTimeout(aplicarFiltros, 300);
+        }
+
+        async function carregarClientes() {
+            const tbody = document.getElementById('tabelaClientes');
+            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>`;
+            try {
+                const params = new URLSearchParams();
+                const afiliadoId = document.getElementById('filtroAfiliado').value;
+                const dataInicio = document.getElementById('dataInicio').value;
+                const dataFim    = document.getElementById('dataFim').value;
+                if (afiliadoId) params.append('afiliado_id', afiliadoId);
+                if (dataInicio) params.append('data_inicio', dataInicio);
+                if (dataFim)    params.append('data_fim', dataFim);
+
+                const r = await fetch(`/api/admin/clientes?${params}`);
+                if (!r.ok) return;
+                allClientes = await r.json();
+                aplicarFiltros();
+                renderPipelineSummary();
+            } catch(e) { console.error(e); }
+        }
+
+        function aplicarFiltros() {
+            _adminPage = 1;
+            const busca    = document.getElementById('buscaClienteAdmin').value.toLowerCase().trim();
+            const statusF  = document.getElementById('filtroStatus').value;
+
+            clientesFiltrados = allClientes.filter(c => {
+                const matchBusca  = !busca || c.nome?.toLowerCase().includes(busca) || c.email?.toLowerCase().includes(busca) || c.cpf?.includes(busca);
+                const matchStatus = !statusF || (c.status || 'lead') === statusF;
+                return matchBusca && matchStatus;
+            });
+
+            document.getElementById('countClientes').textContent = `${clientesFiltrados.length} registros`;
+            document.getElementById('resultsCount').textContent  = `${clientesFiltrados.length} resultado(s)`;
+            renderClientesPage();
+        }
+
+        function limparFiltros() {
+            ['filtroAfiliado','buscaClienteAdmin','dataInicio','dataFim','filtroStatus'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            _statusFilter = null;
+            document.querySelectorAll('.ps-pill').forEach(p => p.classList.remove('active'));
             carregarClientes();
         }
 
+        function renderClientesPage() {
+            const tbody = document.getElementById('tabelaClientes');
+            const start = (_adminPage - 1) * PER_PAGE;
+            const page  = clientesFiltrados.slice(start, start + PER_PAGE);
+
+            if (!page.length) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum resultado encontrado</div></div></td></tr>`;
+                document.getElementById('paginacaoAdmin').innerHTML = '';
+                return;
+            }
+
+            tbody.innerHTML = page.map(c => {
+                const st = c.status || 'lead';
+                const stObj = PIPELINE_STAGES.find(s => s.id === st);
+                return `
+                <tr id="row-${c.id}">
+                    <td><span class="badge badge-gray">#${c.id}</span></td>
+                    <td class="td-primary">${c.nome}</td>
+                    <td style="font-size:12px;">${c.email}</td>
+                    <td style="font-size:12px;">${c.telefone || '—'}</td>
+                    <td style="font-size:12px;">${c.cpf || '—'}</td>
+                    <td>
+                        ${c.codigo_afiliado
+                            ? `<span class="badge badge-amber">${c.codigo_afiliado}</span><br>
+                               <small style="color:var(--white-dim);font-size:11px;display:block;margin-top:3px;">${c.nome_afiliado || ''}</small>`
+                            : '<span class="badge badge-gray">Direto</span>'}
+                    </td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <select class="status-select" data-status="${st}" data-id="${c.id}"
+                                onchange="atualizarStatus(${c.id}, this)">
+                                ${PIPELINE_STAGES.map(s =>
+                                    `<option value="${s.id}" ${s.id === st ? 'selected' : ''}>${s.icon} ${s.label}</option>`
+                                ).join('')}
+                            </select>
+                            <span class="status-saving" id="saving-${c.id}">SALVANDO...</span>
+                            <span class="status-saved"  id="saved-${c.id}">✓ SALVO</span>
+                        </div>
+                    </td>
+                    <td style="font-size:12px;color:var(--white-dim);">${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td>
+                </tr>`;
+            }).join('');
+
+            renderPaginacao();
+        }
+
+        function renderPaginacao() {
+            const total = Math.ceil(clientesFiltrados.length / PER_PAGE);
+            const pag   = document.getElementById('paginacaoAdmin');
+            if (total <= 1) { pag.innerHTML = ''; return; }
+            pag.innerHTML = Array.from({length: total}, (_, i) =>
+                `<button class="page-btn ${i+1 === _adminPage ? 'active' : ''}" onclick="goPage(${i+1})">${i+1}</button>`
+            ).join('');
+        }
+
+        function goPage(n) { _adminPage = n; renderClientesPage(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+        function renderPipelineSummary() {
+            const counts = {};
+            PIPELINE_STAGES.forEach(s => counts[s.id] = 0);
+            allClientes.forEach(c => { const st = c.status || 'lead'; counts[st] = (counts[st]||0)+1; });
+
+            const wrap = document.getElementById('pipelineSummary');
+            wrap.innerHTML = PIPELINE_STAGES.map(s => `
+                <div class="ps-pill ps-${s.id} ${_statusFilter === s.id ? 'active' : ''}"
+                     onclick="filterByStatus('${s.id}')">
+                    ${s.icon} ${s.label}
+                    <span class="ps-count">${counts[s.id]}</span>
+                </div>`).join('');
+        }
+
+        function filterByStatus(stId) {
+            if (_statusFilter === stId) {
+                _statusFilter = null;
+                document.getElementById('filtroStatus').value = '';
+            } else {
+                _statusFilter = stId;
+                document.getElementById('filtroStatus').value = stId;
+            }
+            document.querySelectorAll('.ps-pill').forEach(p => p.classList.remove('active'));
+            if (_statusFilter) {
+                document.querySelector(`.ps-${_statusFilter}`)?.classList.add('active');
+            }
+            aplicarFiltros();
+        }
+
+        // ══════════════════════════════════════════
+        // STATUS UPDATE — calls backend API
+        // ══════════════════════════════════════════
+        async function atualizarStatus(clienteId, selectEl) {
+            const novoStatus = selectEl.value;
+            const savingEl   = document.getElementById(`saving-${clienteId}`);
+            const savedEl    = document.getElementById(`saved-${clienteId}`);
+
+            // Update select color immediately
+            selectEl.dataset.status = novoStatus;
+
+            // Show saving indicator
+            if (savingEl) savingEl.style.display = 'inline';
+            if (savedEl)  savedEl.style.display  = 'none';
+
+            try {
+                const r = await fetch(`/api/admin/cliente/${clienteId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: novoStatus })
+                });
+
+                if (!r.ok) throw new Error('Falha ao salvar');
+                const result = await r.json();
+
+                // Update local data so pipeline summary stays accurate
+                const clienteLocal = allClientes.find(c => c.id === clienteId);
+                if (clienteLocal) clienteLocal.status = novoStatus;
+
+                // Show saved feedback
+                if (savingEl) savingEl.style.display = 'none';
+                if (savedEl)  { savedEl.style.display = 'inline'; setTimeout(() => savedEl.style.display = 'none', 2000); }
+
+                // Refresh pipeline summary
+                renderPipelineSummary();
+                carregarEstatisticas();
+
+                const stObj = PIPELINE_STAGES.find(s => s.id === novoStatus);
+                showToast(`Status de cliente atualizado para "${stObj?.label}"`);
+
+            } catch(err) {
+                if (savingEl) savingEl.style.display = 'none';
+                showToast('Erro ao salvar status — verifique a conexão', true);
+                console.error(err);
+            }
+        }
+
+        // ══════════════════════════════════════════
+        // CRIAR AFILIADO
+        // ══════════════════════════════════════════
         document.getElementById('criarAfiliadoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             const alertBox = document.getElementById('alertCriar');
+            alertBox.className = 'alert-box';
+
             if (data.senha !== data.confirmar_senha) {
                 alertBox.className = 'alert-box alert-danger';
                 alertBox.textContent = '// ERRO: As senhas não coincidem';
@@ -345,20 +744,31 @@
             }
             delete data.confirmar_senha;
             try {
-                const r = await fetch('/api/criar-afiliado', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const r = await fetch('/api/criar-afiliado', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
                 const result = await r.json();
                 if (result.sucesso) {
                     alertBox.className = 'alert-box alert-success';
                     alertBox.textContent = `// OK: Afiliado criado — Código: ${result.codigo_afiliado}`;
                     e.target.reset();
                     carregarEstatisticas();
+                    showToast(`Afiliado criado com código ${result.codigo_afiliado}`);
                 } else {
                     alertBox.className = 'alert-box alert-danger';
                     alertBox.textContent = '// ERRO: ' + (result.erro || 'Falha ao criar afiliado');
                 }
-            } catch { alertBox.className = 'alert-box alert-danger'; alertBox.textContent = '// ERRO: Falha de conexão'; }
+            } catch {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.textContent = '// ERRO: Falha de conexão';
+            }
         });
 
+        // ══════════════════════════════════════════
+        // INIT
+        // ══════════════════════════════════════════
         document.addEventListener('DOMContentLoaded', carregarEstatisticas);
     </script>
 </body>
