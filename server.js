@@ -338,7 +338,7 @@ app.get('/api/meus-clientes', verificarAutenticacao, async (req, res) => {
     try {
         const { data: rows, error } = await supabase
             .from('clientes')
-            select('id, nome, email, telefone, cpf, criado_em, link_id, status')
+            .select('id, nome, email, telefone, cpf, criado_em, link_id, status')
             .eq('id_afiliado', afiliadoId)
             .order('criado_em', { ascending: false });
 
