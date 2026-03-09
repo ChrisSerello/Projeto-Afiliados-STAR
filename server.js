@@ -338,7 +338,7 @@ app.get('/api/meus-clientes', verificarAutenticacao, async (req, res) => {
     try {
         const { data: rows, error } = await supabase
             .from('clientes')
-            .select('id, nome, email, telefone, cpf, criado_em, link_id')
+            select('id, nome, email, telefone, cpf, criado_em, link_id, status')
             .eq('id_afiliado', afiliadoId)
             .order('criado_em', { ascending: false });
 
@@ -813,6 +813,36 @@ app.get('/api/admin/afiliados-filtro', verificarAdmin, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ erro: 'Erro no servidor' });
+    }
+});
+
+// ROTA PARA ATUALIZAR DASHBOARD AFILIADO DE ACORDO COM ATUALIZAÇÃO DO ADMIN
+app.patch('/api/admin/cliente/:id/status', verificarAdmin, async (req, res) => {
+    const clienteId = parseInt(req.params.id, 10);
+    const { status } = req.body;
+    const STATUS_PERMITIDOS = ['lead', 'doc', 'analise', 'aprovado', 'reprovado'];
+
+    if (!status || !STATUS_PERMITIDOS.includes(status)) {
+        return res.status(400).json({ erro: 'Status inválido' });
+    }
+    if (isNaN(clienteId)) {
+        return res.status(400).json({ erro: 'ID inválido' });
+    }
+    try {
+        const { data, error } = await supabase
+            .from('clientes')
+            .update({ status })
+            .eq('id', clienteId)
+            .select('id, status')
+            .single();
+
+        if (error) return res.status(500).json({ erro: error.message });
+        if (!data)  return res.status(404).json({ erro: 'Cliente não encontrado' });
+
+        res.json({ sucesso: true, id: data.id, status: data.status });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ erro: 'Erro interno' });
     }
 });
 
