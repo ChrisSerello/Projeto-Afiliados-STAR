@@ -1310,6 +1310,17 @@
             border-radius: 14px; box-shadow: 0 0 0 4px rgba(168,85,247,0.15), 0 0 40px rgba(168,85,247,0.3);
             pointer-events: none; transition: all 0.45s cubic-bezier(0.4,0,0.2,1); display: none;
         }
+        .camp-metric-note {
+            font-size: 10px; color: rgba(255,255,255,0.18);
+            margin-top: 4px; display: flex; align-items: center; gap: 4px;
+        }
+        .camp-perf-input {
+            background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 7px; padding: 6px 10px; font-size: 13px; font-weight: 600;
+            font-family: 'Inter', sans-serif; color: var(--white); width: 100px;
+            outline: none; transition: border-color 0.2s;
+        }
+        .camp-perf-input:focus { border-color: var(--purple-bright); background: rgba(168,85,247,0.12); }
         @media (max-width: 1100px) { .camp-metrics { grid-template-columns: repeat(3,1fr); } }
         @media (max-width: 768px)  { .camp-metrics { grid-template-columns: repeat(2,1fr); } .camp-grid { grid-template-columns: 1fr; } .sidebar { transform: translateX(-100%); transition: transform 0.3s; } .sidebar.open { transform: translateX(0); } .main { margin-left: 0; padding: 20px; } }
 
@@ -2121,36 +2132,22 @@
             </div>
 
             <!-- Summary metrics -->
-            <div class="camp-metrics" id="campMetrics">
+            <div class="camp-metrics" id="campMetrics" style="grid-template-columns:repeat(3,1fr);">
                 <div class="camp-metric-item">
                     <div class="camp-metric-icon" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.2);color:var(--purple-glow);"><i class="fas fa-rocket"></i></div>
                     <div class="camp-metric-val" id="campTotalLinks">0</div>
                     <div class="camp-metric-label">Campanhas Ativas</div>
                 </div>
-                <div class="camp-metric-item">
+                <div class="camp-metric-item" style="position:relative;">
                     <div class="camp-metric-icon" style="background:rgba(96,165,250,0.1);border-color:rgba(96,165,250,0.2);color:#60a5fa;"><i class="fas fa-mouse-pointer"></i></div>
                     <div class="camp-metric-val" id="campTotalVisitas">0</div>
                     <div class="camp-metric-label">Total de Cliques</div>
+                    <div class="camp-metric-note"><i class="fas fa-info-circle"></i> Requer rastreamento no servidor</div>
                 </div>
                 <div class="camp-metric-item">
                     <div class="camp-metric-icon" style="background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.2);color:#4ade80;"><i class="fas fa-user-plus"></i></div>
                     <div class="camp-metric-val" id="campTotalCadastros">0</div>
                     <div class="camp-metric-label">Leads Gerados</div>
-                </div>
-                <div class="camp-metric-item">
-                    <div class="camp-metric-icon" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.2);color:#fbbf24;"><i class="fas fa-percent"></i></div>
-                    <div class="camp-metric-val" id="campConvRate">0%</div>
-                    <div class="camp-metric-label">Taxa de Conversão</div>
-                </div>
-                <div class="camp-metric-item">
-                    <div class="camp-metric-icon" style="background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.2);color:#4ade80;"><i class="fas fa-check-double"></i></div>
-                    <div class="camp-metric-val" id="campTotalAprovados">0</div>
-                    <div class="camp-metric-label">Aprovados</div>
-                </div>
-                <div class="camp-metric-item">
-                    <div class="camp-metric-icon" style="background:rgba(251,146,60,0.1);border-color:rgba(251,146,60,0.2);color:#fb923c;"><i class="fas fa-coins"></i></div>
-                    <div class="camp-metric-val" id="campComissaoTotal">R$0</div>
-                    <div class="camp-metric-label">Comissão Estimada</div>
                 </div>
             </div>
 
@@ -2395,6 +2392,38 @@
                     <i class="fas fa-calendar-day admin-stat-icon"></i>
                     <div class="admin-stat-val" id="adminHoje">—</div>
                     <div class="admin-stat-label">Indicações Hoje</div>
+                </div>
+            </div>
+
+            <!-- Admin: Campaign Performance Editor -->
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-rocket" style="color:var(--purple-glow);margin-right:8px;"></i>Performance das Campanhas <span style="font-size:11px;color:var(--white-dim);font-weight:400;margin-left:8px;">— Edite Aprovados e Comissão</span></span>
+                    <button class="btn-export" onclick="salvarCampPerformance()" id="btnSalvarCampPerf" style="display:none;">
+                        <i class="fas fa-save"></i> Salvar alterações
+                    </button>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <div id="adminCampTableWrap">
+                        <div class="empty-state" id="adminCampEmpty">
+                            <div class="empty-icon"><i class="fas fa-rocket"></i></div>
+                            <div class="empty-title">Nenhuma campanha criada</div>
+                            <div class="empty-desc">As campanhas criadas pelo afiliado aparecem aqui para edição</div>
+                        </div>
+                        <table id="adminCampTable" style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th>Campanha</th>
+                                    <th>Canal</th>
+                                    <th>Leads</th>
+                                    <th>Aprovados <i class="fas fa-lock" style="font-size:10px;opacity:0.4;"></i></th>
+                                    <th>Comissão (R$) <i class="fas fa-lock" style="font-size:10px;opacity:0.4;"></i></th>
+                                    <th>Criada em</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminCampTbody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -3291,7 +3320,7 @@
             if (sec) sec.classList.add('active');
             if (el) el.classList.add('active');
             if (name === 'dashboard') { carregarMeusClientes(); }
-            if (name === 'admin') { carregarDadosAdmin(); }
+            if (name === 'admin') { carregarDadosAdmin(); renderAdminCampTable(); }
             if (name === 'campanhas') {
                 campLoad();
                 renderCampanhas();
@@ -4091,7 +4120,7 @@
                             <button class="camp-copy-btn" onclick="copyCampLink('${camp.id}',this)">Copiar</button>
                         </div>
                     </div>
-                    <div class="camp-stats">
+                    <div class="camp-stats" style="grid-template-columns:repeat(4,1fr);">
                         <div class="camp-stat">
                             <div class="camp-stat-val">${s.visitas || 0}</div>
                             <div class="camp-stat-label">Cliques</div>
@@ -4100,17 +4129,17 @@
                             <div class="camp-stat-val">${s.cadastros || 0}</div>
                             <div class="camp-stat-label">Leads</div>
                         </div>
-                        <div class="camp-stat">
-                            <div class="camp-stat-val" style="color:#4ade80;">${s.aprovados || 0}</div>
+                        <div class="camp-stat" title="Atualizado pelo Admin">
+                            <div class="camp-stat-val" style="color:#4ade80;">${s.aprovados || 0} <span style="font-size:9px;color:rgba(255,255,255,0.2);font-weight:400;vertical-align:middle;">🔒</span></div>
                             <div class="camp-stat-label">Aprovados</div>
                         </div>
-                        <div class="camp-stat">
-                            <div class="camp-stat-val" style="color:#fbbf24;">${conv}%</div>
-                            <div class="camp-stat-label">Conversão</div>
+                        <div class="camp-stat" title="Atualizado pelo Admin">
+                            <div class="camp-stat-val" style="color:#fbbf24;">R$${(s.comissao||0).toLocaleString('pt-BR',{minimumFractionDigits:0})} <span style="font-size:9px;color:rgba(255,255,255,0.2);font-weight:400;vertical-align:middle;">🔒</span></div>
+                            <div class="camp-stat-label">Comissão</div>
                         </div>
                     </div>
                     <div class="camp-conv-bar">
-                        <div class="camp-conv-fill" style="width:${conv}%"></div>
+                        <div class="camp-conv-fill" style="width:${s.cadastros && s.aprovados ? Math.min(Math.round((s.aprovados/s.cadastros)*100),100) : 0}%"></div>
                     </div>
                 </div>`;
             }).join('');
@@ -4118,20 +4147,14 @@
 
         function updateCampMetrics() {
             const totals = _campanhas.reduce((acc, c) => {
-                acc.v += (c.stats?.visitas   || 0);
                 acc.c += (c.stats?.cadastros || 0);
-                acc.a += (c.stats?.aprovados || 0);
-                acc.m += (c.stats?.comissao  || 0);
                 return acc;
-            }, { v:0, c:0, a:0, m:0 });
+            }, { c: 0 });
 
             const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
             setEl('campTotalLinks',    _campanhas.length);
-            setEl('campTotalVisitas',  totals.v);
-            setEl('campTotalCadastros',totals.c);
-            setEl('campConvRate',      totals.v ? Math.round((totals.c / totals.v) * 100) + '%' : '0%');
-            setEl('campTotalAprovados',totals.a);
-            setEl('campComissaoTotal', 'R$' + totals.m.toLocaleString('pt-BR', {minimumFractionDigits:0}));
+            setEl('campTotalVisitas',  '—'); // requires server-side tracking
+            setEl('campTotalCadastros', totals.c);
         }
 
         // ══════════════════════════════════════════════
@@ -4269,6 +4292,84 @@
                 // do nothing — loaded on demand
             }
         });
+
+        // ══ ADMIN: Campaign Performance Editor ══
+        function renderAdminCampTable() {
+            campLoad();
+            const empty = document.getElementById('adminCampEmpty');
+            const table = document.getElementById('adminCampTable');
+            const tbody = document.getElementById('adminCampTbody');
+            const saveBtn = document.getElementById('btnSalvarCampPerf');
+            if (!tbody) return;
+
+            if (!_campanhas.length) {
+                if (empty) empty.style.display = '';
+                if (table) table.style.display = 'none';
+                if (saveBtn) saveBtn.style.display = 'none';
+                return;
+            }
+            if (empty) empty.style.display = 'none';
+            if (table) table.style.display = '';
+            if (saveBtn) saveBtn.style.display = '';
+
+            tbody.innerHTML = _campanhas.map(c => {
+                const s = c.stats || {};
+                return `
+                <tr>
+                    <td class="td-name">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span>${CAMP_CANAIS[c.canal]||'📌'}</span>
+                            <span>${c.nome}</span>
+                            ${c.abOf ? '<span class="camp-tag ab-tag" style="font-size:9px;">A/B</span>' : ''}
+                        </div>
+                    </td>
+                    <td style="color:var(--white-dim);font-size:12px;">${c.canal}</td>
+                    <td style="color:var(--white);font-weight:600;">${s.cadastros || 0}</td>
+                    <td>
+                        <input class="camp-perf-input" type="number" min="0"
+                            value="${s.aprovados || 0}"
+                            data-campid="${c.id}" data-field="aprovados"
+                            onchange="onCampPerfChange(this)">
+                    </td>
+                    <td>
+                        <input class="camp-perf-input" type="number" min="0" step="0.01"
+                            value="${s.comissao || 0}"
+                            data-campid="${c.id}" data-field="comissao"
+                            onchange="onCampPerfChange(this)">
+                    </td>
+                    <td style="color:var(--white-dim);font-size:12px;">${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        let _campPerfDirty = false;
+        function onCampPerfChange(input) {
+            _campPerfDirty = true;
+            const btn = document.getElementById('btnSalvarCampPerf');
+            if (btn) { btn.style.background = 'rgba(168,85,247,0.2)'; btn.style.color = 'var(--purple-glow)'; btn.style.borderColor = 'rgba(168,85,247,0.3)'; }
+        }
+
+        function salvarCampPerformance() {
+            const inputs = document.querySelectorAll('#adminCampTbody .camp-perf-input');
+            inputs.forEach(inp => {
+                const campId = inp.dataset.campid;
+                const field  = inp.dataset.field;
+                const val    = parseFloat(inp.value) || 0;
+                const camp   = _campanhas.find(c => c.id === campId);
+                if (camp) {
+                    if (!camp.stats) camp.stats = {};
+                    camp.stats[field] = val;
+                }
+            });
+            campSave();
+            _campPerfDirty = false;
+            const btn = document.getElementById('btnSalvarCampPerf');
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Salvo!';
+                btn.style.color = '#4ade80';
+                setTimeout(() => { btn.innerHTML = '<i class="fas fa-save"></i> Salvar alterações'; btn.style.color = ''; btn.style.background = ''; btn.style.borderColor = ''; }, 2000);
+            }
+        }
 
     </script>
 </body>
