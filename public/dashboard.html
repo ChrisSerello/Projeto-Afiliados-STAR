@@ -3292,6 +3292,12 @@
             if (el) el.classList.add('active');
             if (name === 'dashboard') { carregarMeusClientes(); }
             if (name === 'admin') { carregarDadosAdmin(); }
+            if (name === 'campanhas') {
+                campLoad();
+                renderCampanhas();
+                updateCampMetrics();
+                refreshTagFilter();
+            }
             if (name === 'regras') {
                 goToSlideRegras(0);
                 resetRegrasTimer();
@@ -4263,18 +4269,6 @@
                 // do nothing — loaded on demand
             }
         });
-
-        // Extend showSection to handle campanhas
-        const _origShowSection = showSection;
-        function showSection(name, el) {
-            _origShowSection(name, el);
-            if (name === 'campanhas') {
-                campLoad();
-                renderCampanhas();
-                updateCampMetrics();
-                refreshTagFilter();
-            }
-        }
 
     </script>
 </body>
