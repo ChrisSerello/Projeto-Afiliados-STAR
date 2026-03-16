@@ -223,49 +223,37 @@ app.post('/cadastro', async (req, res) => {
             return res.status(400).json({ erro: 'Este email já está cadastrado' });
         }
 
-        // Verificar se CPF já existe (se fornecido)
-        if (cpf) {
-            const cpfLimpo = cpf.replace(/\D/g, '');
-            const { data: cpfExistente } = await supabase
-                .from('afiliados')
-                .select('id')
-                .eq('cpf', cpfLimpo)
-                .single();
-
-            if (cpfExistente) {
-                return res.status(400).json({ erro: 'Este CPF já está cadastrado' });
-            }
-        }
-
         // Criar hash da senha
         const senhaHash = await bcrypt.hash(senha, 10);
 
         // Gerar código de afiliado único
         const codigoAfiliado = uuidv4().substring(0, 8).toUpperCase();
 
-        // Inserir no banco
+        // Montar objeto de inserção (apenas campos que existem na tabela)
+        const dadosAfiliado = {
+            nome,
+            email,
+            senha: senhaHash,
+            codigo_afiliado: codigoAfiliado
+        };
+
+        // Adicionar telefone e cpf apenas se a tabela tiver essas colunas
+        // Por segurança, vamos tentar inserir sem eles primeiro
         const { data: novoAfiliado, error } = await supabase
             .from('afiliados')
-            .insert({
-                nome,
-                email,
-                senha: senhaHash,
-                telefone: telefone || null,
-                cpf: cpf ? cpf.replace(/\D/g, '') : null,
-                codigo_afiliado: codigoAfiliado
-            })
+            .insert(dadosAfiliado)
             .select('id, codigo_afiliado')
             .single();
 
         if (error) {
             console.error('Erro ao criar afiliado:', error);
             if (error.code === '23505') {
-                return res.status(400).json({ erro: 'Email ou CPF já cadastrado' });
+                return res.status(400).json({ erro: 'Email já cadastrado' });
             }
             throw error;
         }
 
-        // Enviar email de boas-vindas (opcional)
+        // Enviar email de boas-vindas (opcional, não bloqueia o cadastro)
         try {
             await transporter.sendMail({
                 from: emailConfig.from,
@@ -297,7 +285,6 @@ app.post('/cadastro', async (req, res) => {
             });
         } catch (emailErr) {
             console.error('Erro ao enviar email de boas-vindas:', emailErr);
-            // Não retorna erro, pois o cadastro foi bem-sucedido
         }
 
         res.json({ 
@@ -983,6 +970,170 @@ app.patch('/api/admin/cliente/:id/status', verificarAdmin, async (req, res) => {
 });
 
 // ─── OPERADORES ────────────────────────────────────────────────────────────
+
+// ─── CHATBOT IA - STELLA ───────────────────────────────────────────────────
+
+const STELLA_WEBHOOK_URL = 'https://unrequested-lamont-unforceable.ngrok-free.dev/webhook/stella-web-chat-Afiliados';
+
+app.post('/api/chat-ia', async (req, res) => {
+    const { mensagem, historico } = req.body;
+
+    if (!mensagem) {
+        return res.status(400).json({ erro: 'Mensagem é obrigatória' });
+    }
+
+    try {
+        // Envia para o webhook
+        const response = await fetch(STELLA_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ 
+                mensagem: mensagem,
+                historico: historico || [],
+                timestamp: new Date().toISOString()
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Erro no webhook Stella:', response.status);
+            const respostaPadrao = gerarRespostaPadrao(mensagem);
+            return res.json({ resposta: respostaPadrao });
+        }
+
+        const data = await response.json();
+        
+        // O webhook pode retornar a resposta em diferentes formatos
+        const resposta = data.resposta || data.response || data.message || data.output || data.text;
+
+        if (resposta) {
+            res.json({ resposta });
+        } else {
+            // Se não tiver resposta válida, usa fallback
+            const respostaPadrao = gerarRespostaPadrao(mensagem);
+            res.json({ resposta: respostaPadrao });
+        }
+
+    } catch (error) {
+        console.error('Erro ao conectar com webhook Stella:', error);
+        const respostaPadrao = gerarRespostaPadrao(mensagem);
+        res.json({ resposta: respostaPadrao });
+    }
+});
+
+// Função de fallback com respostas pré-definidas
+function gerarRespostaPadrao(mensagem) {
+    const msg = mensagem.toLowerCase();
+
+    if (msg.includes('como funciona') || msg.includes('o que é') || msg.includes('explicar')) {
+        return `O <strong>StarCard Afiliados</strong> é um programa onde você pode indicar servidores públicos para produtos financeiros e ganhar comissões! 🚀
+
+<strong>Como funciona:</strong>
+1️⃣ Você cria sua conta gratuita
+2️⃣ Recebe seu código único de afiliado
+3️⃣ Compartilha seu link com servidores públicos
+4️⃣ Acompanha suas indicações no dashboard
+5️⃣ Recebe comissão quando clientes são aprovados
+
+Quer começar? É só clicar em <strong>"Criar Conta"</strong> ali ao lado! 👉`;
+    }
+
+    if (msg.includes('ganhar') || msg.includes('comissão') || msg.includes('dinheiro') || msg.includes('quanto')) {
+        return `Você ganha comissão cada vez que um cliente indicado por você é <strong>aprovado</strong>! 💰
+
+Os valores de comissão variam conforme o produto contratado pelo cliente. Após criar sua conta, você terá acesso a todas as informações sobre comissões no seu painel.
+
+<strong>Produtos que você pode indicar:</strong>
+• Empréstimo Consignado
+• Cartão Consignado
+• Cartão Benefício
+• Auxílio Servidor
+• E mais!
+
+Crie sua conta gratuitamente para saber mais! 🎯`;
+    }
+
+    if (msg.includes('criar conta') || msg.includes('cadastr') || msg.includes('registr')) {
+        return `Criar sua conta é muito fácil e <strong>100% gratuito</strong>! ✨
+
+<strong>Passo a passo:</strong>
+1️⃣ Clique na aba <strong>"Criar Conta"</strong>
+2️⃣ Preencha seus dados (nome, telefone, email, CPF)
+3️⃣ Crie uma senha segura
+4️⃣ Pronto! Você já recebe seu código de afiliado
+
+Depois é só acessar o dashboard e começar a indicar clientes. Simples assim! 🚀`;
+    }
+
+    if (msg.includes('produto') || msg.includes('serviço') || msg.includes('oferecer') || msg.includes('indicar')) {
+        return `Você pode indicar clientes para vários produtos financeiros: 📋
+
+<strong>🏦 Empréstimo Consignado</strong>
+Parcelas descontadas na folha, juros mais baixos
+
+<strong>💳 Cartão Consignado</strong>
+Cartão de crédito com desconto em folha
+
+<strong>⭐ Cartão Benefício</strong>
+Limite para compras + benefícios extras
+
+<strong>🤝 Auxílio Servidor</strong>
+Crédito rápido de curto prazo
+
+<strong>🔄 Compra de Dívida</strong>
+Reorganização de contratos existentes
+
+<strong>📅 Vale Consignado</strong>
+Antecipação pontual da margem
+
+Todos exclusivos para servidores públicos!`;
+    }
+
+    if (msg.includes('cliente') || msg.includes('servidor') || msg.includes('quem pode')) {
+        return `Podem ser clientes todos os <strong>servidores públicos</strong>: 👥
+
+✅ Servidores efetivos
+✅ Comissionados
+✅ Temporários
+✅ Aposentados
+✅ Pensionistas
+
+Você pode indicar colegas de trabalho, familiares ou conhecidos que sejam servidores. Quanto mais indicações aprovadas, mais você ganha! 💪`;
+    }
+
+    if (msg.includes('login') || msg.includes('entrar') || msg.includes('acessar')) {
+        return `Para fazer login, você precisa ter uma conta criada. 🔐
+
+Se já tem conta, preencha seu <strong>email</strong> e <strong>senha</strong> na aba "Entrar".
+
+Esqueceu a senha? Clique em <strong>"Esqueci a senha"</strong> para recuperar.
+
+Ainda não tem conta? Crie agora gratuitamente clicando em <strong>"Criar Conta"</strong>! ✨`;
+    }
+
+    if (msg.includes('stella') || msg.includes('quem é você') || msg.includes('seu nome')) {
+        return `Oi! Eu sou a <strong>Stella</strong>, sua assistente virtual do StarCard Afiliados! 💜
+
+Estou aqui para te ajudar com qualquer dúvida sobre o programa de afiliados. Pode me perguntar sobre como funciona, como ganhar dinheiro, produtos disponíveis e muito mais!
+
+Como posso te ajudar hoje? 😊`;
+    }
+
+    // Resposta padrão
+    return `Oi! Eu sou a <strong>Stella</strong>, sua assistente virtual! 😊
+
+Posso te ajudar com:
+
+• Como funciona o programa de afiliados
+• Como ganhar dinheiro indicando
+• Produtos disponíveis
+• Como criar sua conta
+• Dúvidas sobre o sistema
+
+Me conta, o que você gostaria de saber? 💜`;
+}
 
 app.get('/api/admin/operadores', verificarAdmin, async (req, res) => {
     try {
