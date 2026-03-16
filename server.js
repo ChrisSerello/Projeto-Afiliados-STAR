@@ -198,6 +198,120 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// ─── CADASTRO DE AFILIADO (PÚBLICO) ────────────────────────────────────────
+
+app.post('/cadastro', async (req, res) => {
+    const { nome, email, senha, telefone, cpf } = req.body;
+
+    // Validações
+    if (!nome || !email || !senha) {
+        return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios' });
+    }
+    if (senha.length < 6) {
+        return res.status(400).json({ erro: 'A senha deve ter pelo menos 6 caracteres' });
+    }
+
+    try {
+        // Verificar se email já existe
+        const { data: existente } = await supabase
+            .from('afiliados')
+            .select('id')
+            .eq('email', email)
+            .single();
+
+        if (existente) {
+            return res.status(400).json({ erro: 'Este email já está cadastrado' });
+        }
+
+        // Verificar se CPF já existe (se fornecido)
+        if (cpf) {
+            const cpfLimpo = cpf.replace(/\D/g, '');
+            const { data: cpfExistente } = await supabase
+                .from('afiliados')
+                .select('id')
+                .eq('cpf', cpfLimpo)
+                .single();
+
+            if (cpfExistente) {
+                return res.status(400).json({ erro: 'Este CPF já está cadastrado' });
+            }
+        }
+
+        // Criar hash da senha
+        const senhaHash = await bcrypt.hash(senha, 10);
+
+        // Gerar código de afiliado único
+        const codigoAfiliado = uuidv4().substring(0, 8).toUpperCase();
+
+        // Inserir no banco
+        const { data: novoAfiliado, error } = await supabase
+            .from('afiliados')
+            .insert({
+                nome,
+                email,
+                senha: senhaHash,
+                telefone: telefone || null,
+                cpf: cpf ? cpf.replace(/\D/g, '') : null,
+                codigo_afiliado: codigoAfiliado
+            })
+            .select('id, codigo_afiliado')
+            .single();
+
+        if (error) {
+            console.error('Erro ao criar afiliado:', error);
+            if (error.code === '23505') {
+                return res.status(400).json({ erro: 'Email ou CPF já cadastrado' });
+            }
+            throw error;
+        }
+
+        // Enviar email de boas-vindas (opcional)
+        try {
+            await transporter.sendMail({
+                from: emailConfig.from,
+                to: email,
+                subject: '🚀 Bem-vindo ao StarCard Afiliados!',
+                html: `
+                    <div style="font-family: Inter, Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #0f0620; color: #fff; border-radius: 16px; overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, #6b21a8, #a855f7); padding: 32px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 24px;">🚀 Bem-vindo ao StarCard!</h1>
+                        </div>
+                        <div style="padding: 32px;">
+                            <h2 style="margin: 0 0 12px;">Olá, ${nome}!</h2>
+                            <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 20px;">
+                                Sua conta de afiliado foi criada com sucesso.
+                            </p>
+                            <div style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); border-radius: 10px; padding: 16px; margin-bottom: 20px;">
+                                <p style="margin: 0; font-size: 12px; color: rgba(255,255,255,0.5);">Seu código de afiliado:</p>
+                                <p style="margin: 8px 0 0; font-size: 24px; font-weight: bold; color: #a855f7; letter-spacing: 2px;">${codigoAfiliado}</p>
+                            </div>
+                            <p style="color: rgba(255,255,255,0.6); line-height: 1.6;">
+                                Acesse o painel para começar a indicar clientes e acompanhar seus resultados!
+                            </p>
+                            <a href="${BASE_URL}/login" style="display: inline-block; background: linear-gradient(135deg, #6b21a8, #a855f7); color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 15px; margin-top: 16px;">
+                                Acessar Painel
+                            </a>
+                        </div>
+                    </div>
+                `
+            });
+        } catch (emailErr) {
+            console.error('Erro ao enviar email de boas-vindas:', emailErr);
+            // Não retorna erro, pois o cadastro foi bem-sucedido
+        }
+
+        res.json({ 
+            sucesso: true, 
+            mensagem: 'Conta criada com sucesso!',
+            codigo_afiliado: codigoAfiliado
+        });
+
+    } catch (err) {
+        console.error('Erro no cadastro:', err);
+        res.status(500).json({ erro: 'Erro no servidor. Tente novamente.' });
+    }
+});
+
 app.get('/logout', (req, res) => {
     res.clearCookie('auth_token');
     res.redirect('/login');
@@ -700,6 +814,11 @@ app.get('/api/estatisticas', async (req, res) => {
             .from('clientes')
             .select('*', { count: 'exact', head: true });
 
+        const { count: totalAprovados } = await supabase
+            .from('clientes')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'aprovado');
+
         const mediaClientes = totalAfiliados > 0 ? totalClientes / totalAfiliados : 0;
 
         const { data: afiliados } = await supabase
@@ -721,7 +840,13 @@ app.get('/api/estatisticas', async (req, res) => {
             }
         }
 
-        res.json({ total_afiliados: totalAfiliados, total_clientes: totalClientes, media_clientes: mediaClientes, top_afiliado: topAfiliado });
+        res.json({ 
+            total_afiliados: totalAfiliados, 
+            total_clientes: totalClientes, 
+            total_aprovados: totalAprovados || 0,
+            media_clientes: mediaClientes, 
+            top_afiliado: topAfiliado 
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ erro: 'Erro no servidor' });
@@ -738,11 +863,22 @@ app.get('/api/afiliados', async (req, res) => {
         if (error) throw error;
 
         const resultado = await Promise.all(afiliados.map(async (af) => {
-            const { count } = await supabase
+            const { count: total_clientes } = await supabase
                 .from('clientes')
                 .select('*', { count: 'exact', head: true })
                 .eq('id_afiliado', af.id);
-            return { ...af, total_clientes: count || 0 };
+
+            const { count: total_aprovados } = await supabase
+                .from('clientes')
+                .select('*', { count: 'exact', head: true })
+                .eq('id_afiliado', af.id)
+                .eq('status', 'aprovado');
+
+            return { 
+                ...af, 
+                total_clientes: total_clientes || 0,
+                total_aprovados: total_aprovados || 0
+            };
         }));
 
         res.json(resultado);
