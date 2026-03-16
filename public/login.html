@@ -20,283 +20,121 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            overflow: hidden;
             background: #060410;
+            overflow-x: hidden;
         }
 
-        /* Camadas de profundidade do fundo */
-        .depth-1 {
-            position: fixed; inset: 0; z-index: 0;
-            background:
-                radial-gradient(ellipse 100% 100% at 0% 100%, #000 0%, transparent 55%),
-                radial-gradient(ellipse 100% 100% at 100% 0%, #000 0%, transparent 55%);
-        }
-        .depth-2 {
-            position: fixed; inset: 0; z-index: 1;
-            background:
-                radial-gradient(ellipse 80% 80% at 25% 20%, #7c3aed 0%, transparent 55%),
-                radial-gradient(ellipse 60% 60% at 75% 15%, #9333ea 0%, transparent 45%),
-                radial-gradient(ellipse 70% 60% at 50% 60%, #4c1d95 0%, transparent 60%);
-            opacity: 0.55;
-        }
-        .depth-3 {
-            position: fixed; inset: 0; z-index: 2;
-            background:
-                radial-gradient(ellipse 50% 40% at 30% 20%, #a855f7 0%, transparent 50%),
-                radial-gradient(ellipse 30% 30% at 65% 10%, #c084fc 0%, transparent 45%);
-            opacity: 0.28;
-        }
-        .depth-4 {
-            position: fixed; inset: 0; z-index: 3;
-            background:
-                radial-gradient(ellipse 70% 50% at 50% 120%, #000 0%, transparent 65%),
-                radial-gradient(ellipse 30% 90% at -5% 50%, #000 0%, transparent 50%),
-                radial-gradient(ellipse 30% 90% at 105% 50%, #000 0%, transparent 50%);
-            opacity: 0.75;
-        }
+        .depth-1 { position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse 100% 100% at 0% 100%, #000 0%, transparent 55%), radial-gradient(ellipse 100% 100% at 100% 0%, #000 0%, transparent 55%); }
+        .depth-2 { position: fixed; inset: 0; z-index: 1; background: radial-gradient(ellipse 80% 80% at 25% 20%, #7c3aed 0%, transparent 55%), radial-gradient(ellipse 60% 60% at 75% 15%, #9333ea 0%, transparent 45%), radial-gradient(ellipse 70% 60% at 50% 60%, #4c1d95 0%, transparent 60%); opacity: 0.55; }
+        .depth-3 { position: fixed; inset: 0; z-index: 2; background: radial-gradient(ellipse 50% 40% at 30% 20%, #a855f7 0%, transparent 50%), radial-gradient(ellipse 30% 30% at 65% 10%, #c084fc 0%, transparent 45%); opacity: 0.28; }
+        .depth-4 { position: fixed; inset: 0; z-index: 3; background: radial-gradient(ellipse 70% 50% at 50% 120%, #000 0%, transparent 65%), radial-gradient(ellipse 30% 90% at -5% 50%, #000 0%, transparent 50%), radial-gradient(ellipse 30% 90% at 105% 50%, #000 0%, transparent 50%); opacity: 0.75; }
+        .bg-watermark { position: fixed; bottom: -140px; left: -80px; font-size: 700px; font-weight: 900; color: rgba(168,85,247,0.05); line-height: 1; pointer-events: none; user-select: none; z-index: 4; }
 
-        /* S de fundo */
-        .bg-watermark {
-            position: fixed;
-            bottom: -140px; left: -80px;
-            font-size: 700px;
-            font-weight: 900;
-            color: rgba(168,85,247,0.05);
-            line-height: 1;
-            pointer-events: none;
-            user-select: none;
-            z-index: 4;
-            /* text-align: right; */
-        }
-
-        /* Card */
+        /* Card — 1000px para dar espaço ao form de 2 colunas */
         .card {
             position: relative; z-index: 10;
-            width: 100%; max-width: 860px;
-            min-height: 490px;
+            width: 100%; max-width: 1000px;
             display: flex;
             border-radius: 18px;
             overflow: hidden;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.07),
-                0 60px 120px rgba(0,0,0,0.7),
-                inset 0 1px 0 rgba(255,255,255,0.06);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 60px 120px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
         }
 
-        /* ── PAINEL ESQUERDO ── */
+        /* ESQUERDO */
         .left {
-            flex: 1;
-            padding: 44px 48px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(
-                155deg,
-                #9333ea 0%,
-                #7c3aed 20%,
-                #5b21b6 45%,
-                #3b0f8a 70%,
-                #100530 100%
-            );
+            flex: 1; min-width: 0;
+            padding: 48px 52px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; overflow: hidden;
+            background: linear-gradient(155deg, #9333ea 0%, #7c3aed 20%, #5b21b6 45%, #3b0f8a 70%, #100530 100%);
         }
+        .left::before { content: ''; position: absolute; top: -60px; left: -60px; width: 280px; height: 280px; background: radial-gradient(circle, rgba(216,180,254,0.3) 0%, transparent 65%); pointer-events: none; }
+        .left::after  { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(216,180,254,0.25) 30%, rgba(196,141,252,0.25) 70%, transparent); }
 
-        .left::before {
-            content: '';
-            position: absolute;
-            top: -60px; left: -60px;
-            width: 280px; height: 280px;
-            background: radial-gradient(circle, rgba(216,180,254,0.3) 0%, transparent 65%);
-            pointer-events: none;
-        }
+        .left-main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 0; position: relative; z-index: 1; }
+        .left-brand-name { font-size: clamp(40px, 4vw, 62px); font-weight: 900; color: #fff; letter-spacing: -2px; line-height: 1; margin-bottom: 10px; text-shadow: 0 4px 40px rgba(0,0,0,0.3); font-family: "Funnel Display", sans-serif; }
+        .left-by { font-size: 17px; color: rgba(255,255,255,0.45); font-weight: 300; letter-spacing: 1px; }
+        .left-by b { font-weight: 800; color: rgba(255,255,255,0.75); letter-spacing: 5px; text-transform: uppercase; font-style: italic; }
+        .left-features { margin-top: 36px; position: relative; z-index: 1; }
+        .left-feature { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+        .left-feature-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(216,180,254,0.6); flex-shrink: 0; margin-top: 5px; }
+        .left-feature-text { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
 
-        /* Divisor sutil entre os dois lados */
-        .left::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 1px; height: 100%;
-            background: linear-gradient(
-                to bottom,
-                transparent,
-                rgba(216,180,254,0.25) 30%,
-                rgba(196,141,252,0.25) 70%,
-                transparent
-            );
-        }
-
-        .left-logo {
-            height: 28px; width: auto;
-            filter: brightness(0) invert(1);
-            opacity: 0.88;
-            position: relative; z-index: 1;
-        }
-
-        .left-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            /* text-align: right; */
-            padding: 20px 0;
-            position: relative; z-index: 1;
-        }
-
-        .left-brand-name {
-            font-size: clamp(46px, 5vw, 68px);
-            font-weight: 900;
-            color: #fff;
-            letter-spacing: -2px;
-            line-height: 1;
-            margin-bottom: 10px;
-            text-shadow: 0 4px 40px rgba(0,0,0,0.3);
-            font-family: "Funnel Display", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: weight;
-            font-style: normal;
-        }
-
-        .left-by {
-            font-size: 18px;
-            /* text-align: left; */
-            color: rgba(255,255,255,0.45);
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-        .left-by b {
-            font-weight: 800;
-            color: rgba(255,255,255,0.75);
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            font-style: italic;
-        }
-
-        /* ── PAINEL DIREITO — roxo escuro ── */
+        /* DIREITO */
         .right {
-            width: 360px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 40px;
+            flex: 0 0 46%;
+            width: 46%;
+            min-width: 0;
+            overflow: hidden;
+            display: flex; flex-direction: column; align-items: stretch; justify-content: center;
+            padding: 40px 40px;
             position: relative;
-            background: linear-gradient(
-                155deg,
-                #3b0f8a 0%,
-                #2a0a6e 35%,
-                #16053a 70%,
-                #060210 100%
-            );
+            background: linear-gradient(155deg, #3b0f8a 0%, #2a0a6e 35%, #16053a 70%, #060210 100%);
         }
+        .right::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 65%); pointer-events: none; }
 
-        /* Brilho sutil no canto superior direito */
-        .right::before {
-            content: '';
-            position: absolute;
-            top: -40px; right: -40px;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 65%);
-            pointer-events: none;
-        }
+        .right-logo { height: 84px; width: auto; margin-bottom: 16px; margin-left: 28px; filter: brightness(0) invert(1); opacity: 0.85; position: relative; z-index: 1; align-self: center; }
 
-        .right-logo {
-            height: 90px; width: auto;
-            margin-bottom: 20px;
-            margin-left: 30px;
-            filter: brightness(0) invert(1);
-            opacity: 0.85;
-            position: relative; z-index: 1;
-        }
+        .auth-tabs { display: flex; width: 100%; margin-bottom: 20px; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 4px; position: relative; z-index: 1; }
+        .auth-tab { flex: 1; padding: 9px; text-align: center; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); cursor: pointer; border-radius: 7px; transition: all 0.25s; border: none; background: none; font-family: 'Inter', sans-serif; }
+        .auth-tab.active { background: rgba(168,85,247,0.35); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
-        .right-title {
-            font-size: 22px; font-weight: 800;
-            color: #fff;
-            margin-bottom: 6px;
-            text-align: center;
-            position: relative; z-index: 1;
-        }
-        .right-sub {
-            font-size: 13px;
-            color: rgba(255,255,255,0.4);
-            margin-bottom: 28px;
-            text-align: center;
-            position: relative; z-index: 1;
-        }
+        .form-panel { width: 100%; display: none; }
+        .form-panel.active { display: block; animation: slideIn 0.28s ease; }
+        @keyframes slideIn { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
 
-        /* Inputs no tema escuro */
-        .field { width: 100%; margin-bottom: 12px; position: relative; z-index: 1; }
+        .panel-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 3px; text-align: center; position: relative; z-index: 1; }
+        .panel-sub   { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 18px; text-align: center; position: relative; z-index: 1; }
 
-        .input-wrap {
-            display: flex; align-items: center;
-            border: 1.5px solid rgba(255,255,255,0.1);
-            border-radius: 9px;
-            padding: 0 14px;
-            background: rgba(255,255,255,0.07);
-            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-        }
-        .input-wrap:focus-within {
-            border-color: rgba(196,141,252,0.6);
-            background: rgba(255,255,255,0.1);
-            box-shadow: 0 0 0 3px rgba(168,85,247,0.15);
-        }
+        .field { width: 100%; margin-bottom: 10px; position: relative; z-index: 1; min-width: 0; }
+        .input-wrap { display: flex; align-items: center; border: 1.5px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 0 14px; background: rgba(255,255,255,0.07); transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; min-width: 0; }
+        .input-wrap:focus-within { border-color: rgba(196,141,252,0.6); background: rgba(255,255,255,0.1); box-shadow: 0 0 0 3px rgba(168,85,247,0.15); }
         .input-icon { font-size: 14px; opacity: 0.45; margin-right: 10px; flex-shrink: 0; }
-
-        .inp {
-            flex: 1; border: none; outline: none;
-            padding: 12px 0;
-            font-size: 14px; font-family: 'Inter', sans-serif;
-            color: #fff; background: transparent;
-        }
+        .inp { flex: 1; min-width: 0; width: 0; border: none; outline: none; padding: 12px 0; font-size: 14px; font-family: 'Inter', sans-serif; color: #fff; background: transparent; }
         .inp::placeholder { color: rgba(255,255,255,0.3); }
 
-        .row-forgot {
-            width: 100%; display: flex;
-            justify-content: flex-end; margin-bottom: 20px;
-            position: relative; z-index: 1;
-        }
-        .forgot {
-            font-size: 12px; font-weight: 600;
-            color: rgba(216,180,254,0.8);
-            text-decoration: none; transition: opacity 0.2s;
-        }
+        /* Grid 2 colunas — minmax(0,1fr) impede overflow */
+        .fields-2col { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; width: 100%; position: relative; z-index: 1; margin-bottom: 10px; }
+        .fields-2col .field { margin-bottom: 0; }
+
+        .row-forgot { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 14px; position: relative; z-index: 1; }
+        .forgot { font-size: 12px; font-weight: 600; color: rgba(216,180,254,0.8); text-decoration: none; transition: opacity 0.2s; }
         .forgot:hover { opacity: 0.7; }
 
-        .btn {
-            width: 100%;
-            background: linear-gradient(135deg, #7c3aed, #a855f7, #c084fc);
-            border: none; border-radius: 10px; padding: 13px;
-            font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 700;
-            color: #fff; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
-            position: relative; z-index: 1;
-            box-shadow: 0 4px 20px rgba(168,85,247,0.3);
-        }
+        .btn { width: 100%; background: linear-gradient(135deg, #7c3aed, #a855f7, #c084fc); border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 700; color: #fff; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; position: relative; z-index: 1; box-shadow: 0 4px 20px rgba(168,85,247,0.3); margin-top: 4px; }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(168,85,247,0.5); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .alert { width: 100%; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; position: relative; z-index: 1; }
+        .alert { width: 100%; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px; display: none; position: relative; z-index: 1; }
         .alert.err { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; display: block; }
+        .alert.ok  { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; display: block; }
 
-        .admin-link {
-            display: block; margin-top: 20px; font-size: 11px;
-            color: rgba(255,255,255,0.2); text-decoration: none; text-align: center;
-            transition: color 0.2s; position: relative; z-index: 1;
-        }
+        .divider-or { display: flex; align-items: center; gap: 10px; width: 100%; margin: 12px 0; position: relative; z-index: 1; }
+        .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+        .divider-or span { font-size: 11px; color: rgba(255,255,255,0.2); }
+
+        .terms { font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; margin-top: 10px; position: relative; z-index: 1; line-height: 1.5; }
+        .terms a { color: rgba(196,141,252,0.6); text-decoration: none; }
+        .terms a:hover { color: rgba(216,180,254,0.8); }
+
+        .admin-link { display: block; margin-top: 16px; font-size: 11px; color: rgba(255,255,255,0.2); text-decoration: none; text-align: center; transition: color 0.2s; position: relative; z-index: 1; }
         .admin-link:hover { color: rgba(216,180,254,0.7); }
 
-        .spin {
-            display: inline-block; width: 13px; height: 13px;
-            border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-            border-radius: 50%; animation: rot 0.7s linear infinite;
-            margin-right: 8px; vertical-align: middle;
-        }
+        .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: rot 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
         @keyframes rot { to { transform: rotate(360deg); } }
 
-        @media (max-width: 650px) { .left { display: none; } .right { width: 100%; } .card { max-width: 380px; } }
+        @media (max-width: 780px) {
+            .left { display: none; }
+            .right { flex: 1; width: 100%; min-width: 0; overflow: hidden; padding: 36px 28px; }
+            .card { max-width: 480px; }
+        }
+        @media (max-width: 420px) {
+            .fields-2col { grid-template-columns: 1fr; }
+            .right { padding: 28px 20px; }
+        }
     </style>
 </head>
 <body>
-
     <div class="depth-1"></div>
     <div class="depth-2"></div>
     <div class="depth-3"></div>
@@ -304,79 +142,175 @@
     <div class="bg-watermark">STAR</div>
 
     <div class="card">
-
-        <!-- ESQUERDA -->
+        <!-- ESQUERDO -->
         <div class="left">
-            <!-- <img src="Logo_Starbank.png" alt="StarBank" class="left-logo"> -->
             <div class="left-main">
                 <div class="left-brand-name">Afiliados</div>
                 <div class="left-by">by <b>STAR</b></div>
+                <div class="left-features">
+                    <div class="left-feature"><div class="left-feature-dot"></div><span class="left-feature-text">Indique clientes e acompanhe em tempo real</span></div>
+                    <div class="left-feature"><div class="left-feature-dot"></div><span class="left-feature-text">Gerencie seu pipeline de indicações</span></div>
+                    <div class="left-feature"><div class="left-feature-dot"></div><span class="left-feature-text">Acesso ao seu código exclusivo de afiliado</span></div>
+                </div>
             </div>
         </div>
 
-        <!-- DIREITA -->
+        <!-- DIREITO -->
         <div class="right">
-            <img src="assets/Starcard.png" alt="StarBank" class="right-logo">
-            <div class="right-title">Bem vindo!</div>
-            <div class="right-sub">Portal de afiliados StarCard.</div>
+            <img src="assets/Starcard.png" alt="StarCard" class="right-logo">
 
-            <div class="alert" id="alertBox"></div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Entrar</button>
+                <button class="auth-tab" id="tabCadastro" onclick="switchTab('cadastro')">Criar Conta</button>
+            </div>
 
-            <form id="loginForm" style="width:100%">
-                <div class="field">
-                    <div class="input-wrap">
-                        <span class="input-icon">✉️</span>
-                        <input type="email" class="inp" name="email" placeholder="Insira seu e-mail" required autocomplete="email">
+            <!-- LOGIN -->
+            <div class="form-panel active" id="panelLogin">
+                <div class="panel-title">Bem-vindo!</div>
+                <div class="panel-sub">Acesse o portal de afiliados StarCard.</div>
+
+                <div class="alert" id="alertLogin"></div>
+
+                <form id="loginForm" style="width:100%">
+                    <div class="field">
+                        <div class="input-wrap">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" class="inp" name="email" placeholder="Seu e-mail" required autocomplete="email">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <div class="input-wrap">
-                        <span class="input-icon">🔒</span>
-                        <input type="password" class="inp" name="senha" placeholder="Insira sua senha" required autocomplete="current-password">
+                    <div class="field">
+                        <div class="input-wrap">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" class="inp" name="senha" placeholder="Sua senha" required autocomplete="current-password">
+                        </div>
                     </div>
-                </div>
-                <div class="row-forgot">
-                    <a href="/esqueci-senha" class="forgot">Esqueci a senha</a>
-                </div>
-                <button type="submit" class="btn" id="btn">
-                    <span id="btnText">Entrar</span>
-                </button>
-            </form>
+                    <div class="row-forgot">
+                        <a href="/esqueci-senha" class="forgot">Esqueci a senha</a>
+                    </div>
+                    <button type="submit" class="btn" id="btnLogin"><span id="btnLoginText">Entrar</span></button>
+                </form>
 
-            <a href="/admin" class="admin-link">⚙ Painel Administrativo</a>
+                <div class="divider-or"><span>ou</span></div>
+                <div class="terms">Ainda não tem conta? <a href="#" onclick="switchTab('cadastro'); return false;">Crie agora gratuitamente</a></div>
+            </div>
+
+            <!-- CADASTRO -->
+            <div class="form-panel" id="panelCadastro">
+                <div class="panel-title">Criar Conta</div>
+                <div class="panel-sub">Preencha seus dados para se tornar afiliado.</div>
+
+                <div class="alert" id="alertCadastro"></div>
+
+                <form id="cadastroForm" style="width:100%">
+                    <div class="fields-2col">
+                        <div class="field">
+                            <div class="input-wrap">
+                                <span class="input-icon">👤</span>
+                                <input type="text" class="inp" name="nome" placeholder="Nome completo" required autocomplete="name">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="input-wrap">
+                                <span class="input-icon">📱</span>
+                                <input type="tel" class="inp" name="telefone" id="telefoneInput" placeholder="(11) 99999-9999" required autocomplete="tel">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="input-wrap">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" class="inp" name="email" placeholder="Seu e-mail" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="input-wrap">
+                            <span class="input-icon">🪪</span>
+                            <input type="text" class="inp" name="cpf" id="cpfInput" placeholder="Seu CPF" maxlength="14" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="fields-2col">
+                        <div class="field">
+                            <div class="input-wrap">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" class="inp" name="senha" placeholder="Crie uma senha" required minlength="6" autocomplete="new-password">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="input-wrap">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" class="inp" name="confirmar_senha" placeholder="Confirme" required autocomplete="new-password">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="btnCadastro"><span id="btnCadastroText">Criar Conta</span></button>
+                    <div class="terms">Ao criar conta, você concorda com nossos <a href="#">termos de uso</a> e <a href="#">política de privacidade</a>.</div>
+                </form>
+            </div>
+
+            <a href="/admin/login" class="admin-link">⚙ Painel Administrativo</a>
         </div>
-
     </div>
 
     <script>
+        function switchTab(tab) {
+            ['login','cadastro'].forEach(t => {
+                const key = t.charAt(0).toUpperCase() + t.slice(1);
+                document.getElementById('panel' + key).classList.toggle('active', t === tab);
+                document.getElementById('tab'   + key).classList.toggle('active', t === tab);
+            });
+            document.getElementById('alertLogin').className    = 'alert';
+            document.getElementById('alertCadastro').className = 'alert';
+        }
+
+        document.getElementById('cpfInput').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g,'').slice(0,11);
+            if (v.length > 9)      v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+            else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+            else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+            e.target.value = v;
+        });
+
+        document.getElementById('telefoneInput').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g,'').slice(0,11);
+            if (v.length > 10)     v = v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+            else if (v.length > 6) v = v.replace(/(\d{2})(\d{4,5})(\d{0,4})/,'($1) $2-$3');
+            else if (v.length > 2) v = v.replace(/(\d{2})(\d+)/,'($1) $2');
+            e.target.value = v;
+        });
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn');
-            const btnText = document.getElementById('btnText');
-            const alertBox = document.getElementById('alertBox');
-            btn.disabled = true;
-            btnText.innerHTML = '<span class="spin"></span>Entrando...';
-            alertBox.className = 'alert';
+            const btn = document.getElementById('btnLogin'), btnText = document.getElementById('btnLoginText'), alertBox = document.getElementById('alertLogin');
+            btn.disabled = true; btnText.innerHTML = '<span class="spin"></span>Entrando...'; alertBox.className = 'alert';
             try {
-                const res = await fetch('/login', {
-                    method: 'POST', credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
-                });
+                const res = await fetch('/login', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
                 const r = await res.json();
-                if (r.sucesso) {
-                    btnText.textContent = '✓ Redirecionando...';
-                    window.location.href = r.redirect;
-                } else {
-                    alertBox.className = 'alert err';
-                    alertBox.textContent = r.erro || 'Email ou senha incorretos.';
-                    btn.disabled = false; btnText.textContent = 'Entrar';
-                }
-            } catch {
-                alertBox.className = 'alert err';
-                alertBox.textContent = 'Erro de conexão. Tente novamente.';
-                btn.disabled = false; btnText.textContent = 'Entrar';
-            }
+                if (r.sucesso) { btnText.textContent = '✓ Redirecionando...'; window.location.href = r.redirect; }
+                else { alertBox.className = 'alert err'; alertBox.textContent = r.erro || 'E-mail ou senha incorretos.'; btn.disabled = false; btnText.textContent = 'Entrar'; }
+            } catch { alertBox.className = 'alert err'; alertBox.textContent = 'Erro de conexão. Tente novamente.'; btn.disabled = false; btnText.textContent = 'Entrar'; }
+        });
+
+        document.getElementById('cadastroForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnCadastro'), btnText = document.getElementById('btnCadastroText'), alertBox = document.getElementById('alertCadastro');
+            alertBox.className = 'alert';
+            const data = Object.fromEntries(new FormData(e.target));
+            if (data.senha !== data.confirmar_senha) { alertBox.className = 'alert err'; alertBox.textContent = 'As senhas não coincidem.'; return; }
+            if (data.senha.length < 6) { alertBox.className = 'alert err'; alertBox.textContent = 'A senha deve ter pelo menos 6 caracteres.'; return; }
+            if (data.cpf.replace(/\D/g,'').length !== 11) { alertBox.className = 'alert err'; alertBox.textContent = 'CPF inválido. Digite todos os 11 dígitos.'; return; }
+            delete data.confirmar_senha;
+            btn.disabled = true; btnText.innerHTML = '<span class="spin"></span>Criando conta...';
+            try {
+                const res = await fetch('/cadastro', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+                const r = await res.json();
+                if (r.sucesso) { alertBox.className = 'alert ok'; alertBox.textContent = '✓ Conta criada! Redirecionando para o login...'; e.target.reset(); setTimeout(() => switchTab('login'), 2000); }
+                else { alertBox.className = 'alert err'; alertBox.textContent = r.erro || 'Erro ao criar conta. Tente novamente.'; }
+            } catch { alertBox.className = 'alert err'; alertBox.textContent = 'Erro de conexão. Tente novamente.'; }
+            finally { btn.disabled = false; btnText.textContent = 'Criar Conta'; }
         });
     </script>
 </body>
