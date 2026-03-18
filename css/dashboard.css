@@ -1893,3 +1893,325 @@
             color: var(--white-dim); line-height: 1.6; margin-top: 16px;
         }
         .sim-info-tip i { color: var(--purple-glow); margin-right: 6px; }
+
+        /* ── Mobile Top Bar ── */
+        .mobile-topbar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: var(--bg-card, #1a1033);
+            border-bottom: 1px solid rgba(168,85,247,0.15);
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1100;
+            gap: 12px;
+        }
+        .mobile-topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .mobile-topbar-brand .brand-icon { font-size: 20px; }
+        .hamburger-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            padding: 6px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .hamburger-btn:hover { background: rgba(168,85,247,0.15); }
+        .hamburger-btn span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.25s;
+        }
+        .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+        .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* ── Sidebar Overlay ── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1099;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* ════════════════════════════════
+           BREAKPOINT: ≤ 768px
+        ════════════════════════════════ */
+        @media (max-width: 768px) {
+
+            /* Show mobile top bar */
+            .mobile-topbar { display: flex; }
+
+            /* Sidebar becomes a drawer */
+            .sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100vh !important;
+                width: 260px !important;
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+                z-index: 1200 !important;
+                overflow-y: auto !important;
+            }
+            .sidebar.open { transform: translateX(0) !important; }
+
+            /* Main shifts down for top bar */
+            .main {
+                margin-left: 0 !important;
+                padding-top: 72px !important;
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+                min-width: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Page header */
+            .page-header { padding: 0 0 16px 0 !important; }
+            .page-title { font-size: 20px !important; }
+            .page-subtitle { font-size: 12px !important; }
+
+            /* ── CRM metrics row → 2 columns ── */
+            .crm-metrics-row {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+            }
+            .crm-metric {
+                padding: 12px !important;
+                gap: 8px !important;
+            }
+            .crm-metric-val { font-size: 22px !important; }
+            .crm-metric-label { font-size: 10px !important; }
+            .crm-metric-icon { width: 32px !important; height: 32px !important; font-size: 14px !important; }
+
+            /* ── Pipeline → horizontal scroll ── */
+            .pipeline-card { padding: 14px 12px !important; }
+            .pipeline-stages {
+                display: flex !important;
+                overflow-x: auto !important;
+                gap: 8px !important;
+                padding-bottom: 8px !important;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+            .pipeline-stage {
+                min-width: 110px !important;
+                flex-shrink: 0 !important;
+                padding: 10px 8px !important;
+            }
+            .pipeline-stage-name { font-size: 10px !important; }
+            .pipeline-stage-count { font-size: 20px !important; }
+            .pipeline-stage-pct { font-size: 9px !important; }
+
+            /* ── Notes card ── */
+            .notes-card { padding: 14px 12px !important; }
+            .notes-header { flex-wrap: wrap !important; gap: 8px !important; }
+
+            /* ── Chart card ── */
+            .chart-card { padding: 14px 12px !important; }
+            .card-header { flex-wrap: wrap !important; gap: 8px !important; }
+            .chart-wrapper { height: 200px !important; }
+
+            /* ── Rankings grid → single column ── */
+            .rankings-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+
+            /* ── Card general ── */
+            .card { border-radius: 12px !important; }
+            .card-body { padding: 12px !important; }
+            .card-header {
+                padding: 12px 14px !important;
+                font-size: 13px !important;
+            }
+            .card-title { font-size: 13px !important; }
+
+            /* ── Search row → stack ── */
+            .search-row {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .search-input,
+            .select-filter {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* ── Table wrap → horizontal scroll ── */
+            .table-wrap {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            table { min-width: 500px !important; }
+            th, td { padding: 8px 10px !important; font-size: 12px !important; }
+
+            /* Hide less important table columns on mobile */
+            table th:nth-child(3),
+            table td:nth-child(3),
+            table th:nth-child(4),
+            table td:nth-child(4) {
+                display: none !important;
+            }
+
+            /* ── Pagination ── */
+            .pagination { flex-wrap: wrap !important; gap: 4px !important; }
+
+            /* ── Campanhas section ── */
+            .camp-metrics {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            .camp-filter-bar {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .camp-filter-bar .search-input,
+            .camp-filter-bar .select-filter {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .camp-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            .btn-nova-campanha { font-size: 13px !important; padding: 9px 14px !important; }
+
+            /* ── Simulador → single column ── */
+            .sim-wrapper {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+            .sim-form-card,
+            .sim-result-card { width: 100% !important; }
+            .sim-prazo-group {
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 6px !important;
+            }
+
+            /* ── Admin stats → 2 columns ── */
+            .admin-stats {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+            }
+            .admin-stat { padding: 14px 10px !important; }
+            .admin-stat-val { font-size: 22px !important; }
+
+            /* ── Modals → full width ── */
+            .modal-overlay .modal {
+                max-width: calc(100vw - 24px) !important;
+                width: 100% !important;
+                margin: 0 12px !important;
+                border-radius: 16px !important;
+            }
+            .modal-header { padding: 14px 16px !important; }
+            .modal-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .modal-tab { font-size: 12px !important; padding: 9px 12px !important; white-space: nowrap; }
+
+            /* ── Page header flex wrap ── */
+            .page-header[style*="justify-content:space-between"] {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+
+            /* ── Tour card ── */
+            .tour-card {
+                width: calc(100vw - 40px) !important;
+                max-width: 340px !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+
+            /* ── Period tabs ── */
+            .period-tabs { flex-shrink: 0; }
+
+            /* ── Badge count ── */
+            .badge-count { font-size: 10px !important; }
+
+            /* ── Carousel regras ── */
+            .carousel-arrow { width: 32px !important; height: 32px !important; }
+
+            /* ── Camp card list ── */
+            .camp-card { width: 100% !important; box-sizing: border-box !important; }
+            .camp-list-item { flex-wrap: wrap !important; gap: 8px !important; }
+
+            /* ── Admin Camp Table ── */
+            #adminCampTable { min-width: 560px; }
+            #adminCampTableWrap { overflow-x: auto; }
+        }
+
+        /* ════════════════════════════════
+           BREAKPOINT: ≤ 480px
+        ════════════════════════════════ */
+        @media (max-width: 480px) {
+            .main {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+                padding-top: 68px !important;
+            }
+
+            .crm-metrics-row {
+                grid-template-columns: 1fr 1fr !important;
+            }
+
+            .page-title { font-size: 18px !important; }
+
+            .admin-stats {
+                grid-template-columns: 1fr 1fr !important;
+            }
+
+            .sim-prazo-group {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Camp metrics single col */
+            .camp-metrics { grid-template-columns: 1fr !important; }
+
+            /* Chart smaller */
+            .chart-wrapper { height: 180px !important; }
+
+            /* Notes chars counter smaller */
+            .notes-chars { font-size: 10px !important; }
+
+            /* Table hide more columns */
+            table th:nth-child(2),
+            table td:nth-child(2) {
+                display: none !important;
+            }
+
+            .modal-overlay .modal {
+                max-width: calc(100vw - 16px) !important;
+                margin: 0 8px !important;
+            }
+        }
+
+        /* ════════════════════════════════
+           BREAKPOINT: ≤ 360px (small phones)
+        ════════════════════════════════ */
+        @media (max-width: 360px) {
+            .crm-metric-val { font-size: 18px !important; }
+            .page-title { font-size: 16px !important; }
+        }
