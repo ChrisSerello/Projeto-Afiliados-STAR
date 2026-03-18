@@ -1,775 +1,908 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StarCard — Painel Administrativo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="assets/Planeta.png">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-            --black: #080808;
-            --surface: #0e0e0e;
-            --surface-2: #141414;
-            --border: rgba(255,255,255,0.07);
-            --amber: #f59e0b;
-            --amber-dim: rgba(245,158,11,0.12);
-            --amber-border: rgba(245,158,11,0.2);
-            --white: #ffffff;
-            --white-dim: rgba(255,255,255,0.45);
-            --white-faint: rgba(255,255,255,0.04);
-            --sidebar-w: 240px;
-            --green: #10b981;
-            --red: #ef4444;
-        }
-        body { font-family: 'Outfit', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; display: flex; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StarCard — Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/Planeta.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-        /* ── SIDEBAR ── */
-        .sidebar {
-            width: var(--sidebar-w); min-height: 100vh;
-            background: var(--surface); border-right: 1px solid var(--border);
-            position: fixed; left: 0; top: 0;
-            display: flex; flex-direction: column; z-index: 100;
-        }
-        .sidebar-top { padding: 28px 20px 20px; border-bottom: 1px solid var(--border); }
-        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .brand-mark {
-            width: 32px; height: 32px; border: 1px solid var(--amber); border-radius: 7px;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: var(--amber); flex-shrink: 0;
-        }
-        .brand-info { display: flex; flex-direction: column; gap: 1px; }
-        .brand-name { font-size: 13px; font-weight: 700; color: var(--white); }
-        .brand-role { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1.5px; text-transform: uppercase; }
-        .status-indicator {
-            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-            background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.15); border-radius: 8px;
-        }
-        .status-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; box-shadow: 0 0 6px var(--green); animation: blink 2s ease-in-out infinite; }
-        @keyframes blink { 0%,100%{opacity:1}50%{opacity:.4} }
-        .status-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--green); letter-spacing: 1.5px; text-transform: uppercase; }
-        .sidebar-nav { padding: 16px 12px; flex: 1; }
-        .nav-label { font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 2px; padding: 12px 8px 6px; }
-        .nav-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
-            font-size: 13px; font-weight: 500; color: var(--white-dim); cursor: pointer;
-            transition: all 0.2s; border: 1px solid transparent; text-decoration: none; margin-bottom: 2px;
-        }
-        .nav-item i { width: 14px; font-size: 12px; }
-        .nav-item:hover { background: var(--white-faint); color: var(--white); }
-        .nav-item.active { background: var(--amber-dim); border-color: var(--amber-border); color: var(--amber); }
-        .nav-item.danger { color: rgba(239,68,68,0.6); }
-        .nav-item.danger:hover { background: rgba(239,68,68,0.07); color: #fca5a5; }
-        .sidebar-bottom { padding: 16px 12px; border-top: 1px solid var(--border); }
+:root{
+  --void:     #05030f;
+  --deep:     #0a0620;
+  --surface:  rgba(12,6,35,0.80);
+  --surface2: rgba(18,10,45,0.65);
+  --v1:       #7c3aed;
+  --v2:       #6d28d9;
+  --v3:       #4c1d95;
+  --lt:       #c4b5fd;
+  --lt2:      #a5b4fc;
+  --teal:     #22d3ee;
+  --pink:     #e879f9;
+  --green:    #4ade80;
+  --red:      #f87171;
+  --yellow:   #fbbf24;
+  --white:    #f0eeff;
+  --muted:    rgba(196,181,253,0.45);
+  --border:   rgba(196,181,253,0.10);
+  --border-hi:rgba(196,181,253,0.22);
+  --sidebar-w:260px;
+}
 
-        /* ── LAYOUT ── */
-        .main { margin-left: var(--sidebar-w); flex: 1; padding: 32px 36px; min-height: 100vh; }
-        .page-header { margin-bottom: 32px; }
-        .page-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-        .page-title { font-size: 26px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
+html,body{min-height:100%;background:var(--void)}
+body{font-family:'Nunito',sans-serif;color:var(--white);display:flex;min-height:100vh}
 
-        /* ── STATS ── */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
-        .stat-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
-            position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s;
-        }
-        .stat-card:hover { border-color: var(--amber-border); transform: translateY(-2px); }
-        .stat-card::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--amber), transparent); opacity: 0; transition: opacity 0.2s;
-        }
-        .stat-card:hover::after { opacity: 0.5; }
-        .stat-icon { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1px; margin-bottom: 14px; opacity: 0.7; }
-        .stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--white); letter-spacing: -1px; margin-bottom: 4px; }
-        .stat-label { font-size: 11px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+/* ═══ STATIC STARFIELD BG ═══ */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 60% at 15% 30%, rgba(76,29,149,0.45), transparent 65%),
+    radial-gradient(ellipse 50% 70% at 85% 70%, rgba(67,56,202,0.30), transparent 60%),
+    radial-gradient(ellipse 40% 50% at 50% 10%, rgba(124,58,237,0.20), transparent 55%),
+    radial-gradient(ellipse 30% 40% at 80% 20%, rgba(34,211,238,0.08), transparent 50%),
+    linear-gradient(160deg, #0a0620 0%, #05030f 50%, #080420 100%);
+}
+/* noise */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.5;
+}
 
-        /* ── TABS ── */
-        .tabs-header { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
-        .tab-btn {
-            display: flex; align-items: center; gap: 8px; padding: 10px 18px;
-            font-size: 13px; font-weight: 500; color: var(--white-dim);
-            background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer;
-            transition: all 0.2s; margin-bottom: -1px; font-family: 'Outfit', sans-serif;
-        }
-        .tab-btn:hover { color: var(--white); }
-        .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
-        .tab-btn i { font-size: 12px; }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+/* ═══ SIDEBAR ═══ */
+.sidebar{
+  width:var(--sidebar-w);min-height:100vh;
+  background:linear-gradient(180deg, rgba(12,6,38,0.97) 0%, rgba(8,4,26,0.97) 100%);
+  border-right:1px solid var(--border);
+  position:fixed;left:0;top:0;
+  display:flex;flex-direction:column;z-index:100;
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+}
+/* sidebar top shimmer */
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,181,253,0.5),rgba(34,211,238,0.3),transparent);
+}
 
-        /* ── CARDS ── */
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-        .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap:wrap; gap:10px; }
-        .card-title { font-size: 14px; font-weight: 600; color: var(--white); }
-        .card-tag { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1.5px; text-transform: uppercase; }
-        .card-body { padding: 24px; }
+.sidebar-top{padding:28px 22px 22px;border-bottom:1px solid var(--border)}
 
-        /* ── FORM ── */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-        .field { display: flex; flex-direction: column; gap: 8px; }
-        .field-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1.5px; }
-        .field-label::before { content: '// '; color: var(--amber); opacity: 0.5; }
-        .field-input {
-            background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
-            padding: 11px 14px; font-size: 13px; font-family: 'Outfit', sans-serif; color: var(--white); outline: none; transition: all 0.2s;
-        }
-        .field-input::placeholder { color: rgba(255,255,255,0.15); }
-        .field-input:focus { border-color: var(--amber-border); background: rgba(245,158,11,0.03); }
-        .btn-primary {
-            background: var(--amber); border: none; border-radius: 8px; padding: 11px 24px;
-            font-size: 13px; font-family: 'Outfit', sans-serif; font-weight: 700; color: #000; cursor: pointer; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-primary:hover { background: #fbbf24; box-shadow: 0 6px 20px rgba(245,158,11,0.25); transform: translateY(-1px); }
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.brand-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--v3),var(--v1));
+  border:1px solid rgba(196,181,253,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+  color:var(--lt);letter-spacing:1px;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(124,58,237,0.4);
+}
+.brand-info{display:flex;flex-direction:column;gap:2px}
+.brand-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--white);letter-spacing:1px}
+.brand-role{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--lt);opacity:.6}
 
-        /* ── TABLE ── */
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        thead th {
-            padding: 10px 16px; font-family: 'Space Mono', monospace; font-size: 9px;
-            color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1.5px;
-            text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;
-        }
-        tbody td { padding: 13px 16px; font-size: 13px; color: var(--white-dim); border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
-        tbody tr:hover td { background: var(--white-faint); color: var(--white); }
-        tbody tr:last-child td { border-bottom: none; }
-        .td-primary { color: var(--white) !important; font-weight: 500; }
+.sys-status{
+  display:flex;align-items:center;gap:9px;padding:9px 13px;
+  background:rgba(74,222,128,0.06);
+  border:1px solid rgba(74,222,128,0.15);
+  border-radius:10px;
+}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);animation:sdot 2.2s ease-in-out infinite}
+@keyframes sdot{0%,100%{opacity:1}50%{opacity:.25}}
+.stext{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green)}
 
-        /* ── BADGES ── */
-        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.5px; white-space: nowrap; }
-        .badge-amber  { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); }
-        .badge-green  { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); color: var(--green); }
-        .badge-gray   { background: var(--white-faint); border: 1px solid var(--border); color: var(--white-dim); }
-        .badge-red    { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
-        .badge-blue   { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.15); color: #60a5fa; }
-        .badge-yellow { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: #fbbf24; }
-        .badge-purple { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); color: #a78bfa; }
+/* nav */
+.sidebar-nav{padding:16px 12px;flex:1;overflow-y:auto}
+.nav-section{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(196,181,253,0.25);padding:14px 10px 6px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:10px;
+  font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;
+  transition:all .2s;border:1px solid transparent;text-decoration:none;margin-bottom:3px;
+  position:relative;
+}
+.nav-item i{width:15px;font-size:13px;text-align:center;flex-shrink:0}
+.nav-item:hover{background:rgba(196,181,253,0.06);color:var(--white);border-color:var(--border)}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(109,40,217,0.12));
+  border-color:rgba(196,181,253,0.2);color:var(--lt);
+}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;
+  background:linear-gradient(to bottom,var(--lt),var(--pink));
+  border-radius:0 2px 2px 0;
+}
+.nav-item.active i{color:var(--lt)}
+.nav-item.danger{color:rgba(248,113,113,0.5)}
+.nav-item.danger:hover{background:rgba(248,113,113,0.07);color:var(--red);border-color:rgba(248,113,113,0.15)}
 
-        /* ── STATUS SELECT ── */
-        .status-select {
-            background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px;
-            padding: 6px 10px; font-size: 12px; font-family: 'Outfit', sans-serif; font-weight: 600;
-            color: var(--white); cursor: pointer; outline: none; transition: all 0.2s;
-            min-width: 150px;
-        }
-        .status-select:focus { border-color: var(--amber-border); }
-        .status-select option { background: #0e0e0e; }
+.sidebar-bottom{padding:14px 12px;border-top:1px solid var(--border)}
 
-        /* Per-status colors on select */
-        .status-select[data-status="lead"]      { color: #94a3b8; border-color: rgba(148,163,184,0.25); }
-        .status-select[data-status="doc"]       { color: #a78bfa; border-color: rgba(167,139,250,0.3); }
-        .status-select[data-status="analise"]   { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
-        .status-select[data-status="aprovado"]  { color: #4ade80; border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.04); }
-        .status-select[data-status="reprovado"] { color: #f87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04); }
+/* ═══ MAIN ═══ */
+.main{margin-left:var(--sidebar-w);flex:1;padding:32px 36px;position:relative;z-index:1;min-height:100vh}
 
-        .status-saving { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 1px; padding-left: 6px; display: none; }
-        .status-saved  { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--green); letter-spacing: 1px; padding-left: 6px; display: none; }
+/* page header */
+.page-header{margin-bottom:32px;
+  opacity:0;animation:fup .7s .05s cubic-bezier(.16,1,.3,1) forwards}
+.page-eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--lt);opacity:.6;margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.page-eyebrow::before{content:'★';font-size:8px}
+.page-title{
+  font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;
+  color:var(--white);letter-spacing:.5px;
+}
 
-        /* ── PIPELINE SUMMARY ── */
-        .pipeline-summary {
-            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
-        }
-        .ps-pill {
-            display: flex; align-items: center; gap: 5px;
-            padding: 5px 12px; border-radius: 100px; border: 1px solid;
-            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-        .ps-pill:hover { transform: translateY(-1px); }
-        .ps-pill.active { box-shadow: 0 0 0 2px currentColor; }
-        .ps-count { font-family: 'Space Mono', monospace; font-size: 11px; }
-        .ps-lead     { color: #94a3b8; border-color: rgba(148,163,184,0.2); background: rgba(148,163,184,0.06); }
-        .ps-doc      { color: #a78bfa; border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.06); }
-        .ps-analise  { color: #fbbf24; border-color: rgba(251,191,36,0.2);  background: rgba(251,191,36,0.06);  }
-        .ps-aprovado { color: #4ade80; border-color: rgba(74,222,128,0.2);  background: rgba(74,222,128,0.06);  }
-        .ps-reprovado{ color: #f87171; border-color: rgba(248,113,113,0.2); background: rgba(248,113,113,0.06); }
+/* ═══ STATS GRID ═══ */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
 
-        /* ── FILTERS ── */
-        .filters-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-        .filter-input {
-            background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
-            padding: 9px 13px; font-size: 12px; font-family: 'Outfit', sans-serif; color: var(--white); outline: none; transition: border-color 0.2s;
-        }
-        .filter-input::placeholder { color: rgba(255,255,255,0.2); }
-        .filter-input:focus { border-color: var(--amber-border); }
-        .filter-input.grow { flex: 1; min-width: 180px; }
-        .filter-input option { background: #0e0e0e; }
-        .btn-filter {
-            background: var(--amber-dim); border: 1px solid var(--amber-border); border-radius: 8px;
-            padding: 9px 16px; font-size: 12px; font-family: 'Outfit', sans-serif; font-weight: 600; color: var(--amber); cursor: pointer; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-filter:hover { background: rgba(245,158,11,0.2); }
-        .btn-clear {
-            background: var(--white-faint); border: 1px solid var(--border); border-radius: 8px;
-            padding: 9px 16px; font-size: 12px; font-family: 'Outfit', sans-serif; color: var(--white-dim); cursor: pointer; transition: all 0.2s;
-        }
-        .btn-clear:hover { color: var(--white); }
-        .results-count { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--white-dim); letter-spacing: 1px; margin-left: auto; }
+.stat-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;padding:22px 22px 20px;
+  position:relative;overflow:hidden;
+  transition:border-color .3s,transform .3s,box-shadow .3s;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  opacity:0;animation:fup .7s cubic-bezier(.16,1,.3,1) forwards;
+}
+.stat-card:nth-child(1){animation-delay:.1s}
+.stat-card:nth-child(2){animation-delay:.17s}
+.stat-card:nth-child(3){animation-delay:.24s}
+.stat-card:nth-child(4){animation-delay:.31s}
+/* top shimmer */
+.stat-card::before{
+  content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,181,253,0.5),transparent);
+  transition:opacity .3s;opacity:.5;
+}
+.stat-card:hover{border-color:rgba(196,181,253,0.25);transform:translateY(-3px);box-shadow:0 16px 48px rgba(76,29,149,0.3)}
+.stat-card:hover::before{opacity:1}
 
-        /* ── ALERT ── */
-        .alert-box { border-radius: 8px; padding: 11px 14px; margin-bottom: 16px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.5px; display: none; }
-        .alert-success { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); display: block; }
-        .alert-danger  { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; display: block; }
+.stat-glow{
+  position:absolute;top:-30px;right:-20px;width:100px;height:100px;
+  border-radius:50%;filter:blur(40px);pointer-events:none;opacity:.5;
+}
+.stat-icon-lbl{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--lt);opacity:.5;margin-bottom:16px;position:relative}
+.stat-value{
+  font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;
+  color:var(--white);letter-spacing:-1px;margin-bottom:4px;line-height:1;position:relative;
+}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;position:relative}
 
-        /* ── EMPTY ── */
-        .empty-state { text-align: center; padding: 48px 20px; }
-        .empty-icon  { font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.15); letter-spacing: 2px; margin-bottom: 12px; }
-        .empty-text  { font-size: 13px; color: rgba(255,255,255,0.2); }
+/* ═══ TABS ═══ */
+.tabs-header{
+  display:flex;gap:2px;margin-bottom:22px;
+  background:rgba(12,6,35,0.6);border:1px solid var(--border);
+  border-radius:12px;padding:5px;
+  backdrop-filter:blur(12px);
+  width:fit-content;
+  opacity:0;animation:fup .7s .35s cubic-bezier(.16,1,.3,1) forwards;
+}
+.tab-btn{
+  display:flex;align-items:center;gap:8px;padding:9px 20px;
+  font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.3px;
+  background:none;border:none;border-radius:9px;cursor:pointer;
+  transition:all .25s;font-family:'Nunito',sans-serif;
+}
+.tab-btn i{font-size:11px}
+.tab-btn:hover{color:var(--white)}
+.tab-btn.active{
+  background:linear-gradient(135deg,rgba(124,58,237,0.35),rgba(109,40,217,0.2));
+  color:var(--lt);
+  box-shadow:0 2px 12px rgba(124,58,237,0.25);
+}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fup .35s cubic-bezier(.16,1,.3,1)}
+@keyframes fup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-        /* ── TOAST ── */
-        #toastAdmin {
-            position: fixed; bottom: 28px; right: 28px; z-index: 9999;
-            background: #0e0e0e; border: 1px solid var(--amber-border);
-            border-radius: 10px; padding: 12px 18px;
-            display: flex; align-items: center; gap: 10px;
-            font-size: 13px; font-weight: 500; color: var(--white);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-            transform: translateY(80px); opacity: 0;
-            transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-            pointer-events: none;
-        }
-        #toastAdmin.show { transform: translateY(0); opacity: 1; }
-        #toastAdmin i { color: var(--green); }
-        #toastAdmin.error i { color: #f87171; }
+/* ═══ CARDS ═══ */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  position:relative;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,181,253,0.4),transparent);
+}
+.card-header{
+  padding:18px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  position:relative;
+}
+.card-title{
+  font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;
+  color:var(--white);letter-spacing:.5px;display:flex;align-items:center;gap:8px;
+}
+.card-tag{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--lt);background:rgba(124,58,237,0.15);
+  border:1px solid rgba(196,181,253,0.2);
+  border-radius:6px;padding:4px 10px;
+}
+.card-body{padding:24px}
 
-        /* Pagination */
-        .pagination { display: flex; gap: 5px; padding: 14px 20px; border-top: 1px solid var(--border); }
-        .page-btn {
-            width: 32px; height: 32px; border-radius: 7px; border: 1px solid var(--border);
-            background: var(--white-faint); color: var(--white-dim); font-size: 12px; font-family: 'Outfit', sans-serif;
-            cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;
-        }
-        .page-btn:hover { background: var(--amber-dim); border-color: var(--amber-border); color: var(--amber); }
-        .page-btn.active { background: var(--amber-dim); border-color: var(--amber-border); color: var(--amber); font-weight: 700; }
-    </style>
+/* ═══ FORM ═══ */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field-label{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(196,181,253,0.45);display:flex;align-items:center;gap:5px;
+}
+.field-label::before{content:'//';color:var(--lt);opacity:.4;font-size:9px}
+.field-input{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(196,181,253,0.1);
+  border-radius:10px;padding:12px 14px;
+  font-size:13px;font-family:'Nunito',sans-serif;color:var(--white);
+  outline:none;transition:all .25s;
+}
+.field-input::placeholder{color:rgba(196,181,253,0.18)}
+.field-input:focus{
+  border-color:rgba(196,181,253,0.4);
+  background:rgba(124,58,237,0.07);
+  box-shadow:0 0 0 4px rgba(124,58,237,0.1);
+}
+
+/* ═══ BUTTONS ═══ */
+.btn-primary{
+  border:none;border-radius:10px;padding:12px 24px;
+  font-size:12px;font-family:'Rajdhani',sans-serif;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  color:#fff;cursor:pointer;transition:all .3s;
+  display:inline-flex;align-items:center;gap:8px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#5b21b6 0%,#7c3aed 45%,#9333ea 100%);
+  box-shadow:0 6px 24px rgba(124,58,237,0.35);
+}
+.btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);transform:translateX(-100%);transition:transform .6s}
+.btn-primary:hover::after{transform:translateX(100%)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(124,58,237,0.5)}
+
+/* filter buttons */
+.btn-filter{
+  background:rgba(124,58,237,0.12);border:1px solid rgba(196,181,253,0.18);border-radius:9px;
+  padding:9px 16px;font-size:11px;font-family:'Nunito',sans-serif;font-weight:700;
+  letter-spacing:.5px;color:var(--lt);cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-filter:hover{background:rgba(124,58,237,0.22);border-color:rgba(196,181,253,0.3)}
+.btn-clear{
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;
+  padding:9px 16px;font-size:11px;font-family:'Nunito',sans-serif;font-weight:600;
+  color:var(--muted);cursor:pointer;transition:all .2s;
+}
+.btn-clear:hover{color:var(--white);border-color:var(--border-hi)}
+
+/* ═══ TABLE ═══ */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:10px 16px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(196,181,253,0.3);text-align:left;
+  border-bottom:1px solid rgba(196,181,253,0.08);white-space:nowrap;
+}
+tbody td{
+  padding:13px 16px;font-size:13px;color:var(--muted);
+  border-bottom:1px solid rgba(196,181,253,0.04);vertical-align:middle;
+}
+tbody tr:hover td{background:rgba(124,58,237,0.05);color:var(--white)}
+tbody tr:last-child td{border-bottom:none}
+.td-primary{color:var(--white)!important;font-weight:600}
+
+/* ═══ BADGES ═══ */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;
+  font-size:9px;font-weight:700;letter-spacing:.5px;white-space:nowrap;
+}
+.badge-lt    {background:rgba(196,181,253,0.1);border:1px solid rgba(196,181,253,0.2);color:var(--lt)}
+.badge-teal  {background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);color:var(--teal)}
+.badge-green {background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);color:var(--green)}
+.badge-gray  {background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--muted)}
+.badge-red   {background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
+.badge-yellow{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);color:var(--yellow)}
+.badge-blue  {background:rgba(165,180,252,0.08);border:1px solid rgba(165,180,252,0.2);color:var(--lt2)}
+.badge-pink  {background:rgba(232,121,249,0.08);border:1px solid rgba(232,121,249,0.2);color:var(--pink)}
+
+/* ═══ STATUS SELECT ═══ */
+.status-select{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(196,181,253,0.12);
+  border-radius:8px;padding:7px 10px;
+  font-size:12px;font-family:'Nunito',sans-serif;font-weight:600;
+  color:var(--white);cursor:pointer;outline:none;
+  transition:all .2s;min-width:155px;
+}
+.status-select:focus{border-color:rgba(196,181,253,0.35)}
+.status-select option{background:#0a0620}
+.status-select[data-status="lead"]      {color:#94a3b8;border-color:rgba(148,163,184,0.2)}
+.status-select[data-status="doc"]       {color:var(--lt);border-color:rgba(196,181,253,0.25)}
+.status-select[data-status="analise"]   {color:var(--yellow);border-color:rgba(251,191,36,0.25)}
+.status-select[data-status="aprovado"]  {color:var(--green);border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.04)}
+.status-select[data-status="reprovado"] {color:var(--red);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04)}
+
+.status-saving{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--yellow);padding-left:6px;display:none}
+.status-saved {font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--green);padding-left:6px;display:none}
+
+/* ═══ PIPELINE PILLS ═══ */
+.pipeline-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.ps-pill{
+  display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:100px;border:1px solid;
+  font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;letter-spacing:.3px;
+}
+.ps-pill:hover{transform:translateY(-2px)}
+.ps-pill.active{box-shadow:0 0 0 2px currentColor,0 4px 16px rgba(0,0,0,0.3)}
+.ps-count{font-size:11px;font-weight:800}
+.ps-lead     {color:#94a3b8;border-color:rgba(148,163,184,0.2);background:rgba(148,163,184,0.06)}
+.ps-doc      {color:var(--lt);border-color:rgba(196,181,253,0.2);background:rgba(196,181,253,0.06)}
+.ps-analise  {color:var(--yellow);border-color:rgba(251,191,36,0.2);background:rgba(251,191,36,0.06)}
+.ps-aprovado {color:var(--green);border-color:rgba(74,222,128,0.2);background:rgba(74,222,128,0.06)}
+.ps-reprovado{color:var(--red);border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.06)}
+
+/* ═══ FILTERS ═══ */
+.filters-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-input{
+  background:rgba(255,255,255,0.03);border:1px solid rgba(196,181,253,0.1);
+  border-radius:9px;padding:9px 13px;font-size:12px;font-family:'Nunito',sans-serif;
+  color:var(--white);outline:none;transition:border-color .2s;
+}
+.filter-input::placeholder{color:rgba(196,181,253,0.22)}
+.filter-input:focus{border-color:rgba(196,181,253,0.35)}
+.filter-input.grow{flex:1;min-width:200px}
+.filter-input option{background:#0a0620}
+.results-count{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(196,181,253,0.3);margin-left:auto;
+}
+
+/* ═══ ALERTS ═══ */
+.alert-box{
+  border-radius:10px;padding:11px 14px;margin-bottom:16px;
+  font-size:11px;font-weight:700;letter-spacing:.5px;display:none;
+}
+.alert-success{background:rgba(124,58,237,0.12);border:1px solid rgba(196,181,253,0.22);color:var(--lt);display:block}
+.alert-danger {background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.22);color:var(--red);display:block}
+
+/* ═══ EMPTY ═══ */
+.empty-state{text-align:center;padding:52px 20px}
+.empty-icon{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(196,181,253,0.15);margin-bottom:10px}
+.empty-text{font-size:13px;color:rgba(196,181,253,0.2)}
+
+/* ═══ TOAST ═══ */
+#toastAdmin{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  background:rgba(10,6,32,0.95);
+  border:1px solid rgba(196,181,253,0.2);
+  border-radius:12px;padding:13px 18px;
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:600;color:var(--white);
+  box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 0 1px rgba(196,181,253,0.05) inset;
+  transform:translateY(80px);opacity:0;
+  transition:all .4s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events:none;backdrop-filter:blur(20px);
+}
+#toastAdmin.show{transform:translateY(0);opacity:1}
+#toastAdmin i{color:var(--green)}
+#toastAdmin.error i{color:var(--red)}
+
+/* ═══ PAGINATION ═══ */
+.pagination{display:flex;gap:5px;padding:14px 20px;border-top:1px solid var(--border);flex-wrap:wrap}
+.page-btn{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.03);color:var(--muted);
+  font-size:12px;font-family:'Nunito',sans-serif;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;
+}
+.page-btn:hover{background:rgba(124,58,237,0.15);border-color:rgba(196,181,253,0.25);color:var(--lt)}
+.page-btn.active{background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(109,40,217,0.2));border-color:rgba(196,181,253,0.3);color:var(--lt);font-weight:800}
+
+/* ═══ STARS CANVAS (subtle, behind content) ═══ */
+#starsBg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7}
+</style>
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-top">
-            <div class="brand">
-                <div class="brand-mark">SC</div>
-                <div class="brand-info">
-                    <span class="brand-name">starcard</span>
-                    <span class="brand-role">Admin</span>
-                </div>
+<canvas id="starsBg"></canvas>
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="brand">
+      <div class="brand-mark">SC</div>
+      <div class="brand-info">
+        <span class="brand-name">StarCard</span>
+        <span class="brand-role">Admin</span>
+      </div>
+    </div>
+    <div class="sys-status">
+      <div class="sdot"></div>
+      <span class="stext">Sistema Online</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Navegação</div>
+    <a class="nav-item active" id="nav-criar" onclick="showTab('criar')">
+      <i class="fas fa-user-plus"></i> Criar Afiliado
+    </a>
+    <a class="nav-item" id="nav-afiliados" onclick="showTab('afiliados')">
+      <i class="fas fa-users"></i> Afiliados
+    </a>
+    <a class="nav-item" id="nav-clientes" onclick="showTab('clientes')">
+      <i class="fas fa-user-check"></i> Clientes &amp; Pipeline
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="/admin/logout" class="nav-item danger"><i class="fas fa-sign-out-alt"></i> Sair</a>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+  <div class="page-header">
+    <div class="page-eyebrow">StarCard · Admin</div>
+    <h1 class="page-title">Painel de Controle</h1>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-glow" style="background:rgba(196,181,253,0.25)"></div>
+      <div class="stat-icon-lbl">Afiliados</div>
+      <div class="stat-value" id="totalAfiliados">—</div>
+      <div class="stat-label">Total Cadastrados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-glow" style="background:rgba(165,180,252,0.2)"></div>
+      <div class="stat-icon-lbl">Clientes</div>
+      <div class="stat-value" id="totalClientes">—</div>
+      <div class="stat-label">Total Indicados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-glow" style="background:rgba(74,222,128,0.2)"></div>
+      <div class="stat-icon-lbl">Aprovados</div>
+      <div class="stat-value" id="totalAprovados" style="color:var(--green)">—</div>
+      <div class="stat-label">Clientes Aprovados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-glow" style="background:rgba(232,121,249,0.2)"></div>
+      <div class="stat-icon-lbl">Top Afiliado</div>
+      <div class="stat-value" id="topAfiliado" style="font-size:16px;letter-spacing:0;color:var(--pink)">—</div>
+      <div class="stat-label">Melhor Desempenho</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-header">
+    <button class="tab-btn active" id="tab-criar" onclick="showTab('criar')">
+      <i class="fas fa-user-plus"></i> Criar Afiliado
+    </button>
+    <button class="tab-btn" id="tab-afiliados" onclick="showTab('afiliados')">
+      <i class="fas fa-users"></i> Afiliados
+    </button>
+    <button class="tab-btn" id="tab-clientes" onclick="showTab('clientes')">
+      <i class="fas fa-user-check"></i> Clientes &amp; Pipeline
+    </button>
+  </div>
+
+  <!-- ── TAB: CRIAR ── -->
+  <div class="tab-panel active" id="panel-criar">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fas fa-user-plus" style="color:var(--lt);font-size:13px"></i> Novo Afiliado</span>
+        <span class="card-tag">Criar Acesso</span>
+      </div>
+      <div class="card-body">
+        <div class="alert-box" id="alertCriar"></div>
+        <form id="criarAfiliadoForm">
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label">Nome Completo</label>
+              <input type="text" class="field-input" id="nome" name="nome" placeholder="Nome do afiliado" required>
             </div>
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span class="status-text">Sistema Online</span>
+            <div class="field">
+              <label class="field-label">E-mail</label>
+              <input type="email" class="field-input" id="email" name="email" placeholder="email@exemplo.com" required>
             </div>
+            <div class="field">
+              <label class="field-label">Senha</label>
+              <input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••" required>
+            </div>
+            <div class="field">
+              <label class="field-label">Confirmar Senha</label>
+              <input type="password" class="field-input" id="confirmar_senha" name="confirmar_senha" placeholder="••••••••" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-plus"></i> Criar Afiliado
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: AFILIADOS ── -->
+  <div class="tab-panel" id="panel-afiliados">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fas fa-users" style="color:var(--lt);font-size:13px"></i> Lista de Afiliados</span>
+        <span class="card-tag" id="countAfiliados">—</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Nome</th><th>Email</th><th>Código</th>
+              <th>Total Clientes</th><th>Aprovados</th><th>Cadastro</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaAfiliados">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: CLIENTES ── -->
+  <div class="tab-panel" id="panel-clientes">
+    <div class="pipeline-summary" id="pipelineSummary"></div>
+    <div class="filters-row">
+      <input type="text" class="filter-input grow" id="buscaClienteAdmin"
+        placeholder="🔍  Buscar por nome, email ou CPF..."
+        oninput="debounceFilter()">
+      <select class="filter-input" id="filtroAfiliado" onchange="aplicarFiltros()">
+        <option value="">Todos os afiliados</option>
+      </select>
+      <select class="filter-input" id="filtroStatus" onchange="aplicarFiltros()">
+        <option value="">Todos os status</option>
+        <option value="lead">🌱 Lead Novo</option>
+        <option value="doc">📄 Doc. Enviada</option>
+        <option value="analise">🔍 Em Análise</option>
+        <option value="aprovado">✅ Aprovado</option>
+        <option value="reprovado">❌ Reprovado</option>
+      </select>
+      <input type="date" class="filter-input" id="dataInicio" onchange="aplicarFiltros()">
+      <input type="date" class="filter-input" id="dataFim" onchange="aplicarFiltros()">
+      <button class="btn-clear" onclick="limparFiltros()">Limpar</button>
+      <span class="results-count" id="resultsCount">— registros</span>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fas fa-user-check" style="color:var(--lt);font-size:13px"></i> Todos os Clientes</span>
+        <span class="card-tag" id="countClientes">—</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Nome</th><th>Email</th><th>Telefone</th>
+              <th>CPF</th><th>Afiliado</th><th>Status do Pipeline</th><th>Cadastro</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaClientes">
+            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="paginacaoAdmin"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toastAdmin"><i class="fas fa-check-circle"></i> <span id="toastMsg">Status atualizado</span></div>
+
+<script>
+/* ═══════════════════════════════════════
+   STARS BACKGROUND
+═══════════════════════════════════════ */
+(function(){
+  const c = document.getElementById('starsBg');
+  const cx = c.getContext('2d');
+  let stars = [];
+
+  function resize(){
+    c.width  = window.innerWidth;
+    c.height = window.innerHeight;
+    stars = Array.from({length: Math.floor(c.width*c.height/5000)}, ()=>({
+      x: Math.random()*c.width,
+      y: Math.random()*c.height,
+      r: Math.random()*1.1+.15,
+      a: Math.random()*.8+.1,
+      sp: Math.random()*.004+.001,
+      ph: Math.random()*Math.PI*2,
+      col: Math.random()<.12 ? '#a5b4fc' : Math.random()<.08 ? '#22d3ee' : '#ddd6fe'
+    }));
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  let t = 0;
+  (function draw(){
+    t += .016;
+    cx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      cx.beginPath();
+      cx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      cx.fillStyle = s.col;
+      cx.globalAlpha = s.a*(.3+.7*Math.sin(t*s.sp*60+s.ph));
+      cx.fill();
+    });
+    cx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  })();
+})();
+
+/* ═══════════════════════════════════════
+   APP LOGIC
+═══════════════════════════════════════ */
+const PIPELINE_STAGES = [
+  {id:'lead',label:'Lead Novo',icon:'🌱'},
+  {id:'doc',label:'Doc. Enviada',icon:'📄'},
+  {id:'analise',label:'Em Análise',icon:'🔍'},
+  {id:'aprovado',label:'Aprovado',icon:'✅'},
+  {id:'reprovado',label:'Reprovado',icon:'❌'},
+];
+
+function showToast(msg, isError=false){
+  const t=document.getElementById('toastAdmin');
+  const m=document.getElementById('toastMsg');
+  t.className=isError?'error':'';
+  t.querySelector('i').className=isError?'fas fa-times-circle':'fas fa-check-circle';
+  m.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-item:not(.danger)').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.getElementById(`tab-${name}`).classList.add('active');
+  document.getElementById(`nav-${name}`)?.classList.add('active');
+  if(name==='afiliados') carregarAfiliados();
+  if(name==='clientes'){carregarAfiliadosFiltro();carregarClientes();}
+}
+
+async function carregarEstatisticas(){
+  try{
+    const r=await fetch('/api/estatisticas');
+    if(!r.ok)return;
+    const s=await r.json();
+    document.getElementById('totalAfiliados').textContent=s.total_afiliados??'—';
+    document.getElementById('totalClientes').textContent=s.total_clientes??'—';
+    document.getElementById('totalAprovados').textContent=s.total_aprovados??'—';
+    document.getElementById('topAfiliado').textContent=s.top_afiliado||'—';
+  }catch(e){console.error(e)}
+}
+
+async function carregarAfiliados(){
+  const tbody=document.getElementById('tabelaAfiliados');
+  tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>`;
+  try{
+    const r=await fetch('/api/afiliados');
+    if(!r.ok)return;
+    const af=await r.json();
+    document.getElementById('countAfiliados').textContent=`${af.length} registros`;
+    if(!af.length){
+      tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum afiliado cadastrado</div></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML=af.map(a=>`
+      <tr>
+        <td><span class="badge badge-gray">#${a.id}</span></td>
+        <td class="td-primary">${a.nome}</td>
+        <td style="font-size:12px">${a.email}</td>
+        <td><span class="badge badge-lt">${a.codigo_afiliado}</span></td>
+        <td><span class="badge badge-gray">${a.total_clientes||0}</span></td>
+        <td><span class="badge badge-green">${a.total_aprovados||0}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${new Date(a.criado_em).toLocaleDateString('pt-BR')}</td>
+      </tr>`).join('');
+  }catch(e){console.error(e)}
+}
+
+async function carregarAfiliadosFiltro(){
+  try{
+    const r=await fetch('/api/admin/afiliados-filtro');
+    if(!r.ok)return;
+    const af=await r.json();
+    const filtro=document.getElementById('filtroAfiliado');
+    filtro.innerHTML='<option value="">Todos os afiliados</option>'+
+      af.map(a=>`<option value="${a.id}">${a.nome} (${a.total_clientes||0} clientes)</option>`).join('');
+  }catch(e){}
+}
+
+let allClientes=[],clientesFiltrados=[],_adminPage=1,_statusFilter=null,_debounceTimer=null;
+const PER_PAGE=25;
+
+function debounceFilter(){
+  clearTimeout(_debounceTimer);
+  _debounceTimer=setTimeout(aplicarFiltros,300);
+}
+
+async function carregarClientes(){
+  const tbody=document.getElementById('tabelaClientes');
+  tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>`;
+  try{
+    const params=new URLSearchParams();
+    const afiliadoId=document.getElementById('filtroAfiliado').value;
+    const dataInicio=document.getElementById('dataInicio').value;
+    const dataFim=document.getElementById('dataFim').value;
+    if(afiliadoId)params.append('afiliado_id',afiliadoId);
+    if(dataInicio)params.append('data_inicio',dataInicio);
+    if(dataFim)params.append('data_fim',dataFim);
+    const r=await fetch(`/api/admin/clientes?${params}`);
+    if(!r.ok)return;
+    allClientes=await r.json();
+    aplicarFiltros();
+    renderPipelineSummary();
+  }catch(e){console.error(e)}
+}
+
+function aplicarFiltros(){
+  _adminPage=1;
+  const busca=document.getElementById('buscaClienteAdmin').value.toLowerCase().trim();
+  const statusF=document.getElementById('filtroStatus').value;
+  clientesFiltrados=allClientes.filter(c=>{
+    const mb=!busca||c.nome?.toLowerCase().includes(busca)||c.email?.toLowerCase().includes(busca)||c.cpf?.includes(busca);
+    const ms=!statusF||(c.status||'lead')===statusF;
+    return mb&&ms;
+  });
+  document.getElementById('countClientes').textContent=`${clientesFiltrados.length} registros`;
+  document.getElementById('resultsCount').textContent=`${clientesFiltrados.length} resultado(s)`;
+  renderClientesPage();
+}
+
+function limparFiltros(){
+  ['filtroAfiliado','buscaClienteAdmin','dataInicio','dataFim','filtroStatus'].forEach(id=>document.getElementById(id).value='');
+  _statusFilter=null;
+  document.querySelectorAll('.ps-pill').forEach(p=>p.classList.remove('active'));
+  carregarClientes();
+}
+
+function renderClientesPage(){
+  const tbody=document.getElementById('tabelaClientes');
+  const start=(_adminPage-1)*PER_PAGE;
+  const page=clientesFiltrados.slice(start,start+PER_PAGE);
+  if(!page.length){
+    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum resultado encontrado</div></div></td></tr>`;
+    document.getElementById('paginacaoAdmin').innerHTML='';
+    return;
+  }
+  tbody.innerHTML=page.map(c=>{
+    const st=c.status||'lead';
+    return `
+    <tr id="row-${c.id}">
+      <td><span class="badge badge-gray">#${c.id}</span></td>
+      <td class="td-primary">${c.nome}</td>
+      <td style="font-size:12px">${c.email}</td>
+      <td style="font-size:12px">${c.telefone||'—'}</td>
+      <td style="font-size:12px">${c.cpf||'—'}</td>
+      <td>
+        ${c.codigo_afiliado
+          ?`<span class="badge badge-lt">${c.codigo_afiliado}</span><br><small style="color:var(--muted);font-size:11px;display:block;margin-top:3px">${c.nome_afiliado||''}</small>`
+          :`<span class="badge badge-gray">Direto</span>`}
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <select class="status-select" data-status="${st}" data-id="${c.id}"
+            onchange="atualizarStatus(${c.id},this)">
+            ${PIPELINE_STAGES.map(s=>`<option value="${s.id}" ${s.id===st?'selected':''}>${s.icon} ${s.label}</option>`).join('')}
+          </select>
+          <span class="status-saving" id="saving-${c.id}">SALVANDO...</span>
+          <span class="status-saved" id="saved-${c.id}">✓ SALVO</span>
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-label">Navegação</div>
-            <a class="nav-item active" id="nav-criar" onclick="showTab('criar')">
-                <i class="fas fa-user-plus"></i> Criar Afiliado
-            </a>
-            <a class="nav-item" id="nav-afiliados" onclick="showTab('afiliados')">
-                <i class="fas fa-users"></i> Afiliados
-            </a>
-            <a class="nav-item" id="nav-clientes" onclick="showTab('clientes')">
-                <i class="fas fa-user-check"></i> Clientes &amp; Pipeline
-            </a>
-        </nav>
-        <div class="sidebar-bottom">
-            <a href="/admin/logout" class="nav-item danger"><i class="fas fa-sign-out-alt"></i> Sair</a>
-        </div>
-    </aside>
+      </td>
+      <td style="font-size:12px;color:var(--muted)">${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td>
+    </tr>`;
+  }).join('');
+  renderPaginacao();
+}
 
-    <main class="main">
-        <div class="page-header">
-            <div class="page-eyebrow">StarCard · Admin</div>
-            <h1 class="page-title">Painel de Controle</h1>
-        </div>
+function renderPaginacao(){
+  const total=Math.ceil(clientesFiltrados.length/PER_PAGE);
+  const pag=document.getElementById('paginacaoAdmin');
+  if(total<=1){pag.innerHTML='';return;}
+  pag.innerHTML=Array.from({length:total},(_,i)=>
+    `<button class="page-btn ${i+1===_adminPage?'active':''}" onclick="goPage(${i+1})">${i+1}</button>`
+  ).join('');
+}
 
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">AFILIADOS</div>
-                <div class="stat-value" id="totalAfiliados">—</div>
-                <div class="stat-label">Total Cadastrados</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">CLIENTES</div>
-                <div class="stat-value" id="totalClientes">—</div>
-                <div class="stat-label">Total Indicados</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">APROVADOS</div>
-                <div class="stat-value" id="totalAprovados" style="color:#4ade80;">—</div>
-                <div class="stat-label">Clientes Aprovados</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">TOP</div>
-                <div class="stat-value" id="topAfiliado" style="font-size:14px;letter-spacing:0">—</div>
-                <div class="stat-label">Melhor Afiliado</div>
-            </div>
-        </div>
+function goPage(n){_adminPage=n;renderClientesPage();window.scrollTo({top:0,behavior:'smooth'})}
 
-        <!-- Tabs header -->
-        <div class="tabs-header">
-            <button class="tab-btn active" id="tab-criar" onclick="showTab('criar')">
-                <i class="fas fa-user-plus"></i> Criar Afiliado
-            </button>
-            <button class="tab-btn" id="tab-afiliados" onclick="showTab('afiliados')">
-                <i class="fas fa-users"></i> Afiliados
-            </button>
-            <button class="tab-btn" id="tab-clientes" onclick="showTab('clientes')">
-                <i class="fas fa-user-check"></i> Clientes &amp; Pipeline
-            </button>
-        </div>
+function renderPipelineSummary(){
+  const counts={};
+  PIPELINE_STAGES.forEach(s=>counts[s.id]=0);
+  allClientes.forEach(c=>{const st=c.status||'lead';counts[st]=(counts[st]||0)+1});
+  const wrap=document.getElementById('pipelineSummary');
+  wrap.innerHTML=PIPELINE_STAGES.map(s=>`
+    <div class="ps-pill ps-${s.id} ${_statusFilter===s.id?'active':''}"
+         onclick="filterByStatus('${s.id}')">
+      ${s.icon} ${s.label}
+      <span class="ps-count">${counts[s.id]}</span>
+    </div>`).join('');
+}
 
-        <!-- ── TAB: CRIAR AFILIADO ── -->
-        <div class="tab-panel active" id="panel-criar">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Novo Afiliado</span>
-                    <span class="card-tag">Criar Acesso</span>
-                </div>
-                <div class="card-body">
-                    <div class="alert-box" id="alertCriar"></div>
-                    <form id="criarAfiliadoForm">
-                        <div class="form-grid">
-                            <div class="field">
-                                <label class="field-label">Nome Completo</label>
-                                <input type="text" class="field-input" id="nome" name="nome" placeholder="Nome do afiliado" required>
-                            </div>
-                            <div class="field">
-                                <label class="field-label">E-mail</label>
-                                <input type="email" class="field-input" id="email" name="email" placeholder="email@exemplo.com" required>
-                            </div>
-                            <div class="field">
-                                <label class="field-label">Senha</label>
-                                <input type="password" class="field-input" id="senha" name="senha" placeholder="••••••••" required>
-                            </div>
-                            <div class="field">
-                                <label class="field-label">Confirmar Senha</label>
-                                <input type="password" class="field-input" id="confirmar_senha" name="confirmar_senha" placeholder="••••••••" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-plus"></i> Criar Afiliado
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+function filterByStatus(stId){
+  if(_statusFilter===stId){_statusFilter=null;document.getElementById('filtroStatus').value=''}
+  else{_statusFilter=stId;document.getElementById('filtroStatus').value=stId}
+  document.querySelectorAll('.ps-pill').forEach(p=>p.classList.remove('active'));
+  if(_statusFilter)document.querySelector(`.ps-${_statusFilter}`)?.classList.add('active');
+  aplicarFiltros();
+}
 
-        <!-- ── TAB: AFILIADOS ── -->
-        <div class="tab-panel" id="panel-afiliados">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Lista de Afiliados</span>
-                    <span class="card-tag" id="countAfiliados">—</span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Código</th>
-                                <th>Total Clientes</th>
-                                <th>Aprovados</th>
-                                <th>Cadastro</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaAfiliados">
-                            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+async function atualizarStatus(clienteId,selectEl){
+  const novoStatus=selectEl.value;
+  const savingEl=document.getElementById(`saving-${clienteId}`);
+  const savedEl=document.getElementById(`saved-${clienteId}`);
+  selectEl.dataset.status=novoStatus;
+  if(savingEl)savingEl.style.display='inline';
+  if(savedEl)savedEl.style.display='none';
+  try{
+    const r=await fetch(`/api/admin/cliente/${clienteId}/status`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({status:novoStatus})
+    });
+    if(!r.ok)throw new Error('Falha ao salvar');
+    const clienteLocal=allClientes.find(c=>c.id===clienteId);
+    if(clienteLocal)clienteLocal.status=novoStatus;
+    if(savingEl)savingEl.style.display='none';
+    if(savedEl){savedEl.style.display='inline';setTimeout(()=>savedEl.style.display='none',2000)}
+    renderPipelineSummary();
+    carregarEstatisticas();
+    const stObj=PIPELINE_STAGES.find(s=>s.id===novoStatus);
+    showToast(`Status atualizado para "${stObj?.label}"`);
+  }catch(err){
+    if(savingEl)savingEl.style.display='none';
+    showToast('Erro ao salvar status — verifique a conexão',true);
+    console.error(err);
+  }
+}
 
-        <!-- ── TAB: CLIENTES & PIPELINE ── -->
-        <div class="tab-panel" id="panel-clientes">
+document.getElementById('criarAfiliadoForm').addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  const data=Object.fromEntries(new FormData(e.target));
+  const alertBox=document.getElementById('alertCriar');
+  alertBox.className='alert-box';
+  if(data.senha!==data.confirmar_senha){
+    alertBox.className='alert-box alert-danger';
+    alertBox.textContent='// ERRO: As senhas não coincidem';
+    return;
+  }
+  delete data.confirmar_senha;
+  try{
+    const r=await fetch('/api/criar-afiliado',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    const result=await r.json();
+    if(result.sucesso){
+      alertBox.className='alert-box alert-success';
+      alertBox.textContent=`// OK: Afiliado criado — Código: ${result.codigo_afiliado}`;
+      e.target.reset();
+      carregarEstatisticas();
+      showToast(`Afiliado criado com código ${result.codigo_afiliado}`);
+    }else{
+      alertBox.className='alert-box alert-danger';
+      alertBox.textContent='// ERRO: '+(result.erro||'Falha ao criar afiliado');
+    }
+  }catch{
+    alertBox.className='alert-box alert-danger';
+    alertBox.textContent='// ERRO: Falha de conexão';
+  }
+});
 
-            <!-- Pipeline summary pills -->
-            <div class="pipeline-summary" id="pipelineSummary"></div>
-
-            <!-- Filters -->
-            <div class="filters-row">
-                <input type="text" class="filter-input grow" id="buscaClienteAdmin"
-                    placeholder="🔍  Buscar por nome, email ou CPF..."
-                    oninput="debounceFilter()">
-                <select class="filter-input" id="filtroAfiliado" onchange="aplicarFiltros()">
-                    <option value="">Todos os afiliados</option>
-                </select>
-                <select class="filter-input" id="filtroStatus" onchange="aplicarFiltros()">
-                    <option value="">Todos os status</option>
-                    <option value="lead">🌱 Lead Novo</option>
-                    <option value="doc">📄 Doc. Enviada</option>
-                    <option value="analise">🔍 Em Análise</option>
-                    <option value="aprovado">✅ Aprovado</option>
-                    <option value="reprovado">❌ Reprovado</option>
-                </select>
-                <input type="date" class="filter-input" id="dataInicio" onchange="aplicarFiltros()">
-                <input type="date" class="filter-input" id="dataFim" onchange="aplicarFiltros()">
-                <button class="btn-clear" onclick="limparFiltros()">Limpar</button>
-                <span class="results-count" id="resultsCount">— registros</span>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title"><i class="fas fa-user-check" style="color:var(--amber);margin-right:8px;font-size:13px;"></i>Todos os Clientes</span>
-                    <span class="card-tag" id="countClientes">—</span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Telefone</th>
-                                <th>CPF</th>
-                                <th>Afiliado</th>
-                                <th>Status do Pipeline</th>
-                                <th>Cadastro</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaClientes">
-                            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination" id="paginacaoAdmin"></div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Toast notification -->
-    <div id="toastAdmin"><i class="fas fa-check-circle"></i> <span id="toastMsg">Status atualizado</span></div>
-
-    <script>
-        // ══════════════════════════════════════════
-        // HELPERS
-        // ══════════════════════════════════════════
-        const PIPELINE_STAGES = [
-            { id: 'lead',      label: 'Lead Novo',    icon: '🌱' },
-            { id: 'doc',       label: 'Doc. Enviada', icon: '📄' },
-            { id: 'analise',   label: 'Em Análise',   icon: '🔍' },
-            { id: 'aprovado',  label: 'Aprovado',     icon: '✅' },
-            { id: 'reprovado', label: 'Reprovado',    icon: '❌' },
-        ];
-
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toastAdmin');
-            const m = document.getElementById('toastMsg');
-            t.className = isError ? 'error' : '';
-            t.querySelector('i').className = isError ? 'fas fa-times-circle' : 'fas fa-check-circle';
-            m.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2800);
-        }
-
-        function showTab(name) {
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.nav-item:not(.danger)').forEach(n => n.classList.remove('active'));
-            document.getElementById(`panel-${name}`).classList.add('active');
-            document.getElementById(`tab-${name}`).classList.add('active');
-            document.getElementById(`nav-${name}`)?.classList.add('active');
-            if (name === 'afiliados') carregarAfiliados();
-            if (name === 'clientes')  { carregarAfiliadosFiltro(); carregarClientes(); }
-        }
-
-        // ══════════════════════════════════════════
-        // STATS
-        // ══════════════════════════════════════════
-        async function carregarEstatisticas() {
-            try {
-                const r = await fetch('/api/estatisticas');
-                if (!r.ok) return;
-                const s = await r.json();
-                document.getElementById('totalAfiliados').textContent = s.total_afiliados ?? '—';
-                document.getElementById('totalClientes').textContent  = s.total_clientes  ?? '—';
-                document.getElementById('totalAprovados').textContent = s.total_aprovados ?? '—';
-                document.getElementById('topAfiliado').textContent    = s.top_afiliado    || '—';
-            } catch(e) { console.error(e); }
-        }
-
-        // ══════════════════════════════════════════
-        // AFILIADOS
-        // ══════════════════════════════════════════
-        async function carregarAfiliados() {
-            const tbody = document.getElementById('tabelaAfiliados');
-            tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>`;
-            try {
-                const r = await fetch('/api/afiliados');
-                if (!r.ok) return;
-                const afiliados = await r.json();
-                document.getElementById('countAfiliados').textContent = `${afiliados.length} registros`;
-                if (!afiliados.length) {
-                    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum afiliado cadastrado</div></div></td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = afiliados.map(a => `
-                    <tr>
-                        <td><span class="badge badge-gray">#${a.id}</span></td>
-                        <td class="td-primary">${a.nome}</td>
-                        <td style="font-size:12px;">${a.email}</td>
-                        <td><span class="badge badge-amber">${a.codigo_afiliado}</span></td>
-                        <td><span class="badge badge-gray">${a.total_clientes || 0}</span></td>
-                        <td><span class="badge badge-green">${a.total_aprovados || 0}</span></td>
-                        <td style="font-size:12px;color:var(--white-dim);">${new Date(a.criado_em).toLocaleDateString('pt-BR')}</td>
-                    </tr>`).join('');
-            } catch(e) { console.error(e); }
-        }
-
-        async function carregarAfiliadosFiltro() {
-            try {
-                const r = await fetch('/api/admin/afiliados-filtro');
-                if (!r.ok) return;
-                const afiliados = await r.json();
-                const filtro = document.getElementById('filtroAfiliado');
-                filtro.innerHTML = '<option value="">Todos os afiliados</option>' +
-                    afiliados.map(a => `<option value="${a.id}">${a.nome} (${a.total_clientes || 0} clientes)</option>`).join('');
-            } catch(e) {}
-        }
-
-        // ══════════════════════════════════════════
-        // CLIENTES & PIPELINE
-        // ══════════════════════════════════════════
-        let allClientes = [];
-        let clientesFiltrados = [];
-        let _adminPage = 1;
-        const PER_PAGE = 25;
-        let _statusFilter = null;
-        let _debounceTimer = null;
-
-        function debounceFilter() {
-            clearTimeout(_debounceTimer);
-            _debounceTimer = setTimeout(aplicarFiltros, 300);
-        }
-
-        async function carregarClientes() {
-            const tbody = document.getElementById('tabelaClientes');
-            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// CARREGANDO</div></div></td></tr>`;
-            try {
-                const params = new URLSearchParams();
-                const afiliadoId = document.getElementById('filtroAfiliado').value;
-                const dataInicio = document.getElementById('dataInicio').value;
-                const dataFim    = document.getElementById('dataFim').value;
-                if (afiliadoId) params.append('afiliado_id', afiliadoId);
-                if (dataInicio) params.append('data_inicio', dataInicio);
-                if (dataFim)    params.append('data_fim', dataFim);
-
-                const r = await fetch(`/api/admin/clientes?${params}`);
-                if (!r.ok) return;
-                allClientes = await r.json();
-                aplicarFiltros();
-                renderPipelineSummary();
-            } catch(e) { console.error(e); }
-        }
-
-        function aplicarFiltros() {
-            _adminPage = 1;
-            const busca    = document.getElementById('buscaClienteAdmin').value.toLowerCase().trim();
-            const statusF  = document.getElementById('filtroStatus').value;
-
-            clientesFiltrados = allClientes.filter(c => {
-                const matchBusca  = !busca || c.nome?.toLowerCase().includes(busca) || c.email?.toLowerCase().includes(busca) || c.cpf?.includes(busca);
-                const matchStatus = !statusF || (c.status || 'lead') === statusF;
-                return matchBusca && matchStatus;
-            });
-
-            document.getElementById('countClientes').textContent = `${clientesFiltrados.length} registros`;
-            document.getElementById('resultsCount').textContent  = `${clientesFiltrados.length} resultado(s)`;
-            renderClientesPage();
-        }
-
-        function limparFiltros() {
-            ['filtroAfiliado','buscaClienteAdmin','dataInicio','dataFim','filtroStatus'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-            _statusFilter = null;
-            document.querySelectorAll('.ps-pill').forEach(p => p.classList.remove('active'));
-            carregarClientes();
-        }
-
-        function renderClientesPage() {
-            const tbody = document.getElementById('tabelaClientes');
-            const start = (_adminPage - 1) * PER_PAGE;
-            const page  = clientesFiltrados.slice(start, start + PER_PAGE);
-
-            if (!page.length) {
-                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">// VAZIO</div><div class="empty-text">Nenhum resultado encontrado</div></div></td></tr>`;
-                document.getElementById('paginacaoAdmin').innerHTML = '';
-                return;
-            }
-
-            tbody.innerHTML = page.map(c => {
-                const st = c.status || 'lead';
-                const stObj = PIPELINE_STAGES.find(s => s.id === st);
-                return `
-                <tr id="row-${c.id}">
-                    <td><span class="badge badge-gray">#${c.id}</span></td>
-                    <td class="td-primary">${c.nome}</td>
-                    <td style="font-size:12px;">${c.email}</td>
-                    <td style="font-size:12px;">${c.telefone || '—'}</td>
-                    <td style="font-size:12px;">${c.cpf || '—'}</td>
-                    <td>
-                        ${c.codigo_afiliado
-                            ? `<span class="badge badge-amber">${c.codigo_afiliado}</span><br>
-                               <small style="color:var(--white-dim);font-size:11px;display:block;margin-top:3px;">${c.nome_afiliado || ''}</small>`
-                            : '<span class="badge badge-gray">Direto</span>'}
-                    </td>
-                    <td>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <select class="status-select" data-status="${st}" data-id="${c.id}"
-                                onchange="atualizarStatus(${c.id}, this)">
-                                ${PIPELINE_STAGES.map(s =>
-                                    `<option value="${s.id}" ${s.id === st ? 'selected' : ''}>${s.icon} ${s.label}</option>`
-                                ).join('')}
-                            </select>
-                            <span class="status-saving" id="saving-${c.id}">SALVANDO...</span>
-                            <span class="status-saved"  id="saved-${c.id}">✓ SALVO</span>
-                        </div>
-                    </td>
-                    <td style="font-size:12px;color:var(--white-dim);">${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td>
-                </tr>`;
-            }).join('');
-
-            renderPaginacao();
-        }
-
-        function renderPaginacao() {
-            const total = Math.ceil(clientesFiltrados.length / PER_PAGE);
-            const pag   = document.getElementById('paginacaoAdmin');
-            if (total <= 1) { pag.innerHTML = ''; return; }
-            pag.innerHTML = Array.from({length: total}, (_, i) =>
-                `<button class="page-btn ${i+1 === _adminPage ? 'active' : ''}" onclick="goPage(${i+1})">${i+1}</button>`
-            ).join('');
-        }
-
-        function goPage(n) { _adminPage = n; renderClientesPage(); window.scrollTo({top:0,behavior:'smooth'}); }
-
-        function renderPipelineSummary() {
-            const counts = {};
-            PIPELINE_STAGES.forEach(s => counts[s.id] = 0);
-            allClientes.forEach(c => { const st = c.status || 'lead'; counts[st] = (counts[st]||0)+1; });
-
-            const wrap = document.getElementById('pipelineSummary');
-            wrap.innerHTML = PIPELINE_STAGES.map(s => `
-                <div class="ps-pill ps-${s.id} ${_statusFilter === s.id ? 'active' : ''}"
-                     onclick="filterByStatus('${s.id}')">
-                    ${s.icon} ${s.label}
-                    <span class="ps-count">${counts[s.id]}</span>
-                </div>`).join('');
-        }
-
-        function filterByStatus(stId) {
-            if (_statusFilter === stId) {
-                _statusFilter = null;
-                document.getElementById('filtroStatus').value = '';
-            } else {
-                _statusFilter = stId;
-                document.getElementById('filtroStatus').value = stId;
-            }
-            document.querySelectorAll('.ps-pill').forEach(p => p.classList.remove('active'));
-            if (_statusFilter) {
-                document.querySelector(`.ps-${_statusFilter}`)?.classList.add('active');
-            }
-            aplicarFiltros();
-        }
-
-        // ══════════════════════════════════════════
-        // STATUS UPDATE — calls backend API
-        // ══════════════════════════════════════════
-        async function atualizarStatus(clienteId, selectEl) {
-            const novoStatus = selectEl.value;
-            const savingEl   = document.getElementById(`saving-${clienteId}`);
-            const savedEl    = document.getElementById(`saved-${clienteId}`);
-
-            // Update select color immediately
-            selectEl.dataset.status = novoStatus;
-
-            // Show saving indicator
-            if (savingEl) savingEl.style.display = 'inline';
-            if (savedEl)  savedEl.style.display  = 'none';
-
-            try {
-                const r = await fetch(`/api/admin/cliente/${clienteId}/status`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: novoStatus })
-                });
-
-                if (!r.ok) throw new Error('Falha ao salvar');
-                const result = await r.json();
-
-                // Update local data so pipeline summary stays accurate
-                const clienteLocal = allClientes.find(c => c.id === clienteId);
-                if (clienteLocal) clienteLocal.status = novoStatus;
-
-                // Show saved feedback
-                if (savingEl) savingEl.style.display = 'none';
-                if (savedEl)  { savedEl.style.display = 'inline'; setTimeout(() => savedEl.style.display = 'none', 2000); }
-
-                // Refresh pipeline summary
-                renderPipelineSummary();
-                carregarEstatisticas();
-
-                const stObj = PIPELINE_STAGES.find(s => s.id === novoStatus);
-                showToast(`Status de cliente atualizado para "${stObj?.label}"`);
-
-            } catch(err) {
-                if (savingEl) savingEl.style.display = 'none';
-                showToast('Erro ao salvar status — verifique a conexão', true);
-                console.error(err);
-            }
-        }
-
-        // ══════════════════════════════════════════
-        // CRIAR AFILIADO
-        // ══════════════════════════════════════════
-        document.getElementById('criarAfiliadoForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            const alertBox = document.getElementById('alertCriar');
-            alertBox.className = 'alert-box';
-
-            if (data.senha !== data.confirmar_senha) {
-                alertBox.className = 'alert-box alert-danger';
-                alertBox.textContent = '// ERRO: As senhas não coincidem';
-                return;
-            }
-            delete data.confirmar_senha;
-            try {
-                const r = await fetch('/api/criar-afiliado', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await r.json();
-                if (result.sucesso) {
-                    alertBox.className = 'alert-box alert-success';
-                    alertBox.textContent = `// OK: Afiliado criado — Código: ${result.codigo_afiliado}`;
-                    e.target.reset();
-                    carregarEstatisticas();
-                    showToast(`Afiliado criado com código ${result.codigo_afiliado}`);
-                } else {
-                    alertBox.className = 'alert-box alert-danger';
-                    alertBox.textContent = '// ERRO: ' + (result.erro || 'Falha ao criar afiliado');
-                }
-            } catch {
-                alertBox.className = 'alert-box alert-danger';
-                alertBox.textContent = '// ERRO: Falha de conexão';
-            }
-        });
-
-        // ══════════════════════════════════════════
-        // INIT
-        // ══════════════════════════════════════════
-        document.addEventListener('DOMContentLoaded', carregarEstatisticas);
-    </script>
+document.addEventListener('DOMContentLoaded', carregarEstatisticas);
+</script>
 </body>
 </html>
