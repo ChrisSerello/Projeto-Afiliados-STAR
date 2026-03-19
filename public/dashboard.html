@@ -59,6 +59,20 @@
             --border: rgba(255,255,255,0.07);
             --grid-line: transparent;
         }
+        [data-theme="light"] {
+            --purple-deep: #f0f2f5;
+            --purple-dark: #ffffff;
+            --purple-mid: #7c3aed;
+            --purple-bright: #6d28d9;
+            --purple-glow: #7c3aed;
+            --accent: #7c3aed;
+            --white: #1a1a2e;
+            --white-dim: rgba(30,30,60,0.55);
+            --white-faint: rgba(100,80,180,0.06);
+            --card-bg: rgba(255,255,255,0.85);
+            --border: rgba(100,80,180,0.15);
+            --grid-line: transparent;
+        }
 
         /* Theme: Neon glow effects */
         [data-theme="neon"] body::before {
@@ -89,6 +103,35 @@
         [data-theme="minimal"] .pipeline-card,
         [data-theme="minimal"] .card,
         [data-theme="minimal"] .chart-card { backdrop-filter: none; }
+        /* Theme: Light clean */
+        [data-theme="light"] body::before { display: none; }
+        [data-theme="light"] body::after { display: none; }
+        [data-theme="light"] .sidebar {
+            background: rgba(255,255,255,0.97);
+            border-right: 1px solid rgba(100,80,180,0.15);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.06);
+        }
+        [data-theme="light"] .stat-card,
+        [data-theme="light"] .pipeline-card,
+        [data-theme="light"] .card,
+        [data-theme="light"] .chart-card {
+            background: #ffffff;
+            border-color: rgba(100,80,180,0.1);
+            backdrop-filter: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        [data-theme="light"] .nav-item { color: rgba(30,30,60,0.65); }
+        [data-theme="light"] .nav-item.active {
+            background: rgba(124,58,237,0.08);
+            color: #6d28d9;
+            border-color: rgba(124,58,237,0.2);
+        }
+        [data-theme="light"] .nav-item:hover { background: rgba(124,58,237,0.05); color: #6d28d9; }
+        [data-theme="light"] .nav-item.danger { color: rgba(220,50,50,0.7); }
+        [data-theme="light"] .nav-item.danger:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
+        [data-theme="light"] .sidebar-brand,
+        [data-theme="light"] .sidebar-bottom { border-color: rgba(100,80,180,0.12); }
+        [data-theme="light"] .main { background: #f0f2f5; }
         /* Theme: Galaxy deep space */
         [data-theme="galaxy"] body::after {
             content: '';
@@ -2266,19 +2309,19 @@
             <a class="nav-item active" onclick="showSection('dashboard', this)">
                 <i class="fas fa-chart-line"></i> Dashboard
             </a>
-            <a class="nav-item" onclick="showSection('campanhas', this)">
+            <a class="nav-item" onclick="showSection('campanhas', this)" style="display:none;">
                 <i class="fas fa-rocket"></i> Campanhas &amp; Links
             </a>
             <a class="nav-item" onclick="showSection('criar-link', this)">
                 <i class="fas fa-plus-circle"></i> Link Rápido
             </a>
-            <a class="nav-item" onclick="showSection('regras', this)">
+            <a class="nav-item" onclick="showSection('regras', this)" style="display:none;">
                 <i class="fas fa-book-open"></i> Regras
             </a>
-            <a class="nav-item" onclick="showSection('simulador', this)">
+            <a class="nav-item" onclick="showSection('simulador', this)" style="display:none;">
                 <i class="fas fa-calculator"></i> Produto &amp; Simulador
             </a>
-            <div class="nav-section-label" style="margin-top:8px;">Admin</div>
+            <div class="nav-section-label" style="display:none; margin-top:8px;">Admin</div>
             <a class="nav-item" id="navAdmin" onclick="showSection('admin', this)" style="display:none;">
                 <i class="fas fa-shield-alt"></i> Painel Admin
             </a>
@@ -2297,6 +2340,9 @@
                     </button>
                     <button class="theme-btn theme-minimal" data-theme="minimal" onclick="setTheme('minimal',this)" title="Minimal">
                         <span class="theme-preview"></span>Minimal
+                    </button>
+                    <button class="theme-btn theme-light" data-theme="light" onclick="setTheme('light',this)" title="Light">
+                        <span class="theme-preview" style="background:linear-gradient(135deg,#f0f2f5 40%,#7c3aed)"></span>Light
                     </button>
                 </div>
             </div>
