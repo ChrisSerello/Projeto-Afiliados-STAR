@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const nodemailer = require('nodemailer');
@@ -11,6 +12,30 @@ const multer = require('multer');
 const supabase = require('./db');
 
 require('dotenv').config();
+
+// ─── CONSTANTES ─────────────────────────────────────────────────────────────
+
+const STATUS = {
+    LEAD: 'lead',
+    DOC: 'doc',
+    ANALISE: 'analise',
+    APROVADO: 'aprovado',
+    REPROVADO: 'reprovado'
+};
+
+const STATUS_PERMITIDOS = Object.values(STATUS);
+
+// ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
+
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
 
 const app = express();
 const JWT_SECRET = process.env.SESSION_SECRET || 'secreto-sistema-afiliados';
@@ -40,20 +65,25 @@ async function enviarNotificacaoCliente(clienteData, afiliado) {
         const emailEmpresa = emailConfig.emailEmpresa;
         const emailKaique = 'kaique.silva@starbank.tec.br';
 
+        const nomeCliente = escapeHtml(clienteData.nome);
+        const emailCliente = escapeHtml(clienteData.email);
+        const telefoneCliente = escapeHtml(clienteData.telefone) || 'Não informado';
+        const cpfCliente = escapeHtml(clienteData.cpf) || 'Não informado';
+
         const corpoEmail = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #667eea;">Novo Cliente Cadastrado!</h2>
                 <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
                     <h3>Dados do Cliente:</h3>
-                    <p><strong>Nome:</strong> ${clienteData.nome}</p>
-                    <p><strong>Email:</strong> ${clienteData.email}</p>
-                    <p><strong>Telefone:</strong> ${clienteData.telefone || 'Não informado'}</p>
-                    <p><strong>CPF:</strong> ${clienteData.cpf || 'Não informado'}</p>
+                    <p><strong>Nome:</strong> ${nomeCliente}</p>
+                    <p><strong>Email:</strong> ${emailCliente}</p>
+                    <p><strong>Telefone:</strong> ${telefoneCliente}</p>
+                    <p><strong>CPF:</strong> ${cpfCliente}</p>
                     ${afiliado ? `
                     <h3>Dados do Afiliado:</h3>
-                    <p><strong>Nome:</strong> ${afiliado.nome}</p>
-                    <p><strong>Email:</strong> ${afiliado.email}</p>
-                    <p><strong>Código:</strong> ${afiliado.codigo_afiliado}</p>
+                    <p><strong>Nome:</strong> ${escapeHtml(afiliado.nome)}</p>
+                    <p><strong>Email:</strong> ${escapeHtml(afiliado.email)}</p>
+                    <p><strong>Código:</strong> ${escapeHtml(afiliado.codigo_afiliado)}</p>
                     ` : '<p><strong>Cadastro direto (sem afiliado)</strong></p>'}
                 </div>
                 <p style="color: #666;">Data do cadastro: ${new Date().toLocaleString('pt-BR')}</p>
@@ -61,25 +91,25 @@ async function enviarNotificacaoCliente(clienteData, afiliado) {
         `;
 
         const promises = [
-            transporter.sendMail({ from: emailConfig.from, to: emailEmpresa, subject: `Novo Cliente Cadastrado - ${clienteData.nome}`, html: corpoEmail }),
-            transporter.sendMail({ from: emailConfig.from, to: emailKaique, subject: `Novo Cliente Cadastrado - ${clienteData.nome}`, html: corpoEmail }),
+            transporter.sendMail({ from: emailConfig.from, to: emailEmpresa, subject: `Novo Cliente Cadastrado - ${nomeCliente}`, html: corpoEmail }),
+            transporter.sendMail({ from: emailConfig.from, to: emailKaique, subject: `Novo Cliente Cadastrado - ${nomeCliente}`, html: corpoEmail }),
         ];
 
         if (afiliado && afiliado.email) {
             promises.push(transporter.sendMail({
                 from: emailConfig.from,
                 to: afiliado.email,
-                subject: `Novo Cliente Cadastrado - ${clienteData.nome}`,
+                subject: `Novo Cliente Cadastrado - ${nomeCliente}`,
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                         <h2 style="color: #667eea;">Parabéns! Novo Cliente Cadastrado</h2>
                         <p>Um novo cliente se cadastrou através do seu link!</p>
                         <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
                             <h3>Dados do Cliente:</h3>
-                            <p><strong>Nome:</strong> ${clienteData.nome}</p>
-                            <p><strong>Email:</strong> ${clienteData.email}</p>
-                            <p><strong>Telefone:</strong> ${clienteData.telefone || 'Não informado'}</p>
-                            <p><strong>CPF:</strong> ${clienteData.cpf || 'Não informado'}</p>
+                            <p><strong>Nome:</strong> ${nomeCliente}</p>
+                            <p><strong>Email:</strong> ${emailCliente}</p>
+                            <p><strong>Telefone:</strong> ${telefoneCliente}</p>
+                            <p><strong>CPF:</strong> ${cpfCliente}</p>
                         </div>
                         <p style="color: #666;">Data do cadastro: ${new Date().toLocaleString('pt-BR')}</p>
                         <p>Continue compartilhando seu link para cadastrar mais clientes!</p>
@@ -97,12 +127,25 @@ async function enviarNotificacaoCliente(clienteData, afiliado) {
     }
 }
 
+// ─── RATE LIMITING ──────────────────────────────────────────────────────────
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 10,
+    message: { erro: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
 // ─── MIDDLEWARES ────────────────────────────────────────────────────────────
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/assets', express.static(path.join(__dirname, 'public')));
+app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
+app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
+app.use('/css', express.static(path.join(__dirname, 'css')));
 
 // ─── HELPERS JWT ────────────────────────────────────────────────────────────
 
@@ -172,7 +215,7 @@ app.get('/formulario-starbank', (req, res) => serveHTML(res, path.join(__dirname
 
 // ─── AUTENTICAÇÃO ──────────────────────────────────────────────────────────
 
-app.post('/login', async (req, res) => {
+app.post('/login', loginLimiter, async (req, res) => {
     const { email, senha } = req.body;
     try {
         const { data: afiliado, error } = await supabase
@@ -617,16 +660,16 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
                         <p style="color: rgba(255,255,255,0.6); margin: 6px 0 0; font-size: 13px;">Benefício ao Servidor</p>
                     </div>
                     <div style="background: #f8f7ff; padding: 28px; border-radius: 0 0 12px 12px; border: 1px solid #e2e0f0;">
-                        <p><strong>Afiliado:</strong> ${nome_afiliado || '—'} (${codigo_afiliado || '—'})</p>
-                        <p><strong>Nome:</strong> ${nome_completo}</p>
-                        <p><strong>CPF:</strong> ${cpf}</p>
-                        <p><strong>Nascimento:</strong> ${data_nascimento || '—'}</p>
-                        <p><strong>Celular:</strong> ${celular}</p>
-                        <p><strong>Órgão:</strong> ${orgao}</p>
-                        <p><strong>Vínculo:</strong> ${tipo_vinculo}</p>
-                        <p><strong>Objetivo:</strong> ${objetivo}</p>
-                        <p><strong>Bancos atuais:</strong> ${bancos_atuais || 'Não informado'}</p>
-                        ${holeriteUrl ? `<p>📎 <a href="${holeriteUrl}">Ver Holerite</a></p>` : ''}
+                        <p><strong>Afiliado:</strong> ${escapeHtml(nome_afiliado) || '—'} (${escapeHtml(codigo_afiliado) || '—'})</p>
+                        <p><strong>Nome:</strong> ${escapeHtml(nome_completo)}</p>
+                        <p><strong>CPF:</strong> ${escapeHtml(cpf)}</p>
+                        <p><strong>Nascimento:</strong> ${escapeHtml(data_nascimento) || '—'}</p>
+                        <p><strong>Celular:</strong> ${escapeHtml(celular)}</p>
+                        <p><strong>Órgão:</strong> ${escapeHtml(orgao)}</p>
+                        <p><strong>Vínculo:</strong> ${escapeHtml(tipo_vinculo)}</p>
+                        <p><strong>Objetivo:</strong> ${escapeHtml(objetivo)}</p>
+                        <p><strong>Bancos atuais:</strong> ${escapeHtml(bancos_atuais) || 'Não informado'}</p>
+                        ${holeriteUrl ? `<p>📎 <a href="${escapeHtml(holeriteUrl)}">Ver Holerite</a></p>` : ''}
                         <p style="color: #8b83b0; font-size: 12px; margin-top: 16px;">Recebido em: ${new Date().toLocaleString('pt-BR')}</p>
                     </div>
                 </div>
@@ -748,11 +791,11 @@ app.get('/obrigado', (req, res) => {
 
 app.get('/admin', (req, res) => serveHTML(res, path.join(__dirname, 'public', 'admin-login.html')));
 
-app.post('/admin/login', (req, res) => {
+app.post('/admin/login', loginLimiter, (req, res) => {
     const { email, senha } = req.body;
     const emailsAutorizados = ['christian.serello@starbank.tec.br', 'kaique.silva@starbank.tec.br'];
     if (!emailsAutorizados.includes(email)) return res.status(403).json({ erro: 'Não autorizado' });
-    if (senha !== 'admin123') return res.status(401).json({ erro: 'Senha incorreta' });
+    if (senha !== process.env.ADMIN_PASSWORD) return res.status(401).json({ erro: 'Senha incorreta' });
 
     criarTokenCookie(res, { adminEmail: email }, 'admin_token');
     res.json({ sucesso: true, redirect: '/admin/dashboard' });
@@ -813,17 +856,24 @@ app.get('/api/estatisticas', async (req, res) => {
             .select('id, nome');
 
         let topAfiliado = '-';
-        let maxClientes = -1;
 
-        for (const af of (afiliados || [])) {
-            const { count } = await supabase
+        if (afiliados && afiliados.length > 0) {
+            // Busca contagem de clientes por afiliado em uma única query
+            const { data: clientesPorAfiliado } = await supabase
                 .from('clientes')
-                .select('*', { count: 'exact', head: true })
-                .eq('id_afiliado', af.id);
+                .select('id_afiliado')
+                .in('id_afiliado', afiliados.map(a => a.id));
 
-            if (count > maxClientes) {
-                maxClientes = count;
-                topAfiliado = af.nome;
+            if (clientesPorAfiliado && clientesPorAfiliado.length > 0) {
+                const contagemMap = {};
+                for (const c of clientesPorAfiliado) {
+                    contagemMap[c.id_afiliado] = (contagemMap[c.id_afiliado] || 0) + 1;
+                }
+                const topId = Object.keys(contagemMap).reduce((a, b) =>
+                    contagemMap[a] > contagemMap[b] ? a : b
+                );
+                const topAf = afiliados.find(a => String(a.id) === String(topId));
+                if (topAf) topAfiliado = topAf.nome;
             }
         }
 
@@ -849,23 +899,26 @@ app.get('/api/afiliados', async (req, res) => {
 
         if (error) throw error;
 
-        const resultado = await Promise.all(afiliados.map(async (af) => {
-            const { count: total_clientes } = await supabase
-                .from('clientes')
-                .select('*', { count: 'exact', head: true })
-                .eq('id_afiliado', af.id);
+        const ids = afiliados.map(a => a.id);
 
-            const { count: total_aprovados } = await supabase
-                .from('clientes')
-                .select('*', { count: 'exact', head: true })
-                .eq('id_afiliado', af.id)
-                .eq('status', 'aprovado');
+        const [{ data: todosClientes }, { data: aprovados }] = await Promise.all([
+            supabase.from('clientes').select('id_afiliado').in('id_afiliado', ids),
+            supabase.from('clientes').select('id_afiliado').in('id_afiliado', ids).eq('status', STATUS.APROVADO)
+        ]);
 
-            return { 
-                ...af, 
-                total_clientes: total_clientes || 0,
-                total_aprovados: total_aprovados || 0
-            };
+        const contagemTotal = {};
+        const contagemAprovados = {};
+        for (const c of (todosClientes || [])) {
+            contagemTotal[c.id_afiliado] = (contagemTotal[c.id_afiliado] || 0) + 1;
+        }
+        for (const c of (aprovados || [])) {
+            contagemAprovados[c.id_afiliado] = (contagemAprovados[c.id_afiliado] || 0) + 1;
+        }
+
+        const resultado = afiliados.map(af => ({
+            ...af,
+            total_clientes: contagemTotal[af.id] || 0,
+            total_aprovados: contagemAprovados[af.id] || 0
         }));
 
         res.json(resultado);
@@ -924,12 +977,20 @@ app.get('/api/admin/afiliados-filtro', verificarAdmin, async (req, res) => {
 
         if (error) throw error;
 
-        const resultado = await Promise.all(afiliados.map(async (af) => {
-            const { count } = await supabase
-                .from('clientes')
-                .select('*', { count: 'exact', head: true })
-                .eq('id_afiliado', af.id);
-            return { ...af, total_clientes: count || 0 };
+        const ids = afiliados.map(a => a.id);
+        const { data: clientes } = await supabase
+            .from('clientes')
+            .select('id_afiliado')
+            .in('id_afiliado', ids);
+
+        const contagem = {};
+        for (const c of (clientes || [])) {
+            contagem[c.id_afiliado] = (contagem[c.id_afiliado] || 0) + 1;
+        }
+
+        const resultado = afiliados.map(af => ({
+            ...af,
+            total_clientes: contagem[af.id] || 0
         }));
 
         res.json(resultado);
@@ -943,7 +1004,6 @@ app.get('/api/admin/afiliados-filtro', verificarAdmin, async (req, res) => {
 app.patch('/api/admin/cliente/:id/status', verificarAdmin, async (req, res) => {
     const clienteId = parseInt(req.params.id, 10);
     const { status } = req.body;
-    const STATUS_PERMITIDOS = ['lead', 'doc', 'analise', 'aprovado', 'reprovado'];
 
     if (!status || !STATUS_PERMITIDOS.includes(status)) {
         return res.status(400).json({ erro: 'Status inválido' });
@@ -973,7 +1033,7 @@ app.patch('/api/admin/cliente/:id/status', verificarAdmin, async (req, res) => {
 
 // ─── CHATBOT IA - STELLA ───────────────────────────────────────────────────
 
-const STELLA_WEBHOOK_URL = 'https://unrequested-lamont-unforceable.ngrok-free.dev/webhook/stella-web-chat-Afiliados';
+const STELLA_WEBHOOK_URL = process.env.STELLA_WEBHOOK_URL || '';
 
 app.post('/api/chat-ia', async (req, res) => {
     const { mensagem, historico } = req.body;

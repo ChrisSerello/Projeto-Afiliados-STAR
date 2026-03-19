@@ -5,10 +5,10 @@ const emailConfig = {
     secure: true,
     auth: {
         user: 'resend',
-        pass: 're_jbSjyPP9_HjxYX2WAvY3kfmHrYCNF6nGK' // API Key do Resend
+        pass: process.env.RESEND_API_KEY
     },
-    emailEmpresa: 'christian.serello@starbank.tec.br',
-    from: '"StarCard" <onboarding@resend.dev>'
+    emailEmpresa: process.env.EMAIL_EMPRESA || 'christian.serello@starbank.tec.br',
+    from: process.env.EMAIL_FROM || '"StarCard" <onboarding@resend.dev>'
 };
 
 module.exports = emailConfig;

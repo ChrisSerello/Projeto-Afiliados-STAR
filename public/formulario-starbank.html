@@ -203,6 +203,7 @@
 
         @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } .hero { padding: 36px 16px 48px; } .form-wrapper { padding: 20px 16px 60px; } }
     </style>
+    <script src="/js/utils.js"></script>
 </head>
 <body>
 
@@ -539,17 +540,8 @@
         carregarAfiliado();
 
         // ── MÁSCARAS ───────────────────────────────────────────────────────
-        document.getElementById('cpfInput').addEventListener('input', function(e) {
-            let v = e.target.value.replace(/\D/g, '');
-            v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-            e.target.value = v;
-        });
-
-        document.getElementById('celularInput').addEventListener('input', function(e) {
-            let v = e.target.value.replace(/\D/g, '');
-            v = v.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');
-            e.target.value = v;
-        });
+        document.getElementById('cpfInput').addEventListener('input', mascaraCPF);
+        document.getElementById('celularInput').addEventListener('input', mascaraTelefone);
 
         // ── FILE UPLOAD ───────────────────────────────────────────────────
         function previewFile(input) {

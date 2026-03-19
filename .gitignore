@@ -1,2 +1,6 @@
 .env
-.env
+.env.local
+config-email.js
+node_modules/
+uploads/
+afiliados.db
