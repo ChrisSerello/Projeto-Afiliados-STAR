@@ -3914,7 +3914,7 @@
             return document.documentElement.getAttribute('data-theme') === 'light';
         }
         function getChartTextColor() {
-            return isLightTheme() ? 'rgba(30,30,60,0.5)' : 'rgba(255,255,255,0.35)';
+            return isLightTheme() ? 'rgba(15,15,40,0.75)' : 'rgba(255,255,255,0.35)';
         }
         function getChartGridColor() {
             return isLightTheme() ? 'rgba(100,80,180,0.08)' : 'rgba(255,255,255,0.05)';
@@ -3941,6 +3941,28 @@
                     ctx.roundRect(x - width/2, y, width, height, 8);
                     ctx.fill();
                     ctx.restore();
+                });
+                ctx.restore();
+            }
+        };
+
+        const dataLabelPlugin = {
+            id: 'dataLabel',
+            afterDatasetsDraw(chart) {
+                const { ctx } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta?.data) return;
+                const light = isLightTheme();
+                ctx.save();
+                ctx.font = '700 11px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = light ? 'rgba(15,15,40,0.72)' : 'rgba(255,255,255,0.75)';
+                meta.data.forEach((bar, i) => {
+                    const v = chart.data.datasets[0].data[i];
+                    if (!v || v <= 0) return;
+                    const { x, y } = bar.getProps(['x','y'], true);
+                    ctx.fillText(v, x, y - 5);
                 });
                 ctx.restore();
             }
@@ -3982,6 +4004,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: { top: 22 } },
                     animation: {
                         duration: 700,
                         easing: 'easeOutQuart',
@@ -4030,7 +4053,7 @@
                         }
                     }
                 },
-                plugins: [glowBarPlugin, {
+                plugins: [glowBarPlugin, dataLabelPlugin, {
                     id: 'gradientFill',
                     afterLayout(chart) {
                         const { ctx, chartArea } = chart;
