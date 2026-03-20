@@ -120,6 +120,22 @@
             backdrop-filter: none;
             box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
+        [data-theme="light"] .chart-card::before {
+            background: linear-gradient(90deg, transparent, rgba(124,58,237,0.4) 30%, rgba(124,58,237,0.6) 50%, rgba(124,58,237,0.4) 70%, transparent);
+        }
+        [data-theme="light"] .chart-stat-chip {
+            background: rgba(124,58,237,0.05);
+            border-color: rgba(124,58,237,0.12);
+        }
+        [data-theme="light"] .chart-stat-chip-label { color: rgba(30,30,60,0.45); }
+        [data-theme="light"] .chart-stat-chip-value { color: #1a1a2e; }
+        [data-theme="light"] .period-tab.active {
+            background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(124,58,237,0.08));
+            color: #6d28d9;
+            border-color: rgba(124,58,237,0.25);
+            box-shadow: 0 0 8px rgba(124,58,237,0.15);
+        }
+        [data-theme="minimal"] .chart-card { backdrop-filter: none; }
         [data-theme="light"] .nav-item { color: rgba(30,30,60,0.65); }
         [data-theme="light"] .nav-item.active {
             background: rgba(124,58,237,0.08);
@@ -1557,18 +1573,70 @@
         .chart-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
             margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 0 0 1px rgba(168,85,247,0.08),
+                        0 8px 32px rgba(0,0,0,0.25),
+                        0 0 60px rgba(168,85,247,0.04);
+            backdrop-filter: blur(12px);
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(168,85,247,0.6) 30%,
+                rgba(232,121,249,0.8) 50%,
+                rgba(168,85,247,0.6) 70%,
+                transparent 100%);
+            z-index: 2;
         }
 
         .chart-wrapper {
-            padding: 20px 24px 16px;
+            padding: 0 24px 20px;
             position: relative;
-            height: 280px;
+            height: 320px;
         }
 
         .chart-wrapper canvas { max-height: 100%; }
+
+        .chart-stats-row {
+            display: flex;
+            gap: 8px;
+            padding: 0 24px 16px;
+        }
+
+        .chart-stat-chip {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: rgba(168,85,247,0.07);
+            border: 1px solid rgba(168,85,247,0.12);
+            flex: 1;
+        }
+
+        .chart-stat-chip-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .chart-stat-chip-value {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.5px;
+            font-family: 'Inter', sans-serif;
+        }
 
         /* Rankings */
         .rankings-grid {
@@ -1719,8 +1787,10 @@
         }
 
         .period-tab.active {
-            background: rgba(168,85,247,0.2);
+            background: linear-gradient(135deg, rgba(168,85,247,0.35), rgba(232,121,249,0.2));
             color: var(--purple-glow);
+            border: 1px solid rgba(168,85,247,0.3);
+            box-shadow: 0 0 12px rgba(168,85,247,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
         }
 
         .period-tab:hover:not(.active) { color: var(--white); }
@@ -2089,6 +2159,9 @@
             .chart-card { padding: 14px 12px !important; }
             .card-header { flex-wrap: wrap !important; gap: 8px !important; }
             .chart-wrapper { height: 200px !important; }
+            .chart-stats-row { gap: 6px !important; padding: 0 12px 12px !important; }
+            .chart-stat-chip { padding: 6px 10px !important; }
+            .chart-stat-chip-value { font-size: 14px !important; }
 
             /* ── Rankings grid → single column ── */
             .rankings-grid {
@@ -2437,6 +2510,20 @@
                         <button class="period-tab active" onclick="setPeriodDash('7', this)">7d</button>
                         <button class="period-tab" onclick="setPeriodDash('15', this)">15d</button>
                         <button class="period-tab" onclick="setPeriodDash('30', this)">30d</button>
+                    </div>
+                </div>
+                <div class="chart-stats-row">
+                    <div class="chart-stat-chip">
+                        <span class="chart-stat-chip-label">Total</span>
+                        <span class="chart-stat-chip-value" id="chartDashTotal">—</span>
+                    </div>
+                    <div class="chart-stat-chip">
+                        <span class="chart-stat-chip-label">Máx/dia</span>
+                        <span class="chart-stat-chip-value" id="chartDashMax">—</span>
+                    </div>
+                    <div class="chart-stat-chip">
+                        <span class="chart-stat-chip-label">Média/dia</span>
+                        <span class="chart-stat-chip-value" id="chartDashAvg">—</span>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -2837,6 +2924,20 @@
                         <button class="period-tab active" onclick="setPeriodAdmin('7', this)">7d</button>
                         <button class="period-tab" onclick="setPeriodAdmin('15', this)">15d</button>
                         <button class="period-tab" onclick="setPeriodAdmin('30', this)">30d</button>
+                    </div>
+                </div>
+                <div class="chart-stats-row">
+                    <div class="chart-stat-chip">
+                        <span class="chart-stat-chip-label">Total</span>
+                        <span class="chart-stat-chip-value" id="chartAdminTotal">—</span>
+                    </div>
+                    <div class="chart-stat-chip">
+                        <span class="chart-stat-chip-label">Máx/dia</span>
+                        <span class="chart-stat-chip-value" id="chartAdminMax">—</span>
+                    </div>
+                    <div class="chart-stat-chip">
+                        <span class="chart-stat-chip-label">Média/dia</span>
+                        <span class="chart-stat-chip-value" id="chartAdminAvg">—</span>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -3805,14 +3906,64 @@
         let chartDashInstance = null;
 
         const CHART_COLORS = {
-            bar: 'rgba(168,85,247,0.75)',
+            barFallback: 'rgba(168,85,247,0.75)',
             barHover: 'rgba(192,132,252,0.95)',
-            grid: 'rgba(255,255,255,0.05)',
-            text: 'rgba(255,255,255,0.35)',
-            border: 'rgba(168,85,247,0.5)',
+        };
+
+        function isLightTheme() {
+            return document.documentElement.getAttribute('data-theme') === 'light';
+        }
+        function getChartTextColor() {
+            return isLightTheme() ? 'rgba(30,30,60,0.5)' : 'rgba(255,255,255,0.35)';
+        }
+        function getChartGridColor() {
+            return isLightTheme() ? 'rgba(100,80,180,0.08)' : 'rgba(255,255,255,0.05)';
+        }
+
+        const glowBarPlugin = {
+            id: 'glowBar',
+            afterDatasetsDraw(chart) {
+                const { ctx } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta?.data) return;
+                const light = isLightTheme();
+                ctx.save();
+                meta.data.forEach((bar, i) => {
+                    const v = chart.data.datasets[0].data[i];
+                    if (!v || v <= 0) return;
+                    const { x, y, width, height } = bar.getProps(['x','y','width','height'], true);
+                    ctx.save();
+                    ctx.shadowColor = light ? 'rgba(124,58,237,0.35)' : 'rgba(192,132,252,0.55)';
+                    ctx.shadowBlur = 18;
+                    ctx.globalAlpha = light ? 0.5 : 0.7;
+                    ctx.fillStyle = light ? 'rgba(124,58,237,0.3)' : 'rgba(168,85,247,0.4)';
+                    ctx.beginPath();
+                    ctx.roundRect(x - width/2, y, width, height, 8);
+                    ctx.fill();
+                    ctx.restore();
+                });
+                ctx.restore();
+            }
         };
 
         function buildChartConfig(labels, data, label) {
+            const maxIdx = data.indexOf(Math.max(...data));
+
+            function makeGrad(ctx, area) {
+                const g = ctx.createLinearGradient(0, area.top, 0, area.bottom);
+                g.addColorStop(0,   'rgba(192,132,252,0.90)');
+                g.addColorStop(0.5, 'rgba(168,85,247,0.65)');
+                g.addColorStop(1,   'rgba(139,92,246,0.10)');
+                return g;
+            }
+            function makeAccentGrad(ctx, area) {
+                const g = ctx.createLinearGradient(0, area.top, 0, area.bottom);
+                g.addColorStop(0,   'rgba(232,121,249,1.0)');
+                g.addColorStop(0.4, 'rgba(192,132,252,0.85)');
+                g.addColorStop(1,   'rgba(168,85,247,0.15)');
+                return g;
+            }
+
             return {
                 type: 'bar',
                 data: {
@@ -3821,54 +3972,88 @@
                         label,
                         data,
                         backgroundColor: data.map((_, i) =>
-                            i === data.indexOf(Math.max(...data))
-                                ? 'rgba(232,121,249,0.85)' : CHART_COLORS.bar),
+                            i === maxIdx ? 'rgba(232,121,249,0.85)' : CHART_COLORS.barFallback),
                         hoverBackgroundColor: CHART_COLORS.barHover,
-                        borderRadius: 8,
+                        borderRadius: 10,
                         borderSkipped: false,
-                        borderColor: CHART_COLORS.border,
                         borderWidth: 0,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 700, easing: 'easeOutQuart' },
+                    animation: {
+                        duration: 700,
+                        easing: 'easeOutQuart',
+                        delay(ctx) {
+                            return ctx.type === 'data' && ctx.mode === 'default' ? ctx.dataIndex * 40 : 0;
+                        }
+                    },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(15,6,32,0.95)',
-                            borderColor: 'rgba(168,85,247,0.3)',
+                            backgroundColor: isLightTheme() ? 'rgba(255,255,255,0.97)' : 'rgba(15,6,32,0.96)',
+                            borderColor: isLightTheme() ? 'rgba(124,58,237,0.2)' : 'rgba(168,85,247,0.35)',
                             borderWidth: 1,
-                            titleColor: '#fff',
-                            bodyColor: 'rgba(255,255,255,0.7)',
-                            padding: 12,
-                            cornerRadius: 10,
+                            titleColor: isLightTheme() ? 'rgba(30,30,60,0.5)' : 'rgba(255,255,255,0.55)',
+                            titleFont: { size: 11, family: 'Inter' },
+                            bodyColor: isLightTheme() ? '#1a1a2e' : '#ffffff',
+                            bodyFont: { size: 14, family: 'Inter', weight: '700' },
+                            padding: { top: 10, right: 14, bottom: 10, left: 14 },
+                            cornerRadius: 12,
+                            displayColors: false,
                             callbacks: {
-                                label: ctx => ` ${ctx.parsed.y} indicaç${ctx.parsed.y === 1 ? 'ão' : 'ões'}`
+                                label: ctx => `  ${ctx.parsed.y} indicaç${ctx.parsed.y === 1 ? 'ão' : 'ões'}`
                             }
                         }
                     },
                     scales: {
                         x: {
-                            grid: { color: CHART_COLORS.grid, drawBorder: false },
-                            ticks: { color: CHART_COLORS.text, font: { size: 11, family: 'Inter' } },
+                            grid: { color: 'transparent', drawBorder: false },
+                            ticks: { color: getChartTextColor(), font: { size: 11, family: 'Inter' }, maxRotation: 0 },
                             border: { display: false }
                         },
                         y: {
-                            grid: { color: CHART_COLORS.grid, drawBorder: false },
+                            grid: {
+                                color: ctx => ctx.tick.value === 0 ? 'transparent' : getChartGridColor(),
+                                drawBorder: false
+                            },
                             ticks: {
-                                color: CHART_COLORS.text,
+                                color: getChartTextColor(),
                                 font: { size: 11, family: 'Inter' },
                                 stepSize: 1,
-                                precision: 0
+                                precision: 0,
+                                padding: 8
                             },
                             border: { display: false },
                             beginAtZero: true
                         }
                     }
-                }
+                },
+                plugins: [glowBarPlugin, {
+                    id: 'gradientFill',
+                    afterLayout(chart) {
+                        const { ctx, chartArea } = chart;
+                        if (!chartArea) return;
+                        const ds = chart.data.datasets[0];
+                        const mi = ds.data.indexOf(Math.max(...ds.data));
+                        ds.backgroundColor = ds.data.map((_, i) =>
+                            i === mi ? makeAccentGrad(ctx, chartArea) : makeGrad(ctx, chartArea));
+                        ds.hoverBackgroundColor = ds.backgroundColor;
+                    }
+                }]
             };
+        }
+
+        function updateChartStats(data, prefix) {
+            const total = data.reduce((s, v) => s + v, 0);
+            const max   = data.length ? Math.max(...data) : 0;
+            const avg   = data.length ? total / data.length : 0;
+            const fmt   = n => Number.isInteger(n) ? n : n.toFixed(1);
+            const s = id => document.getElementById(id);
+            if (s(prefix + 'Total')) s(prefix + 'Total').textContent = total;
+            if (s(prefix + 'Max'))   s(prefix + 'Max').textContent   = max;
+            if (s(prefix + 'Avg'))   s(prefix + 'Avg').textContent   = fmt(avg);
         }
 
         function getDaysData(clients, days) {
@@ -3894,6 +4079,7 @@
             if (!canvas) return;
             if (chartDashInstance) { chartDashInstance.destroy(); chartDashInstance = null; }
             chartDashInstance = new Chart(canvas, buildChartConfig(labels, data, 'Indicações'));
+            updateChartStats(data, 'chartDash');
         }
 
         function setPeriodDash(days, btn) {
@@ -4034,6 +4220,7 @@
             if (!canvas) return;
             if (chartAdminInstance) { chartAdminInstance.destroy(); chartAdminInstance = null; }
             chartAdminInstance = new Chart(canvas, buildChartConfig(labels, data, 'Indicações'));
+            updateChartStats(data, 'chartAdmin');
         }
 
         function setPeriodAdmin(days, btn) {
