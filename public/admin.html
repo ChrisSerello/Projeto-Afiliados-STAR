@@ -404,6 +404,99 @@ tbody tr:last-child td{border-bottom:none}
 
 /* ═══ STARS CANVAS (subtle, behind content) ═══ */
 #starsBg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7}
+
+/* ═══ LIGHT THEME ═══ */
+html[data-theme="light"]{
+  --void:     #f5f3ff;
+  --deep:     #ede9fe;
+  --surface:  rgba(255,255,255,0.90);
+  --surface2: rgba(241,237,255,0.80);
+  --lt:       #6d28d9;
+  --lt2:      #4338ca;
+  --white:    #1e1b4b;
+  --muted:    rgba(79,70,229,0.70);
+  --border:   rgba(109,40,217,0.14);
+  --border-hi:rgba(109,40,217,0.30);
+}
+html[data-theme="light"] body{background:var(--void);color:var(--white)}
+html[data-theme="light"] body::before{
+  background:
+    radial-gradient(ellipse 70% 60% at 15% 30%,rgba(196,181,253,0.25),transparent 65%),
+    radial-gradient(ellipse 50% 70% at 85% 70%,rgba(165,180,252,0.18),transparent 60%),
+    radial-gradient(ellipse 40% 50% at 50% 10%,rgba(124,58,237,0.10),transparent 55%),
+    linear-gradient(160deg,#f5f3ff 0%,#ede9fe 50%,#f0eeff 100%);
+}
+html[data-theme="light"] body::after{opacity:.12}
+html[data-theme="light"] #starsBg{opacity:.12}
+html[data-theme="light"] .sidebar{
+  background:linear-gradient(180deg,rgba(237,233,254,0.98) 0%,rgba(221,214,254,0.98) 100%);
+}
+html[data-theme="light"] .sidebar::before{
+  background:linear-gradient(90deg,transparent,rgba(109,40,217,0.35),rgba(79,70,229,0.2),transparent);
+}
+html[data-theme="light"] .nav-section{color:rgba(79,70,229,0.38)}
+html[data-theme="light"] .nav-item{color:rgba(79,70,229,0.58)}
+html[data-theme="light"] .nav-item:hover{background:rgba(109,40,217,0.09);color:var(--white)}
+html[data-theme="light"] .nav-item.active{
+  background:linear-gradient(135deg,rgba(109,40,217,0.15),rgba(91,33,182,0.08));
+  color:var(--lt);border-color:var(--border-hi);
+}
+html[data-theme="light"] .nav-item.active i{color:var(--lt)}
+html[data-theme="light"] .nav-item.danger{color:rgba(220,38,38,0.55)}
+html[data-theme="light"] .nav-item.danger:hover{background:rgba(220,38,38,0.07);color:#dc2626}
+html[data-theme="light"] .field-input,
+html[data-theme="light"] .filter-input{
+  background:rgba(109,40,217,0.04);color:var(--white);border-color:rgba(109,40,217,0.15);
+}
+html[data-theme="light"] .field-input::placeholder,
+html[data-theme="light"] .filter-input::placeholder{color:rgba(79,70,229,0.30)}
+html[data-theme="light"] .field-input:focus,
+html[data-theme="light"] .filter-input:focus{
+  border-color:rgba(109,40,217,0.40);background:rgba(109,40,217,0.07);
+  box-shadow:0 0 0 4px rgba(109,40,217,0.08);
+}
+html[data-theme="light"] .field-label{color:rgba(79,70,229,0.55)}
+html[data-theme="light"] .status-select{background:rgba(109,40,217,0.04);color:var(--white)}
+html[data-theme="light"] .status-select option,
+html[data-theme="light"] .filter-input option{background:#ede9fe;color:#1e1b4b}
+html[data-theme="light"] .tabs-header{background:rgba(237,233,254,0.75);border-color:var(--border)}
+html[data-theme="light"] .tab-btn{color:rgba(79,70,229,0.55)}
+html[data-theme="light"] .tab-btn:hover{color:var(--white)}
+html[data-theme="light"] .tab-btn.active{
+  background:linear-gradient(135deg,rgba(109,40,217,0.20),rgba(91,33,182,0.10));
+  color:var(--lt);
+}
+html[data-theme="light"] thead th{color:rgba(79,70,229,0.45)}
+html[data-theme="light"] tbody td{color:rgba(79,70,229,0.65)}
+html[data-theme="light"] tbody tr:hover td{background:rgba(109,40,217,0.05);color:var(--white)}
+html[data-theme="light"] .page-eyebrow{color:var(--lt);opacity:1}
+html[data-theme="light"] .stat-icon-lbl{color:var(--lt)}
+html[data-theme="light"] .btn-clear{color:rgba(79,70,229,0.55)}
+html[data-theme="light"] .btn-clear:hover{color:var(--white)}
+html[data-theme="light"] .btn-filter{color:var(--lt)}
+html[data-theme="light"] .results-count{color:rgba(79,70,229,0.40)}
+html[data-theme="light"] .empty-icon{color:rgba(79,70,229,0.20)}
+html[data-theme="light"] .empty-text{color:rgba(79,70,229,0.28)}
+html[data-theme="light"] .page-btn{color:rgba(79,70,229,0.55);background:rgba(109,40,217,0.04)}
+html[data-theme="light"] .page-btn:hover{background:rgba(109,40,217,0.12);color:var(--lt)}
+html[data-theme="light"] .page-btn.active{color:var(--lt)}
+html[data-theme="light"] #toastAdmin{
+  background:rgba(237,233,254,0.97);color:var(--white);
+  border-color:rgba(109,40,217,0.20);
+  box-shadow:0 8px 40px rgba(109,40,217,0.15);
+}
+html[data-theme="light"] .sys-status{
+  background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.20);
+}
+html[data-theme="light"] .card::before{
+  background:linear-gradient(90deg,transparent,rgba(109,40,217,0.3),transparent);
+}
+html[data-theme="light"] .stat-card::before{
+  background:linear-gradient(90deg,transparent,rgba(109,40,217,0.25),transparent);
+}
+
+/* theme toggle button reset */
+button.nav-item{width:100%;text-align:left;background:none;font-family:'Nunito',sans-serif}
 </style>
 </head>
 <body>
@@ -438,6 +531,10 @@ tbody tr:last-child td{border-bottom:none}
     </a>
   </nav>
   <div class="sidebar-bottom">
+    <button class="nav-item" id="themeToggle" onclick="toggleTheme()">
+      <i class="fas fa-sun" id="themeIcon"></i>
+      <span id="themeLabel">Tema Claro</span>
+    </button>
     <a href="/admin/logout" class="nav-item danger"><i class="fas fa-sign-out-alt"></i> Sair</a>
   </div>
 </aside>
@@ -600,6 +697,33 @@ tbody tr:last-child td{border-bottom:none}
 <div id="toastAdmin"><i class="fas fa-check-circle"></i> <span id="toastMsg">Status atualizado</span></div>
 
 <script>
+/* ═══════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════ */
+function toggleTheme(){
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  localStorage.setItem('adminTheme', next);
+}
+function applyTheme(theme){
+  const icon  = document.getElementById('themeIcon');
+  const label = document.getElementById('themeLabel');
+  if(theme === 'light'){
+    document.documentElement.setAttribute('data-theme','light');
+    icon.className  = 'fas fa-moon';
+    label.textContent = 'Tema Escuro';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    icon.className  = 'fas fa-sun';
+    label.textContent = 'Tema Claro';
+  }
+}
+(function(){
+  const saved = localStorage.getItem('adminTheme');
+  if(saved) applyTheme(saved);
+})();
+
 /* ═══════════════════════════════════════
    STARS BACKGROUND
 ═══════════════════════════════════════ */
