@@ -559,6 +559,45 @@ app.get('/api/afiliado-publico', async (req, res) => {
     }
 });
 
+// ─── PRÉ-CAPTURA DE LEAD ────────────────────────────────────────────────────
+app.post('/api/pre-cadastro', express.json(), async (req, res) => {
+    try {
+        const { nome, celular, codigo_afiliado } = req.body;
+        if (!nome || !celular) {
+            return res.json({ sucesso: false, erro: 'Nome e celular são obrigatórios.' });
+        }
+
+        let id_afiliado = null;
+        if (codigo_afiliado) {
+            const { data: af } = await supabase
+                .from('afiliados')
+                .select('id')
+                .eq('codigo_afiliado', codigo_afiliado)
+                .single();
+            if (af) id_afiliado = af.id;
+        }
+
+        const { data, error } = await supabase
+            .from('clientes')
+            .insert({
+                nome,
+                telefone: celular,
+                codigo_afiliado: codigo_afiliado || null,
+                id_afiliado,
+                status: 'lead',
+            })
+            .select('id')
+            .single();
+
+        if (error) throw error;
+
+        res.json({ sucesso: true, id: data.id });
+    } catch (err) {
+        console.error('Erro pre-cadastro:', err);
+        res.json({ sucesso: false, erro: 'Erro interno ao salvar.' });
+    }
+});
+
 app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) => {
     try {
         const { codigo_afiliado, nome_afiliado, nome_completo, cpf, data_nascimento, celular, orgao, tipo_vinculo, objetivo, bancos_atuais } = req.body;
@@ -598,8 +637,10 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
 
         if (insertError) throw insertError;
 
-        // ── INSERIR TAMBÉM NA TABELA CLIENTES ──────────────────────────────
+        // ── INSERIR / ATUALIZAR NA TABELA CLIENTES ─────────────────────────
         try {
+            const preId = req.body.pre_id || null;
+
             let idAfiliado = null;
             if (codigo_afiliado) {
                 const { data: af } = await supabase
@@ -610,15 +651,29 @@ app.post('/api/enviar-formulario', upload.single('holerite'), async (req, res) =
                 idAfiliado = af?.id || null;
             }
 
-            await supabase.from('clientes').insert({
-                nome: nome_completo,
-                email: null,
-                telefone: celular,
-                cpf: cpf,
-                id_afiliado: idAfiliado,
-                codigo_afiliado: codigo_afiliado || null,
-                link_id: null
-            });
+            if (preId) {
+                // Atualiza o registro de lead criado na pré-captura
+                await supabase.from('clientes').update({
+                    nome: nome_completo,
+                    email: null,
+                    telefone: celular,
+                    cpf: cpf,
+                    id_afiliado: idAfiliado,
+                    codigo_afiliado: codigo_afiliado || null,
+                    link_id: null
+                }).eq('id', preId);
+            } else {
+                // Sem pré-captura: cria novo registro normalmente
+                await supabase.from('clientes').insert({
+                    nome: nome_completo,
+                    email: null,
+                    telefone: celular,
+                    cpf: cpf,
+                    id_afiliado: idAfiliado,
+                    codigo_afiliado: codigo_afiliado || null,
+                    link_id: null
+                });
+            }
         } catch (clienteErr) {
             console.error('Erro ao espelhar cliente:', clienteErr);
         }

@@ -6,6 +6,7 @@
     <title>Benefício ao Servidor — Starcard</title>
     <link rel="icon" type="image/png" href="assets/Planeta.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -202,6 +203,50 @@
         .lgpd-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
 
         @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } .hero { padding: 36px 16px 48px; } .form-wrapper { padding: 20px 16px 60px; } }
+
+        /* ── PRÉ-CAPTURA ── */
+        #preCaptura {
+            max-width: 480px;
+            margin: 40px auto 0;
+            padding: 40px 36px 36px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .pre-cap-emoji { font-size: 40px; margin-bottom: 12px; display: block; }
+        .pre-cap-title { font-size: 22px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; line-height: 1.3; }
+        .pre-cap-sub { font-size: 14px; color: #6b7280; margin-bottom: 28px; line-height: 1.5; }
+        .pre-cap-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; text-align: left; }
+        .pre-cap-fields label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.4px; }
+        .pre-cap-fields input {
+            width: 100%; padding: 13px 16px;
+            border: 1.5px solid #e5e7eb; border-radius: 10px;
+            font-size: 15px; font-family: inherit; color: #1a1a2e;
+            background: #f9fafb; transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .pre-cap-fields input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.12); background: #fff; }
+        #btnPreCap {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            font-family: inherit; transition: opacity 0.2s, transform 0.15s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        #btnPreCap:hover { opacity: 0.92; transform: translateY(-1px); }
+        #btnPreCap:active { transform: translateY(0); }
+        #btnPreCap:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .pre-cap-note { margin-top: 16px; font-size: 12px; color: #9ca3af; }
+        #preCapError {
+            display: none; margin-top: 12px; padding: 10px 14px;
+            background: #fef2f2; border: 1px solid #fecaca;
+            border-radius: 8px; color: #dc2626; font-size: 13px;
+        }
+        @media (max-width: 600px) {
+            #preCaptura { margin: 24px 0 0; padding: 28px 20px 24px; border-radius: 16px; }
+        }
     </style>
     <script src="/js/utils.js"></script>
 </head>
@@ -229,10 +274,37 @@
     </div>
 
     <div class="form-wrapper" id="mainWrapper">
+
+        <!-- PRÉ-CAPTURA -->
+        <div id="preCaptura">
+            <span class="pre-cap-emoji">👋</span>
+            <div class="pre-cap-title">Antes de começar,<br>só 2 informações rápidas</div>
+            <p class="pre-cap-sub">Preencha o formulario abaixo para ter acesso as oportunidades.<br>Leva menos de 2 minutos.</p>
+            <div class="pre-cap-fields">
+                <div>
+                    <label for="preNome">Nome completo</label>
+                    <input type="text" id="preNome" placeholder="Seu nome completo" autocomplete="name">
+                </div>
+                <div>
+                    <label for="preCelular">WhatsApp / Celular</label>
+                    <input type="tel" id="preCelular" placeholder="(00) 00000-0000" autocomplete="tel">
+                </div>
+            </div>
+            <button type="button" id="btnPreCap" onclick="submitPreCaptura()">
+                Ver oportunidades
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <div id="preCapError"></div>
+            <p class="pre-cap-note">🔒 Seus dados são tratados com total sigilo</p>
+        </div>
+
+        <!-- FORMULÁRIO PRINCIPAL (oculto até a pré-captura ser preenchida) -->
+        <div id="formularioPrincipal" style="display:none">
         <div class="alert alert-danger" id="alertBox"></div>
 
         <form id="formulario" enctype="multipart/form-data">
             <input type="hidden" id="codigoAfiliado" name="codigo_afiliado">
+            <input type="hidden" id="preId" name="pre_id">
 
             <!-- SEÇÃO 1 -->
             <div class="section">
@@ -270,7 +342,7 @@
                     <div class="field-row">
                         <div class="field" style="grid-column: 1 / -1;">
                             <label class="field-label">Nome Completo <span class="required">*</span></label>
-                            <input type="text" class="field-input" name="nome_completo" placeholder="Seu nome completo" required>
+                            <input type="text" class="field-input" id="nomeCompleto" name="nome_completo" placeholder="Seu nome completo" required>
                         </div>
                     </div>
                     <div class="field-row">
@@ -449,6 +521,7 @@
                 💬 Chamar no WhatsApp
             </a>
         </div>
+        </div><!-- /#formularioPrincipal -->
     </div>
 
     <div class="lgpd-footer">
@@ -503,6 +576,68 @@
                 texto.textContent = produto.texto;
                 descricao.classList.add('show');
                 descricao.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // ── PRÉ-CAPTURA ────────────────────────────────────────────────────
+        document.getElementById('preCelular').addEventListener('input', function() {
+            let v = this.value.replace(/\D/g,'');
+            if (v.length > 11) v = v.slice(0,11);
+            if (v.length > 6)      v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+            else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+            else if (v.length > 0) v = `(${v}`;
+            this.value = v;
+        });
+
+        async function submitPreCaptura() {
+            const nome    = document.getElementById('preNome').value.trim();
+            const celular = document.getElementById('preCelular').value.trim();
+            const errEl   = document.getElementById('preCapError');
+            const btn     = document.getElementById('btnPreCap');
+
+            errEl.style.display = 'none';
+
+            if (!nome) {
+                errEl.textContent = 'Por favor, informe seu nome.';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (celular.replace(/\D/g,'').length < 10) {
+                errEl.textContent = 'Por favor, informe um celular válido.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff;"></span> Salvando...';
+
+            try {
+                const res = await fetch('/api/pre-cadastro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, celular, codigo_afiliado: codigoParam || '' })
+                });
+                const json = await res.json();
+
+                if (json.sucesso) {
+                    document.getElementById('nomeCompleto').value  = nome;
+                    document.getElementById('celularInput').value  = celular;
+                    document.getElementById('preId').value         = json.id || '';
+
+                    document.getElementById('preCaptura').style.display          = 'none';
+                    document.getElementById('formularioPrincipal').style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    errEl.textContent = json.erro || 'Erro ao salvar. Tente novamente.';
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = 'Continuar para o formulário <i class="fas fa-arrow-right"></i>';
+                }
+            } catch {
+                errEl.textContent = 'Erro de conexão. Verifique sua internet.';
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = 'Continuar para o formulário <i class="fas fa-arrow-right"></i>';
             }
         }
 
